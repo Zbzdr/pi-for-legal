@@ -1,0 +1,12 @@
+Pi Legal packages
+Copyright 2026 Pi Legal package contributors
+
+These products include material adapted from "claude-for-legal" by Anthropic,
+PBC, licensed under the Apache License, Version 2.0.
+
+Upstream: https://github.com/anthropics/claude-for-legal
+Reference revision: 4a6c651889c97cc9140580363c73e0eb17379c2b (2026-07-23)
+
+The adapted material has been modified for Pi's Agent Skills and package
+formats. Claude-specific plugin paths, agents, hooks, and connector declarations
+are not included.

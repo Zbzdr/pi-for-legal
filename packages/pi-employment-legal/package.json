@@ -1,0 +1,51 @@
+{
+  "name": "@zbzdr/pi-employment-legal",
+  "version": "0.1.0",
+  "description": "Pi legal skills for employment workflows, adapted from claude-for-legal.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Zbzdr/pi-for-legal.git",
+    "directory": "packages/pi-employment-legal"
+  },
+  "homepage": "https://github.com/Zbzdr/pi-for-legal#readme",
+  "bugs": {
+    "url": "https://github.com/Zbzdr/pi-for-legal/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "pi-package",
+    "pi",
+    "agent-skills",
+    "legal",
+    "employment"
+  ],
+  "files": [
+    "skills",
+    "README.md",
+    "LICENSE",
+    "NOTICE"
+  ],
+  "scripts": {
+    "prepack": "node ../../scripts/prepare-package.mjs"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "pi": {
+    "skills": [
+      "./skills"
+    ]
+  },
+  "piLegal": {
+    "companionPackages": [
+      "@zbzdr/pi-legal-core"
+    ],
+    "upstreamRevision": "4a6c651889c97cc9140580363c73e0eb17379c2b",
+    "skillCount": 17
+  }
+}

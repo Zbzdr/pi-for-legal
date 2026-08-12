@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.pi/
+.npmrc
+.env
+.env.*
+*.log
+*.tgz
+.DS_Store
+packages/*/LICENSE
+packages/*/NOTICE
+packages/pi-legal-suite/skills/

@@ -1,0 +1,52 @@
+{
+  "name": "@zbzdr/pi-commercial-legal",
+  "version": "0.1.0",
+  "description": "US commercial contract, NDA, SaaS, amendment, and renewal review skills for Pi.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Zbzdr/pi-for-legal.git",
+    "directory": "packages/pi-commercial-legal"
+  },
+  "homepage": "https://github.com/Zbzdr/pi-for-legal#readme",
+  "bugs": {
+    "url": "https://github.com/Zbzdr/pi-for-legal/issues"
+  },
+  "keywords": [
+    "pi-package",
+    "pi-coding-agent",
+    "legal",
+    "contract-review",
+    "saas"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "files": [
+    "skills",
+    "README.md",
+    "LICENSE",
+    "NOTICE",
+    "package.json"
+  ],
+  "scripts": {
+    "prepack": "node ../../scripts/prepare-package.mjs"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "piLegal": {
+    "companionPackages": [
+      "@zbzdr/pi-legal-core"
+    ],
+    "upstreamRevision": "4a6c651889c97cc9140580363c73e0eb17379c2b",
+    "skillCount": 6
+  },
+  "pi": {
+    "skills": [
+      "./skills"
+    ]
+  }
+}
