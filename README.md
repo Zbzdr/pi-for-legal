@@ -6,13 +6,16 @@ Pi for Legal 是 [Anthropic Claude for Legal](https://github.com/anthropics/clau
 
 ## 它目前能做什么
 
-- 美国法法律研究：梳理问题、核对权威层级、检查时效与负面处理，并输出带来源说明的 memo；
+- 多法域法律研究：识别适用法和权威层级，检查时效与后续处理，并输出带来源说明的 memo；
 - 商业合同：路由并审查 MSA、SaaS、NDA、vendor agreement、修订和续期事项；
 - 法务工作流：privacy、regulatory、AI governance、employment、corporate、litigation、IP 和 product；
-- 项目级 setup、实践 profile、matter 隔离、升级判断和业务摘要；
+- 项目级 setup、quick defaults、实践 profile、matter 隔离、playbook 学习、升级判断和业务摘要；
+- 经确认后生成带自动备份的轻量 DOCX tracked redline；
 - 在没有可靠外部来源时明确标记验证缺口，不把模型记忆包装成已完成的法律检索。
 
-目前的 all-in-one 包包含 86 个 Skills，不内置 MCP、web access、邮件、Slack、todo 或其他 Pi extensions。
+目前的 all-in-one 包包含 88 个 Skills，不内置 MCP、web access、邮件、Slack、todo 或其他 Pi extensions。
+
+DOCX redline 首次使用时会在当前项目的 `.pi/legal-workbench/venvs/docx-redline/` 建立 Python 虚拟环境，并在用户确认后安装固定版本的 `python-docx` 和 `lxml`；不会改动系统 Python。
 
 ## Quick start
 
@@ -33,12 +36,13 @@ Setup 会询问实践类型、法域、审查偏好和数据目录，并在写�
 接下来可以直接描述任务，也可以显式调用 Skill：
 
 ```text
-/skill:legal-research 美国法下，这个免责条款是否可能无法执行？
+/skill:legal-research 比较纽约法与英格兰法下这个免责条款的可执行性
 /skill:legal-contract-review review ./contracts/vendor-msa.pdf
-/skill:legal-nda-review review ./contracts/inbound-nda.docx
+/skill:legal-docx-redline ./contracts/inbound-nda.docx
 /skill:legal-privacy-dpa-review review ./contracts/dpa.pdf
 /skill:legal-product-launch-review review ./launch/new-feature.md
 /skill:legal-litigation-matter-intake
+/skill:legal-playbook-learning capture
 /skill:legal-stakeholder-summary
 /skill:legal-customize
 ```
@@ -63,7 +67,7 @@ pi update --extensions
 
 更新完成后，在正在运行的 Pi 中输入 `/reload`，或重新启动 Pi。
 
-带版本号的安装会锁定版本。例如 `npm:@zbzdr/pi-legal-suite@0.1.0` 不会被上述命令自动升级；需要改用新的版本号重新安装：
+带版本号的安装会锁定版本。例如 `npm:@zbzdr/pi-legal-suite@0.2.0` 不会被上述命令自动升级；需要改用新的版本号重新安装：
 
 ```bash
 pi install -l npm:@zbzdr/pi-legal-suite@<new-version>
@@ -91,8 +95,8 @@ pi install -l npm:@zbzdr/pi-privacy-legal
 
 ## 未来更新路线图
 
-- 建立 CN 法域模块，再逐步扩展 UK、EEA 和其他法域；
-- 增加可选的 DOCX 输出和 redline 工作流；
+- 深化 CN 及其他法域的本地化资料、来源策略和专门模板；
+- 从轻量精确替换扩展到复杂 DOCX redline、批注和格式保真；
 - 实现法律检索 MCP的接入和配置，必要时依赖第三方 MCP adapter；
 - 以单整合包的形式，把 MCP、web access、todo、ask-user-question 等常用能力组合起来；最终让用户在一个工作区里只安装一个包，就能完成主要法律任务。
 

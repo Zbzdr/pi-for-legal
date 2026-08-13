@@ -2,7 +2,6 @@
 name: legal-ai-policy-monitor
 description: "Keep the AI policy current with practice — weekly sweep of saved AIAs, triage results, and vendor reviews to find policy drift, or direct query for a proposed new AI practice. Use when user says \"policy sweep\", \"does our AI policy cover this\", \"we want to start doing X — does the policy need updating\", \"run the policy monitor\", or on a recurring schedule."
 ---
-
 # /skill:legal-ai-policy-monitor
 
 > **Attribution:** Adapted from Anthropic's `claude-for-legal/ai-governance-legal` at revision `4a6c651889c97cc9140580363c73e0eb17379c2b` under Apache-2.0 and modified for Pi. See the package `NOTICE`.

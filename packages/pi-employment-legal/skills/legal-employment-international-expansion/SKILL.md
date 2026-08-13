@@ -1,14 +1,16 @@
 ---
 name: legal-employment-international-expansion
 description: "implementation-planning framework for international hiring — EOR vs. entity decision framing, cross-functional triggers for tax/finance/HR, structured outside-counsel briefing requests, and a persistent gap tracker. Loaded by /expansion-kickoff and /expansion-update; not invoked directly."
+disable-model-invocation: true
 ---
-
 # International Expansion Skill
 
 > **Attribution:** Adapted from Anthropic's `claude-for-legal/employment-legal` at revision `4a6c651889c97cc9140580363c73e0eb17379c2b` under Apache-2.0 and modified for Pi. See the package `NOTICE`.
+This is an internal worker in the upstream workflow. Pi hides it from automatic model selection with `disable-model-invocation`, while explicit `/skill:*` invocation remains possible. On direct invocation, preserve every intake, profile, matter, authority, and approval gate and route to the corresponding public mode command when one exists.
+
 ## Matter context
 
-**Matter context.** Check `## Matter workspaces` in the practice-level project legal profile. If `Enabled` is `✗` (the default for in-house users), skip the rest of this paragraph — skills use practice-level context and the matter machinery is invisible. If enabled and there is no active matter, ask: "Which matter is this for? Run `/skill:legal-matter-workspace switch <slug>` or say `practice-level`." Load the active matter's `matter.md` for matter-specific context and overrides. Write outputs to the matter folder at `<dataDir>/employment-legal/matters/<matter-slug>/`. Never read another matter's files unless `Cross-matter context` is `on`.
+**Matter context.** Check `## Matter workspaces` in the practice-level project legal profile. If `Enabled` is `✗` (the default for in-house users), skip the rest of this paragraph — skills use practice-level context and the matter machinery is invisible. If enabled and there is no active matter, ask: "Which matter is this for? Run `/skill:legal-matter-workspace switch <slug>` or say `practice-level`." Load the active matter's `matter.md` for matter-specific context and overrides. Write outputs to the matter folder at `<dataDir>/matters/<matter-slug>/`. Never read another matter's files unless `Cross-matter context` is `on`.
 
 ---
 

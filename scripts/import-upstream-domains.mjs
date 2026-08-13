@@ -13,6 +13,7 @@ import { fileURLToPath } from "node:url";
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const upstreamRoot = process.argv[2];
 const revision = "4a6c651889c97cc9140580363c73e0eb17379c2b";
+const workspaceVersion = JSON.parse(readFileSync(join(root, "package.json"), "utf8")).version;
 
 if (!upstreamRoot || !existsSync(join(upstreamRoot, ".git"))) {
   console.error("Usage: node scripts/import-upstream-domains.mjs /path/to/claude-for-legal");
@@ -158,7 +159,11 @@ function parseSkill(text) {
     }
     description = parts.join(" ");
   }
-  return { description: description.replace(/\s+/g, " ").trim(), body: match[2] };
+  return {
+    description: description.replace(/\s+/g, " ").trim(),
+    body: match[2],
+    internalWorker: /^user-invocable:\s*false\s*$/m.test(match[1]),
+  };
 }
 
 function adaptText(text, domain) {
@@ -185,6 +190,20 @@ function adaptText(text, domain) {
     .replaceAll("WebSearch", "an available web-search capability")
     .replaceAll("WebFetch", "an available web-fetch capability");
 
+  output = output
+    .replaceAll(`<dataDir>/${domain.upstream}/matters/`, "<dataDir>/matters/")
+    .replaceAll(`<dataDir>/${domain.upstream}/matters`, "<dataDir>/matters")
+    .replaceAll("generic defaults — US jurisdiction,", "generic defaults — governing jurisdiction from the task/profile,")
+    .replaceAll("middle risk appetite, lawyer role, US jurisdiction (CCPA + common federal sectoral baselines),", "middle risk appetite, lawyer role, governing jurisdiction from the task/profile,")
+    .replaceAll("middle risk appetite, lawyer role, US jurisdiction (USPTO + common-law),", "middle risk appetite, lawyer role, governing jurisdiction from the task/profile,")
+    .replaceAll("middle risk appetite, lawyer role, US jurisdiction,", "middle risk appetite, lawyer role, governing jurisdiction from the task/profile,")
+    .replace(/(?:the\s+)?`internal-investigation`\s+reference skill/g, "`../legal-employment-internal-investigation/SKILL.md`")
+    .replace(/(?:the\s+)?`international-expansion`\s+reference skill/g, "`../legal-employment-international-expansion/SKILL.md`")
+    .replace(/(?:in|from)\s+the\s+`internal-investigation`\s+reference/g, "in `../legal-employment-internal-investigation/SKILL.md`")
+    .replace(/(?:in|from)\s+the\s+`international-expansion`\s+reference/g, "in `../legal-employment-international-expansion/SKILL.md`")
+    .replace(/(?:in|from)\s+`internal-investigation`\s+reference/g, "in `../legal-employment-internal-investigation/SKILL.md`")
+    .replace(/(?:in|from)\s+`international-expansion`\s+reference/g, "in `../legal-employment-international-expansion/SKILL.md`");
+
   return output;
 }
 
@@ -194,11 +213,12 @@ function adaptationNotice(domain) {
 
 function addReferenceNotice(text, domain, path) {
   const source = `Anthropic's claude-for-legal/${domain.upstream}`;
+  const normalized = `${text.trim()}\n`;
   if (path.endsWith(".md")) {
-    return `> **Attribution:** Adapted from ${source} at revision \`${revision}\` under Apache-2.0 and modified for Pi. See the package \`NOTICE\`.\n\n${text.replace(/^\s+/, "")}`;
+    return `> **Attribution:** Adapted from ${source} at revision \`${revision}\` under Apache-2.0 and modified for Pi. See the package \`NOTICE\`.\n\n${normalized.replace(/^\s+/, "")}`;
   }
   if (path.endsWith(".yaml") || path.endsWith(".yml")) {
-    return `# Attribution: Adapted from ${source} at revision ${revision} under Apache-2.0 and modified for Pi. See the package NOTICE.\n${text.replace(/^\s+/, "")}`;
+    return `# Attribution: Adapted from ${source} at revision ${revision} under Apache-2.0 and modified for Pi. See the package NOTICE.\n${normalized.replace(/^\s+/, "")}`;
   }
   return text;
 }
@@ -225,7 +245,7 @@ function packageManifest(domain, skillCount) {
   const packageDirectory = domain.packageName.slice(domain.packageName.indexOf("/") + 1);
   return {
     name: domain.packageName,
-    version: "0.1.0",
+    version: workspaceVersion,
     description: `Pi legal skills for ${domain.title.toLowerCase()} workflows, adapted from claude-for-legal.`,
     type: "module",
     license: "Apache-2.0",
@@ -254,7 +274,7 @@ function packageManifest(domain, skillCount) {
 }
 
 function packageReadme(domain, names) {
-  return `# ${domain.packageName}\n\n${domain.summary}。这是一个纯 Pi Agent Skills package，不内置 MCP、connector、extension 或运行时依赖。\n\n## 安装\n\n推荐安装到当前项目（\`-l\`），并同时安装共享 setup、profile、法律研究与 matter 能力：\n\n\`\`\`bash\npi install -l npm:@zbzdr/pi-legal-core@0.1.0\npi install -l npm:${domain.packageName}@0.1.0\n\`\`\`\n\n不带 \`-l\` 的用户全局安装属于次要支持模式，会让该 package 出现在该用户的所有 Pi 项目中；仍需在每个项目单独运行 setup，并避免与项目中重复安装 suite/领域包。\n\n## Skills（${names.length}）\n\n${names.map((name) => `- \`/skill:${name}\``).join("\n")}\n\n首次使用先运行 \`/skill:legal-setup\`。本包以美国法工作流为起点；涉及其他法域时必须使用当前、可核验的权威来源，或明确限制为问题识别和研究计划。所有实质输出均需合格律师复核。\n`;
+  return `# ${domain.packageName}\n\n${domain.summary}。这是一个纯 Pi Agent Skills package，不内置 MCP、connector、extension 或运行时依赖。\n\n## 安装\n\n推荐安装到当前项目（\`-l\`），并同时安装共享 setup、profile、法律研究与 matter 能力：\n\n\`\`\`bash\npi install -l npm:@zbzdr/pi-legal-core@${workspaceVersion}\npi install -l npm:${domain.packageName}@${workspaceVersion}\n\`\`\`\n\n不带 \`-l\` 的用户全局安装属于次要支持模式，会让该 package 出现在该用户的所有 Pi 项目中；仍需在每个项目单独运行 setup，并避免与项目中重复安装 suite/领域包。\n\n## Skills（${names.length}）\n\n${names.map((name) => `- \`/skill:${name}\``).join("\n")}\n\n首次使用先运行 \`/skill:legal-setup\`。本包保留上游工作流覆盖的美国、英国、EEA/EU 及跨境法律框架；处理任何法域时均应识别适用法、使用相应权威来源，并标明未完成的核实。所有实质输出均需合格律师复核。\n`;
 }
 
 for (const domain of domains) {
@@ -268,7 +288,7 @@ for (const domain of domains) {
   for (const sourceName of sourceSkillNames(domain).sort()) {
     if (sharedSkills.has(sourceName) || domain.skip?.has(sourceName)) continue;
     const sourceSkillRoot = join(upstreamRoot, domain.upstream, "skills", sourceName);
-    const { description, body } = parseSkill(readFileSync(join(sourceSkillRoot, "SKILL.md"), "utf8"));
+    const { description, body, internalWorker } = parseSkill(readFileSync(join(sourceSkillRoot, "SKILL.md"), "utf8"));
     const name = destinationName(domain, sourceName);
     const destinationSkillRoot = join(destinationSkills, name);
     mkdirSync(destinationSkillRoot, { recursive: true });
@@ -284,10 +304,22 @@ for (const domain of domains) {
     const firstHeading = adaptedBody.match(/^# .+$/m);
     const insertAt = firstHeading ? firstHeading.index + firstHeading[0].length : 0;
     const referenceInstruction = referenceInstructions.get(`${domain.upstream}/${sourceName}`);
-    const bodyWithNotice = `${adaptedBody.slice(0, insertAt)}\n\n${adaptationNotice(domain)}${referenceInstruction ? `${referenceInstruction}\n\n` : ""}${adaptedBody.slice(insertAt).replace(/^\n+/, "")}`;
+    const hideFromAutomaticModelSelection = internalWorker && !(domain.upstream === "regulatory-legal" && sourceName === "gap-surfacer");
+    const workerInstruction = hideFromAutomaticModelSelection
+      ? "This is an internal worker in the upstream workflow. Pi hides it from automatic model selection with `disable-model-invocation`, while explicit `/skill:*` invocation remains possible. On direct invocation, preserve every intake, profile, matter, authority, and approval gate and route to the corresponding public mode command when one exists.\n\n"
+      : "";
+    const bodyWithNotice = `${adaptedBody.slice(0, insertAt)}\n\n${adaptationNotice(domain)}${workerInstruction}${referenceInstruction ? `${referenceInstruction}\n\n` : ""}${adaptedBody.slice(insertAt).replace(/^\n+/, "")}`;
+    const frontmatter = [
+      "---",
+      `name: ${name}`,
+      `description: ${JSON.stringify(adaptedDescription)}`,
+      ...(hideFromAutomaticModelSelection ? ["disable-model-invocation: true"] : []),
+      "---",
+      "",
+    ].join("\n");
     writeFileSync(
       join(destinationSkillRoot, "SKILL.md"),
-      `---\nname: ${name}\ndescription: ${JSON.stringify(adaptedDescription)}\n---\n\n${bodyWithNotice.trim()}\n`,
+      `${frontmatter}${bodyWithNotice.trim()}\n`,
     );
     copyReferences(sourceSkillRoot, destinationSkillRoot, bodyWithNotice, domain);
 

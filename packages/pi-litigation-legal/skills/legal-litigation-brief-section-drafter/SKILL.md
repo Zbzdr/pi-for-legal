@@ -2,7 +2,6 @@
 name: legal-litigation-brief-section-drafter
 description: "Draft a brief section in house style, consistent with the case theory — every fact cited, every case checked, every argument tied to the theory. Use when the user says \"draft the [section]\", \"write the statement of facts\", \"argument section on [issue]\", or needs a first draft of a brief section."
 ---
-
 # /skill:legal-litigation-brief-section-drafter
 
 > **Attribution:** Adapted from Anthropic's `claude-for-legal/litigation-legal` at revision `4a6c651889c97cc9140580363c73e0eb17379c2b` under Apache-2.0 and modified for Pi. See the package `NOTICE`.
@@ -81,7 +80,7 @@ A rebuttal that sounds like a re-read of the opening loses ground. The draft sho
 
 the project legal profile → case theory, house style (citation format, structure, tone, length norms).
 
-**Conflicts gate — unbypassable.** Before drafting, check `<dataDir>/litigation-legal/matters/_log.yaml` for the matter slug this skill is being invoked on. If the matter is not in `_log.yaml`, refuse and route:
+**Conflicts gate — unbypassable.** Before drafting, check `<dataDir>/matters/_log.yaml` for the matter slug this skill is being invoked on. If the matter is not in `_log.yaml`, refuse and route:
 
 > "I don't see [matter slug] in the matter log. Run `/skill:legal-litigation-matter-intake` first so the conflicts check runs and the matter workspace is set up. I won't draft substantive work product on a matter that hasn't been intaken — the conflicts check is the gate."
 

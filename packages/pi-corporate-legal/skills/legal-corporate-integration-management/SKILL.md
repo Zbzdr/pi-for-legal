@@ -2,7 +2,6 @@
 name: legal-corporate-integration-management
 description: "Post-closing M&A integration tracker — phased workplan, consent tracking, contract assignment at scale, weekly status reports. Initializes from whatever deal artifacts are available (purchase agreement, deal summary, closing checklist) and connects to deal-context.md and closing-checklist.yaml from the M&A cold-start. Use when user says \"integration\", \"post-close\", \"post-closing\", \"consents outstanding\", \"contract assignment\", \"integration status\", or \"what's left on the deal\"."
 ---
-
 # /skill:legal-corporate-integration-management
 
 > **Attribution:** Adapted from Anthropic's `claude-for-legal/corporate-legal` at revision `4a6c651889c97cc9140580363c73e0eb17379c2b` under Apache-2.0 and modified for Pi. See the package `NOTICE`.
@@ -22,7 +21,7 @@ description: "Post-closing M&A integration tracker — phased workplan, consent 
 
 ## Matter context
 
-**Matter context.** Check `## Matter workspaces` in the practice-level project legal profile. If `Enabled` is `✗` (the default for in-house users), skip the rest of this paragraph — skills use practice-level context and the matter machinery is invisible. If enabled and there is no active matter, ask: "Which matter is this for? Run `/skill:legal-matter-workspace switch <slug>` or say `practice-level`." Load the active matter's `matter.md` for matter-specific context and overrides. Write outputs to the matter folder at `<dataDir>/corporate-legal/matters/<matter-slug>/`. Never read another matter's files unless `Cross-matter context` is `on`.
+**Matter context.** Check `## Matter workspaces` in the practice-level project legal profile. If `Enabled` is `✗` (the default for in-house users), skip the rest of this paragraph — skills use practice-level context and the matter machinery is invisible. If enabled and there is no active matter, ask: "Which matter is this for? Run `/skill:legal-matter-workspace switch <slug>` or say `practice-level`." Load the active matter's `matter.md` for matter-specific context and overrides. Write outputs to the matter folder at `<dataDir>/matters/<matter-slug>/`. Never read another matter's files unless `Cross-matter context` is `on`.
 
 ---
 

@@ -1,15 +1,15 @@
 > **Attribution:** Adapted from Anthropic's claude-for-legal at revision 4a6c651889c97cc9140580363c73e0eb17379c2b under Apache-2.0 and modified for Pi. See the package NOTICE.
 
-# US legal research source policy
+# Multi-jurisdiction legal research source policy
 
 ## Authority hierarchy
 
-1. US and state constitutions; current enacted statutes.
-2. Current regulations and controlling official agency materials.
-3. Binding opinions from the controlling US Supreme Court, federal circuit, or state courts, with district-court posture handled accurately.
-4. Persuasive opinions from other courts.
-5. Approved citators and professional research databases.
-6. Treatises, restatements, practice guides, law reviews, bar and law-firm materials.
+1. The jurisdiction's constitution, foundational or treaty texts, and current enacted legislation.
+2. Current regulations, delegated legislation, and controlling official administrative materials.
+3. Binding judgments or decisions from the controlling court, tribunal, or authority, classified under that legal system's own hierarchy and precedent rules.
+4. Persuasive judgments, decisions, preparatory works, guidance, or comparative authority where recognized.
+5. Jurisdiction-appropriate citators, legislation-status services, and professional research databases.
+6. Treatises, restatements, practice guides, law reviews, bar/law-society materials, and law-firm commentary.
 7. Model knowledge only as a search lead.
 
 Secondary authority may orient the search but should not replace available primary law for a material proposition.
@@ -35,7 +35,7 @@ For each material authority capture:
 - date;
 - reporter, docket, code, CFR, or other citation;
 - stable URL or database locator;
-- binding/persuasive/not-applicable status;
+- binding/persuasive/official-guidance/not-applicable status under the relevant legal system;
 - current/historical/proposed/unclear status;
 - negative-treatment or citator status;
 - proposition supported;

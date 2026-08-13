@@ -2,7 +2,6 @@
 name: legal-ip-portfolio
 description: "Track the IP portfolio — registrations, renewals, maintenance fees, and use declarations. Use when checking what's renewing, adding or updating an asset, recording a maintenance filing, or auditing the register for gaps, lapses, and use-in-commerce questions. Receives handoffs from prosecution and clearance work."
 ---
-
 # /skill:legal-ip-portfolio
 
 > **Attribution:** Adapted from Anthropic's `claude-for-legal/ip-legal` at revision `4a6c651889c97cc9140580363c73e0eb17379c2b` under Apache-2.0 and modified for Pi. See the package `NOTICE`.

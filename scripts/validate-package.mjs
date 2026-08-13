@@ -26,6 +26,13 @@ const sourcePackageDirectories = new Set(suiteConfig.packages);
 const allSourceSkills = new Map();
 const suiteSkills = new Set();
 const workspaceVersion = JSON.parse(readFileSync(join(root, "package.json"), "utf8")).version;
+const internalWorkers = new Set([
+  "legal-nda-review",
+  "legal-saas-review",
+  "legal-vendor-review",
+  "legal-employment-internal-investigation",
+  "legal-employment-international-expansion",
+]);
 
 for (const packageRoot of packageDirectories) {
   const packageRelative = relative(root, packageRoot);
@@ -92,8 +99,9 @@ for (const packageRoot of packageDirectories) {
     const name = frontmatter[1].match(/^name:\s*([^\r\n]+)$/m)?.[1]?.trim();
     const description = frontmatter[1].match(/^description:\s*([^\r\n]+)$/m)?.[1]?.trim();
     const frontmatterKeys = [...frontmatter[1].matchAll(/^([A-Za-z0-9_-]+):/gm)].map((match) => match[1]).sort();
-    if (JSON.stringify(frontmatterKeys) !== JSON.stringify(["description", "name"])) {
-      fail(`${packageJson.name}/${skillRelative}: frontmatter must contain only name and description`);
+    const allowedFrontmatterKeys = new Set(["name", "description", "disable-model-invocation"]);
+    if (frontmatterKeys.some((key) => !allowedFrontmatterKeys.has(key))) {
+      fail(`${packageJson.name}/${skillRelative}: unsupported frontmatter field`);
     }
     if (!name) fail(`${packageJson.name}/${skillRelative}: missing name`);
     if (!description) fail(`${packageJson.name}/${skillRelative}: missing single-line description`);
@@ -102,6 +110,10 @@ for (const packageRoot of packageDirectories) {
     if (name && localNames.has(name)) fail(`${packageJson.name}: duplicate skill name ${name}`);
     if (name) localNames.add(name);
     if (description && description.length > 1024) fail(`${packageJson.name}/${name}: description exceeds 1024 characters`);
+    const hiddenFromAutomaticSelection = /^disable-model-invocation:\s*true\s*$/m.test(frontmatter[1]);
+    if (name && internalWorkers.has(name) !== hiddenFromAutomaticSelection) {
+      fail(`${packageJson.name}/${name}: internal-worker progressive-disclosure flag is incorrect`);
+    }
 
     if (name && isSuite) suiteSkills.add(name);
     if (name && sourcePackageDirectories.has(basename(packageRoot))) {

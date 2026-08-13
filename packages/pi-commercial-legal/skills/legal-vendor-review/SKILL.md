@@ -1,11 +1,14 @@
 ---
 name: legal-vendor-review
-description: Review a US commercial vendor, customer, services, consulting, supply, licensing, MSA, or SOW agreement against the project's sales-side or purchasing-side playbook. Use directly or when routed by legal-contract-review.
+description: Review a commercial vendor, customer, services, consulting, supply, licensing, MSA, or SOW agreement against the project's sales-side or purchasing-side playbook. Use directly or when routed by legal-contract-review.
+disable-model-invocation: true
 ---
 
 # Vendor and services agreement review
 
 > **Attribution:** Adapted from Anthropic's claude-for-legal/commercial-legal at revision 4a6c651889c97cc9140580363c73e0eb17379c2b under Apache-2.0 and modified for Pi. See the package NOTICE.
+
+This is a worker Skill normally loaded by `/skill:legal-contract-review`. Pi still permits explicit `/skill:legal-vendor-review` invocation. On direct invocation, first perform the router's profile, source-manifest, document-structure, side, amendment, and routing checks. If the main document is an NDA, return to `/skill:legal-contract-review`; if SaaS terms apply, also read `../legal-saas-review/SKILL.md`. Do not bypass the integrated-review gates.
 
 ## Preconditions
 

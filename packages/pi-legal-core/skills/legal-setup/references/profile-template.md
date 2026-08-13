@@ -16,7 +16,7 @@
 - Practice setting: in-house | firm/solo | government/legal aid/clinic
 - User role: lawyer/legal professional | legal operations | supervised non-lawyer
 - Attorney/supervisor: [name or role, if applicable]
-- Primary US jurisdictions: [states, federal forums, circuits]
+- Jurisdictions and forums: [countries, states/provinces, courts, regulators, arbitral or administrative forums]
 - The thing that hurts: [in the user's words]
 
 ## Available integrations
@@ -159,3 +159,8 @@
 ## Open configuration questions
 
 - [Not configured — ask at use time]
+
+## Default provenance
+
+- Any value labeled `[DEFAULT — generic starting point]` came from the package quick-start profile, not from the organization or client.
+- Replace defaults with approved playbooks, policies, templates, authority matrices, and jurisdiction-specific instructions as they become available.

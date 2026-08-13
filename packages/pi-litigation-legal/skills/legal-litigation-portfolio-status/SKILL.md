@@ -2,13 +2,12 @@
 name: legal-litigation-portfolio-status
 description: "Roll up the portfolio from _log.yaml — risk distribution, upcoming deadlines, stale matters, materiality totals, stage distribution, and flagged anomalies. Use when the user asks \"where do we stand\", \"how many open matters\", or wants a portfolio rollup or status across all active matters."
 ---
-
 # /skill:legal-litigation-portfolio-status
 
 > **Attribution:** Adapted from Anthropic's `claude-for-legal/litigation-legal` at revision `4a6c651889c97cc9140580363c73e0eb17379c2b` under Apache-2.0 and modified for Pi. See the package `NOTICE`.
 1. Load the project legal profile → risk calibration (defines how to read the `risk:` field).
 2. Follow the workflow and reference below.
-3. Parse `<dataDir>/litigation-legal/matters/_log.yaml`. Filter closed matters by default (include with `--all`).
+3. Parse `<dataDir>/matters/_log.yaml`. Filter closed matters by default (include with `--all`).
 4. Produce rollup: risk distribution, deadlines in next 14/30/60 days, matters with no update in >30 days, materiality totals, stage distribution.
 5. Flag anomalies — everything marked critical, overdue next_deadline, matters without outside counsel assigned where risk is medium or high.
 
@@ -22,7 +21,7 @@ One read that answers: what do I own right now, what needs attention, and what's
 
 ## Load context
 
-- `<dataDir>/litigation-legal/matters/_log.yaml` — source of truth
+- `<dataDir>/matters/_log.yaml` — source of truth
 - the project legal profile — risk calibration (to interpret risk/materiality fields correctly)
 
 ## Flags & filters

@@ -2,7 +2,6 @@
 name: legal-litigation-deposition-prep
 description: "Build a deposition outline for a witness — pull their documents from the eDiscovery platform, organize topics around the case theory, and surface impeachment material. Use when the user says \"depo prep for [witness]\", \"build a depo outline\", or \"prepare for [name]'s deposition\"."
 ---
-
 # /skill:legal-litigation-deposition-prep
 
 > **Attribution:** Adapted from Anthropic's `claude-for-legal/litigation-legal` at revision `4a6c651889c97cc9140580363c73e0eb17379c2b` under Apache-2.0 and modified for Pi. See the package `NOTICE`.
@@ -60,7 +59,7 @@ A depo outline is read aloud in real time. That's oral advocacy, not written. It
 
 the project legal profile → case theory (theory, pivot fact, key facts for/against), eDiscovery platform.
 
-**Conflicts gate — unbypassable.** Before building an outline, check `<dataDir>/litigation-legal/matters/_log.yaml` for the matter slug. If the matter is not in `_log.yaml`, refuse and route:
+**Conflicts gate — unbypassable.** Before building an outline, check `<dataDir>/matters/_log.yaml` for the matter slug. If the matter is not in `_log.yaml`, refuse and route:
 
 > "I don't see [matter slug] in the matter log. Run `/skill:legal-litigation-matter-intake` first so the conflicts check runs and the matter workspace is set up. I won't build a deposition outline on a matter that hasn't been intaken — the conflicts check is the gate."
 

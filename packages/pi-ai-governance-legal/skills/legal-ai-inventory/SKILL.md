@@ -2,7 +2,6 @@
 name: legal-ai-inventory
 description: "EU AI Act per-system inventory — track each AI system's role (provider, deployer, importer, distributor, authorized representative, product manufacturer) and risk tier (prohibited, high-risk, limited, minimal, GPAI, GPAI+systemic). Role and tier are assessed per system, not per company. Use when the user says \"ai inventory\", \"add an ai system\", \"what systems do we have\", \"classify this ai system\", \"eu ai act register\", or \"ai system registry\"."
 ---
-
 # /skill:legal-ai-inventory
 
 > **Attribution:** Adapted from Anthropic's `claude-for-legal/ai-governance-legal` at revision `4a6c651889c97cc9140580363c73e0eb17379c2b` under Apache-2.0 and modified for Pi. See the package `NOTICE`.

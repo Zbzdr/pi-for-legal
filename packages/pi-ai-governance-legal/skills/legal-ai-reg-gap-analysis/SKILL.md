@@ -2,7 +2,6 @@
 name: legal-ai-reg-gap-analysis
 description: "Diff a new AI regulation or guidance against your current governance posture — surfaces gaps, priorities, and a remediation plan with owners and deadlines. Use when an AI regulation moves (or you learn about one you missed), or when user says \"new reg just dropped\", \"does [regulation] affect us\", \"gap analysis for EU AI Act\", \"compliance check against [AI law or guidance]\", or pastes regulatory text."
 ---
-
 # /skill:legal-ai-reg-gap-analysis
 
 > **Attribution:** Adapted from Anthropic's `claude-for-legal/ai-governance-legal` at revision `4a6c651889c97cc9140580363c73e0eb17379c2b` under Apache-2.0 and modified for Pi. See the package `NOTICE`.

@@ -2,7 +2,6 @@
 name: legal-regulatory-comments
 description: "Review open NPRM comment periods, log decisions, track deadlines. Use when an NPRM has a comment window open and you need to surface deadlines, decide whether to file, or record a filing / not-filing / waived decision (--decide CMT-ID)."
 ---
-
 # /skill:legal-regulatory-comments
 
 > **Attribution:** Adapted from Anthropic's `claude-for-legal/regulatory-legal` at revision `4a6c651889c97cc9140580363c73e0eb17379c2b` under Apache-2.0 and modified for Pi. See the package `NOTICE`.

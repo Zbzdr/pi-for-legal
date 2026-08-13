@@ -2,7 +2,6 @@
 name: legal-ai-use-case-triage
 description: "Classify a proposed AI use case against your registry — approved, conditional, or not approved — and produce required conditions and next steps. Flags cross-package handoffs to privacy or product counsel. Use when user says \"triage this use case\", \"can we use AI for X\", \"is this approved\", \"what do we need to do to use AI for X\"."
 ---
-
 # /skill:legal-ai-use-case-triage
 
 > **Attribution:** Adapted from Anthropic's `claude-for-legal/ai-governance-legal` at revision `4a6c651889c97cc9140580363c73e0eb17379c2b` under Apache-2.0 and modified for Pi. See the package `NOTICE`.
@@ -20,7 +19,7 @@ description: "Classify a proposed AI use case against your registry — approved
 
 ## Matter context
 
-**Matter context.** Check `## Matter workspaces` in the practice-level project legal profile. If `Enabled` is `✗` (the default for in-house users), skip the rest of this paragraph — skills use practice-level context and the matter machinery is invisible. If enabled and there is no active matter, ask: "Which matter is this for? Run `/skill:legal-matter-workspace switch <slug>` or say `practice-level`." Load the active matter's `matter.md` for matter-specific context and overrides. Write outputs to the matter folder at `<dataDir>/ai-governance-legal/matters/<matter-slug>/`. Never read another matter's files unless `Cross-matter context` is `on`.
+**Matter context.** Check `## Matter workspaces` in the practice-level project legal profile. If `Enabled` is `✗` (the default for in-house users), skip the rest of this paragraph — skills use practice-level context and the matter machinery is invisible. If enabled and there is no active matter, ask: "Which matter is this for? Run `/skill:legal-matter-workspace switch <slug>` or say `practice-level`." Load the active matter's `matter.md` for matter-specific context and overrides. Write outputs to the matter folder at `<dataDir>/matters/<matter-slug>/`. Never read another matter's files unless `Cross-matter context` is `on`.
 
 ---
 
@@ -45,11 +44,11 @@ If the project legal profile contains `[PLACEHOLDER]`, surface this bounce:
 >
 > **Two choices:**
 > - Run `/skill:legal-setup` (2 minutes) to configure your profile, then I'll triage tailored to YOUR practice.
-> - Say **"provisional"** and I'll triage against generic defaults — US jurisdiction, middle risk appetite, lawyer role, no playbook — and tag every output `[PROVISIONAL — configure your profile for tailored output]` so you can see what I do before committing.
+> - Say **"provisional"** and I'll triage against generic defaults — governing jurisdiction from the task/profile, middle risk appetite, lawyer role, no playbook — and tag every output `[PROVISIONAL — configure your profile for tailored output]` so you can see what I do before committing.
 
 ### Provisional mode
 
-If the user says "provisional," run triage normally using these generic defaults: middle risk appetite, lawyer role, US jurisdiction, no registry (classify by general AI governance principles rather than matching to a registered entry). Tag the reviewer note and every finding block with `[PROVISIONAL]`. At the end of the output, append:
+If the user says "provisional," run triage normally using these generic defaults: middle risk appetite, lawyer role, governing jurisdiction from the task/profile, no registry (classify by general AI governance principles rather than matching to a registered entry). Tag the reviewer note and every finding block with `[PROVISIONAL]`. At the end of the output, append:
 
 > "That was a generic run against default assumptions. Run `/skill:legal-setup` to get output calibrated to YOUR practice — your registry, your jurisdiction, your risk appetite. 2 minutes."
 

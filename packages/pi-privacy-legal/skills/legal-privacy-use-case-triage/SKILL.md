@@ -2,7 +2,6 @@
 name: legal-privacy-use-case-triage
 description: "Quickly determine whether a processing activity needs a PIA, a mandatory GDPR DPIA, or can proceed — surfaces privacy policy conflicts and routes to the right next step. Use when the user asks \"does this need a PIA\", \"triage this feature\", \"privacy check on X\", \"is this okay from a privacy perspective\", or describes a new data processing activity, product feature, or vendor relationship."
 ---
-
 # /skill:legal-privacy-use-case-triage
 
 > **Attribution:** Adapted from Anthropic's `claude-for-legal/privacy-legal` at revision `4a6c651889c97cc9140580363c73e0eb17379c2b` under Apache-2.0 and modified for Pi. See the package `NOTICE`.
@@ -22,7 +21,7 @@ description: "Quickly determine whether a processing activity needs a PIA, a man
 
 ## Matter context
 
-**Matter context.** Check `## Matter workspaces` in the practice-level project legal profile. If `Enabled` is `✗` (the default for in-house users), skip the rest of this paragraph — skills use practice-level context and the matter machinery is invisible. If enabled and there is no active matter, ask: "Which matter is this for? Run `/skill:legal-matter-workspace switch <slug>` or say `practice-level`." Load the active matter's `matter.md` for matter-specific context and overrides. Write outputs to the matter folder at `<dataDir>/privacy-legal/matters/<matter-slug>/`. Never read another matter's files unless `Cross-matter context` is `on`.
+**Matter context.** Check `## Matter workspaces` in the practice-level project legal profile. If `Enabled` is `✗` (the default for in-house users), skip the rest of this paragraph — skills use practice-level context and the matter machinery is invisible. If enabled and there is no active matter, ask: "Which matter is this for? Run `/skill:legal-matter-workspace switch <slug>` or say `practice-level`." Load the active matter's `matter.md` for matter-specific context and overrides. Write outputs to the matter folder at `<dataDir>/matters/<matter-slug>/`. Never read another matter's files unless `Cross-matter context` is `on`.
 
 ---
 
@@ -64,11 +63,11 @@ If the file is missing or contains `[PLACEHOLDER]`, surface this bounce:
 >
 > **Two choices:**
 > - Run `/skill:legal-setup` (2 minutes) to configure your profile, then I'll triage tailored to YOUR practice.
-> - Say **"provisional"** and I'll triage against generic defaults — US jurisdiction, middle risk appetite, lawyer role, no playbook — and tag every output `[PROVISIONAL — configure your profile for tailored output]` so you can see what I do before committing.
+> - Say **"provisional"** and I'll triage against generic defaults — governing jurisdiction from the task/profile, middle risk appetite, lawyer role, no playbook — and tag every output `[PROVISIONAL — configure your profile for tailored output]` so you can see what I do before committing.
 
 ### Provisional mode
 
-If the user says "provisional," run triage normally using these generic defaults: middle risk appetite, lawyer role, US jurisdiction (CCPA + common federal sectoral baselines), no playbook (classify from general privacy-law principles rather than matching to configured commitments). Tag the reviewer note and every finding block with `[PROVISIONAL]`. At the end of the output, append:
+If the user says "provisional," run triage normally using these generic defaults: middle risk appetite, lawyer role, governing jurisdiction from the task/profile, no playbook (classify from general privacy-law principles rather than matching to configured commitments). Tag the reviewer note and every finding block with `[PROVISIONAL]`. At the end of the output, append:
 
 > "That was a generic run against default assumptions. Run `/skill:legal-setup` to get output calibrated to YOUR practice — your regulatory footprint, your privacy policy commitments, your risk appetite. 2 minutes."
 

@@ -2,7 +2,6 @@
 name: legal-corporate-tabular-review
 description: "Tabular review — one row per document, one column per data point, every cell cited to source. Built for M&A diligence (\"review these 200 target contracts for change-of-control, assignment, and MAC clauses\") but works for any batch review that needs a spreadsheet out the other end. Use when user says \"tabular review\", \"review grid\", \"build a grid\", \"extract these fields from these contracts\", \"review these documents for X, Y, Z\", \"give me a spreadsheet of\", \"batch review\", or points at a folder of documents and asks to compare them."
 ---
-
 # /skill:legal-corporate-tabular-review
 
 > **Attribution:** Adapted from Anthropic's `claude-for-legal/corporate-legal` at revision `4a6c651889c97cc9140580363c73e0eb17379c2b` under Apache-2.0 and modified for Pi. See the package `NOTICE`.
@@ -37,7 +36,7 @@ When `--template ma-diligence` is requested, read `references/ma-diligence-colum
 
 ## Matter context
 
-**Matter context.** Check `## Matter workspaces` in the practice-level project legal profile. If `Enabled` is `✗` (the default for in-house users), skip the rest of this paragraph — skills use practice-level context and the matter machinery is invisible. If enabled and there is no active matter, ask: "Which matter is this for? Run `/skill:legal-matter-workspace switch <slug>` or say `practice-level`." Load the active matter's `matter.md` for matter-specific context and overrides. Write outputs to the matter folder at `<dataDir>/corporate-legal/matters/<matter-slug>/`. Never read another matter's files unless `Cross-matter context` is `on`.
+**Matter context.** Check `## Matter workspaces` in the practice-level project legal profile. If `Enabled` is `✗` (the default for in-house users), skip the rest of this paragraph — skills use practice-level context and the matter machinery is invisible. If enabled and there is no active matter, ask: "Which matter is this for? Run `/skill:legal-matter-workspace switch <slug>` or say `practice-level`." Load the active matter's `matter.md` for matter-specific context and overrides. Write outputs to the matter folder at `<dataDir>/matters/<matter-slug>/`. Never read another matter's files unless `Cross-matter context` is `on`.
 
 ---
 

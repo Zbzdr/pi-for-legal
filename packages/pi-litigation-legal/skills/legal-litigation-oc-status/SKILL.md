@@ -2,13 +2,12 @@
 name: legal-litigation-oc-status
 description: "Generate weekly status-request email drafts to outside counsel across the active portfolio — markdown per matter, plus Gmail drafts when the MCP is available. Use when the user asks for OC status requests, weekly outside counsel check-ins, or wants per-matter status emails drafted from the portfolio log."
 ---
-
 # /skill:legal-litigation-oc-status
 
 > **Attribution:** Adapted from Anthropic's `claude-for-legal/litigation-legal` at revision `4a6c651889c97cc9140580363c73e0eb17379c2b` under Apache-2.0 and modified for Pi. See the package `NOTICE`.
 To run weekly, set a recurring reminder to invoke `/skill:legal-litigation-oc-status`. Automated scheduling requires a scheduled-tasks integration, which is not bundled.
 
-1. Load `<dataDir>/litigation-legal/matters/_log.yaml`, filter per default rules (or per flags).
+1. Load `<dataDir>/matters/_log.yaml`, filter per default rules (or per flags).
 2. Load the project legal profile → outside counsel directive style, signer defaults, budget posture.
 3. Follow the workflow and reference below.
 4. For each matter in scope: read `matter.md` + `history.md`, draft per-matter email.
@@ -26,9 +25,9 @@ Writing the same status-request email to outside counsel every week across 5–1
 
 ## Load context
 
-- `<dataDir>/litigation-legal/matters/_log.yaml` — the filtering and field source
-- `<dataDir>/litigation-legal/matters/[slug]/matter.md` — matter context (current posture, open questions)
-- `<dataDir>/litigation-legal/matters/[slug]/history.md` — recent events to inform what to ask about
+- `<dataDir>/matters/_log.yaml` — the filtering and field source
+- `<dataDir>/matters/[slug]/matter.md` — matter context (current posture, open questions)
+- `<dataDir>/matters/[slug]/history.md` — recent events to inform what to ask about
 - the project legal profile → outside counsel directive style, signer name/email, budget posture
 
 ## Filtering — which matters?

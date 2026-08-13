@@ -2,12 +2,11 @@
 name: legal-litigation-demand-received
 description: "Triage an inbound demand letter — extract fields, cross-check the portfolio, assess merit, present response options with a recommendation, and hand off to matter-intake or demand-intake if escalation is warranted. Use when the user says \"we got a demand letter\", \"triage this demand\", or shares an incoming demand to evaluate."
 ---
-
 # /skill:legal-litigation-demand-received
 
 > **Attribution:** Adapted from Anthropic's `claude-for-legal/litigation-legal` at revision `4a6c651889c97cc9140580363c73e0eb17379c2b` under Apache-2.0 and modified for Pi. See the package `NOTICE`.
 1. Read the incoming document from provided path.
-2. Load `<dataDir>/litigation-legal/matters/_log.yaml` for portfolio cross-check.
+2. Load `<dataDir>/matters/_log.yaml` for portfolio cross-check.
 3. Load the project legal profile → risk calibration, landscape, demand-letter practice.
 4. Follow the workflow and reference below.
 5. Extract fields; cross-check portfolio; assess merit; present options with recommendation.
@@ -29,7 +28,7 @@ Inbound demand letters are the bread and butter of an in-house litigation practi
 ## Load context
 
 - The incoming document (user provides path or drops it in-session)
-- `<dataDir>/litigation-legal/matters/_log.yaml` — scan for related matters (same counterparty, overlapping counterparties via entity relationships, or matter type + recent date)
+- `<dataDir>/matters/_log.yaml` — scan for related matters (same counterparty, overlapping counterparties via entity relationships, or matter type + recent date)
 - the project legal profile → risk calibration (for merit assessment), landscape (is the sender a frequent adversary?), demand-letter practice (house tone and response defaults)
 
 ## Workflow

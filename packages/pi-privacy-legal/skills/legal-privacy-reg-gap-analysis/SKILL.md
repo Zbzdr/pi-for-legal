@@ -2,7 +2,6 @@
 name: legal-privacy-reg-gap-analysis
 description: "Diff a new or changed regulation against current privacy policy and practice — outputs a gap list and a remediation plan with owners and dates. Use when a new reg drops, the user asks \"does [regulation] affect us\", \"gap analysis for [state privacy law]\", \"compliance check against [reg]\", or pastes regulatory text."
 ---
-
 # /skill:legal-privacy-reg-gap-analysis
 
 > **Attribution:** Adapted from Anthropic's `claude-for-legal/privacy-legal` at revision `4a6c651889c97cc9140580363c73e0eb17379c2b` under Apache-2.0 and modified for Pi. See the package `NOTICE`.

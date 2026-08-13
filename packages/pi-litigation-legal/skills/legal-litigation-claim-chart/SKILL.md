@@ -2,7 +2,6 @@
 name: legal-litigation-claim-chart
 description: "Build or review an element chart — a patent claim chart (infringement, invalidity, or review) or a civil element chart for any cause of action or defense — with every cell pin-cited and gap detection as the priority output. Use when the user asks for a claim chart, element chart, proof chart, infringement or invalidity contention, element-by-element mapping, or asks \"what are we missing to prove [claim]\"."
 ---
-
 # /skill:legal-litigation-claim-chart
 
 > **Attribution:** Adapted from Anthropic's `claude-for-legal/litigation-legal` at revision `4a6c651889c97cc9140580363c73e0eb17379c2b` under Apache-2.0 and modified for Pi. See the package `NOTICE`.
@@ -47,7 +46,7 @@ Under-flagging a gap is a one-way door — a complaint filed without plausibilit
 
 ## Matter context
 
-Check `## Matter workspaces` in the practice-level project legal profile. If `Enabled` is `✗` (the default for in-house users), skip the rest of this paragraph — skills use practice-level context and the matter machinery is invisible. If enabled and there is no active matter, ask: "Which matter is this for? Run `/skill:legal-matter-workspace switch <slug>` or say `practice-level`." Load the active matter's `matter.md` — especially the case theory, the pleading / complaint (for the elements actually alleged), the jurisdiction, any Markman order or stipulated constructions (patent mode), and the phase of the case. Write outputs to the matter folder at `<dataDir>/litigation-legal/matters/<matter-slug>/claim-charts/`. Never read another matter's files unless `Cross-matter context` is `on`.
+Check `## Matter workspaces` in the practice-level project legal profile. If `Enabled` is `✗` (the default for in-house users), skip the rest of this paragraph — skills use practice-level context and the matter machinery is invisible. If enabled and there is no active matter, ask: "Which matter is this for? Run `/skill:legal-matter-workspace switch <slug>` or say `practice-level`." Load the active matter's `matter.md` — especially the case theory, the pleading / complaint (for the elements actually alleged), the jurisdiction, any Markman order or stipulated constructions (patent mode), and the phase of the case. Write outputs to the matter folder at `<dataDir>/matters/<matter-slug>/claim-charts/`. Never read another matter's files unless `Cross-matter context` is `on`.
 
 ---
 
@@ -64,15 +63,15 @@ If `project legal profile` has `[PLACEHOLDER]` markers, surface this bounce:
 >
 > **Two choices:**
 > - Run `/skill:legal-setup` (2 minutes) to configure your profile, then I'll run this tailored to YOUR practice.
-> - Say **"provisional"** and I'll run this against generic defaults — US jurisdiction, middle risk appetite, lawyer role, no playbook — and tag every output `[PROVISIONAL — configure your profile for tailored output]` so you can see what I do before committing.
+> - Say **"provisional"** and I'll run this against generic defaults — governing jurisdiction from the task/profile, middle risk appetite, lawyer role, no playbook — and tag every output `[PROVISIONAL — configure your profile for tailored output]` so you can see what I do before committing.
 
 ### Provisional mode
 
-If the user says "provisional," build the claim chart normally using these generic defaults: middle risk appetite, lawyer role, US jurisdiction, no practice-level playbook (work from the matter's pleadings and the elements of the claims as pleaded). Tag the reviewer note and every row of the chart with `[PROVISIONAL]`. At the end of the output, append:
+If the user says "provisional," build the claim chart normally using these generic defaults: middle risk appetite, lawyer role, governing jurisdiction from the task/profile, no practice-level playbook (work from the matter's pleadings and the elements of the claims as pleaded). Tag the reviewer note and every row of the chart with `[PROVISIONAL]`. At the end of the output, append:
 
 > "That was a generic run against default assumptions. Run `/skill:legal-setup` to get output calibrated to YOUR practice — your risk calibration, your landscape, your house style. 2 minutes."
 
-**Conflicts gate — unbypassable.** Before building a claim chart, check `<dataDir>/litigation-legal/matters/_log.yaml` for the matter slug. If the matter is not in `_log.yaml`, refuse and route:
+**Conflicts gate — unbypassable.** Before building a claim chart, check `<dataDir>/matters/_log.yaml` for the matter slug. If the matter is not in `_log.yaml`, refuse and route:
 
 > "I don't see [matter slug] in the matter log. Run `/skill:legal-litigation-matter-intake` first so the conflicts check runs and the matter workspace is set up. I won't build a claim chart on a matter that hasn't been intaken — the conflicts check is the gate."
 
@@ -414,7 +413,7 @@ Prepend the work-product header as the top row. Alongside it, include:
 - Civil: `element-chart-[count-slug]-[side]-YYYY-MM-DD.{md,csv,xlsx}`
 - Review: `chart-review-[subject]-YYYY-MM-DD.{md,csv,xlsx}`
 
-If matter workspaces enabled and a matter is active: `<dataDir>/litigation-legal/matters/<matter-slug>/claim-charts/`. Otherwise: `<dataDir>/litigation-legal/claim-charts/`. Surface the path. Append a one-line entry to the matter's `history.md`.
+If matter workspaces enabled and a matter is active: `<dataDir>/matters/<matter-slug>/claim-charts/`. Otherwise: `<dataDir>/litigation-legal/claim-charts/`. Surface the path. Append a one-line entry to the matter's `history.md`.
 
 ## Summary readout
 

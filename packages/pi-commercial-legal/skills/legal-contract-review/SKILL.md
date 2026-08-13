@@ -1,6 +1,6 @@
 ---
 name: legal-contract-review
-description: Route and integrate a US commercial contract review across NDA, vendor/service, and SaaS workflows. Use when the user asks to review an agreement or uploads an MSA, NDA, order form, subscription, services agreement, DPA, SLA, or related contract set.
+description: Route and integrate a commercial contract review across NDA, vendor/service, and SaaS workflows in the governing jurisdiction. Use when the user asks to review an agreement or uploads an MSA, NDA, order form, subscription, services agreement, DPA, SLA, or related contract set.
 ---
 
 # Contract review router
@@ -32,9 +32,9 @@ Read titles, table of contents, signature blocks, exhibit names, and order-of-pr
 
 | Structure | Workflow |
 |---|---|
-| NDA or confidentiality agreement as the main document | load `legal-nda-review` |
-| MSA, professional services, consulting, supply, licensing, SOW | load `legal-vendor-review` |
-| Subscription, cloud service, recurring software order, SaaS order form | load `legal-vendor-review`, then `legal-saas-review` as an overlay |
+| NDA or confidentiality agreement as the main document | read `../legal-nda-review/SKILL.md` |
+| MSA, professional services, consulting, supply, licensing, SOW | read `../legal-vendor-review/SKILL.md` |
+| Subscription, cloud service, recurring software order, SaaS order form | read `../legal-vendor-review/SKILL.md`, then `../legal-saas-review/SKILL.md` as an overlay |
 | DPA or security exhibit | include in data/privacy review and flag specialist issues |
 | SLA | include in the SaaS overlay |
 | Base agreement plus amendments | load `legal-amendment-history` before substantive review |
@@ -43,7 +43,7 @@ When routing confirmation is enabled in the profile, show the identified documen
 
 ## 4. Run the review
 
-Apply each selected workflow fully, then consolidate duplicate findings. Check the active side's "one thing" first. For every material finding include:
+Read and apply each selected worker workflow fully, then consolidate duplicate findings. Those workers use Pi's `disable-model-invocation` metadata for progressive disclosure: they are omitted from the ordinary model skill list but remain available through this router and explicit `/skill:*` commands. Check the active side's "one thing" first. For every material finding include:
 
 - severity and whether it is legal risk, business friction, or both;
 - exact contract language and a stable source anchor;
@@ -65,3 +65,5 @@ Before external sharing, signature, acceptance, or rejection, apply the profile'
 Follow `references/review-memo.md`. Put all coverage, source, currency, and judgment caveats in the reviewer note instead of scattering banners through the memo. Preserve favorable terms as well as risks.
 
 If an auto-renewal or cancel-by date is found, offer `/skill:legal-renewal-tracker`. If a deviation exceeds authority, offer `/skill:legal-escalation`. If a business audience needs the result, offer `/skill:legal-stakeholder-summary`.
+
+If the user approves proposed clause changes and supplies a DOCX, offer `/skill:legal-docx-redline`. If the user later reports the final signed or approved outcome, offer `/skill:legal-playbook-learning capture`.

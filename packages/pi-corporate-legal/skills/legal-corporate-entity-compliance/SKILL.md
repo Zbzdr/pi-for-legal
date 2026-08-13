@@ -2,7 +2,6 @@
 name: legal-corporate-entity-compliance
 description: "Entity compliance tracker — initialize, report upcoming deadlines, update status, run health audit, export to CSV. Maintains a compliance-tracker.yaml built from the entity table, calculates filing deadlines by entity and jurisdiction, and surfaces what's due in the next 30/60/90 days. Use when user says \"entity compliance\", \"filing deadlines\", \"annual reports due\", \"entity tracker\", \"what filings are due\", \"entity health\", or \"good standing\"."
 ---
-
 # /skill:legal-corporate-entity-compliance
 
 > **Attribution:** Adapted from Anthropic's `claude-for-legal/corporate-legal` at revision `4a6c651889c97cc9140580363c73e0eb17379c2b` under Apache-2.0 and modified for Pi. See the package `NOTICE`.

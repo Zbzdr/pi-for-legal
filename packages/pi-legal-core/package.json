@@ -1,7 +1,7 @@
 {
   "name": "@zbzdr/pi-legal-core",
-  "version": "0.1.0",
-  "description": "Shared project profile, US legal research, matter isolation, escalation, and review guardrails for Pi legal workflows.",
+  "version": "0.2.0",
+  "description": "Shared project profile, multi-jurisdiction legal research, matter isolation, playbook learning, escalation, and review guardrails for Pi legal workflows.",
   "type": "module",
   "license": "Apache-2.0",
   "repository": {
@@ -43,6 +43,6 @@
   },
   "piLegal": {
     "upstreamRevision": "4a6c651889c97cc9140580363c73e0eb17379c2b",
-    "skillCount": 6
+    "skillCount": 7
   }
 }

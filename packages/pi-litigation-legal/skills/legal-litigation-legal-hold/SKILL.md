@@ -2,12 +2,11 @@
 name: legal-litigation-legal-hold
 description: "Issue, refresh, release, or report on legal holds — drafts the hold notice as .docx, updates legal_hold fields in _log.yaml, and calendars the next refresh. Use when the user says \"issue a hold\", \"refresh hold\", \"release hold\", or asks for a portfolio-wide hold status report."
 ---
-
 # /skill:legal-litigation-legal-hold
 
 > **Attribution:** Adapted from Anthropic's `claude-for-legal/litigation-legal` at revision `4a6c651889c97cc9140580363c73e0eb17379c2b` under Apache-2.0 and modified for Pi. See the package `NOTICE`.
 1. If `--status` (no slug): read `_log.yaml`, produce portfolio-wide hold report.
-2. Otherwise: load `<dataDir>/litigation-legal/matters/[slug]/matter.md` + log row.
+2. Otherwise: load `<dataDir>/matters/[slug]/matter.md` + log row.
 3. Load the project legal profile → privilege markings, hold template pointer, escalation norms.
 4. Follow the workflow and reference below.
 5. Route by flag:
@@ -32,8 +31,8 @@ Preservation duties vary materially by forum. Federal common law (via Zubulake /
 
 ## Load context
 
-- `<dataDir>/litigation-legal/matters/_log.yaml` — log row (legal_hold fields + status)
-- `<dataDir>/litigation-legal/matters/[slug]/matter.md` — matter context (counterparty, facts, key custodians from internal_owners)
+- `<dataDir>/matters/_log.yaml` — log row (legal_hold fields + status)
+- `<dataDir>/matters/[slug]/matter.md` — matter context (counterparty, facts, key custodians from internal_owners)
 - the project legal profile — house style for litigation hold template pointer, privilege marking, escalation norms
 
 **Conflicts gate — unbypassable.** Before issuing, refreshing, or releasing a hold, check `_log.yaml` for the matter slug. If the matter is not in `_log.yaml`, refuse and route:
@@ -134,8 +133,8 @@ release. You may be asked to reaffirm compliance at periodic intervals.
 > This is a draft legal hold notice for attorney review, not a notice ready to issue. Issuing a hold triggers preservation obligations the company will be judged on in any later spoliation argument, and the notice itself may be discoverable. A licensed attorney reviews, approves, and issues. Do not distribute this draft unreviewed.
 
 **Writes:**
-- `<dataDir>/litigation-legal/matters/[slug]/legal-hold-v1.docx` via the `docx` skill
-- Appends to `<dataDir>/litigation-legal/matters/[slug]/history.md`:
+- `<dataDir>/matters/[slug]/legal-hold-v1.docx` via the `docx` skill
+- Appends to `<dataDir>/matters/[slug]/history.md`:
   ```
   ## [YYYY-MM-DD] — Legal hold issued
 
@@ -169,7 +168,7 @@ Refresh cadence: default 6 months; adjustable per matter. When `next_refresh < t
 **Departed custodians:** if a custodian has left the company since last refresh, the skill flags this as a preservation action item — the departing employee's files and email archive need to be preserved at IT level, not just via notice to the individual. Records this in history.md as a separate entry requiring action.
 
 **Writes:**
-- `<dataDir>/litigation-legal/matters/[slug]/legal-hold-v[N].docx` (next version number)
+- `<dataDir>/matters/[slug]/legal-hold-v[N].docx` (next version number)
 - `history.md` entry
 - `_log.yaml`: updates `last_refresh` and `next_refresh` fields; modifies `custodians` list if changed
 
@@ -195,7 +194,7 @@ Do not send the release notice without an explicit yes.
 **Release notice template:** one paragraph, formal. "The litigation hold issued [date] regarding [matter] is released effective [date]. Normal retention resumes."
 
 **Writes:**
-- `<dataDir>/litigation-legal/matters/[slug]/legal-hold-release.docx`
+- `<dataDir>/matters/[slug]/legal-hold-release.docx`
 - `history.md` entry
 - `_log.yaml`: sets `released: [YYYY-MM-DD]`
 

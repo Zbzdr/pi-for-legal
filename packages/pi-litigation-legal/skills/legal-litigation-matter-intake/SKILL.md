@@ -2,7 +2,6 @@
 name: legal-litigation-matter-intake
 description: "Intake a new matter — uniform questions covering identification, conflicts, source, risk triage, materiality, outside counsel, owners, legal hold, and key dates; writes matter.md and history.md and appends a structured row to _log.yaml. Use when the user says \"new matter\", \"intake this matter\", or wants to bring a new matter into the portfolio."
 ---
-
 # /skill:legal-litigation-matter-intake
 
 > **Attribution:** Adapted from Anthropic's `claude-for-legal/litigation-legal` at revision `4a6c651889c97cc9140580363c73e0eb17379c2b` under Apache-2.0 and modified for Pi. See the package `NOTICE`.
@@ -10,9 +9,9 @@ description: "Intake a new matter — uniform questions covering identification,
 2. Follow the workflow and reference below.
 3. Run the uniform intake: identification, conflicts check, source, risk triage, materiality, outside counsel, internal owners, legal hold, key dates, initial posture.
 4. Generate slug from matter name (lowercase, hyphens, year).
-5. Create `<dataDir>/litigation-legal/matters/[slug]/matter.md` — full narrative intake.
-6. Create `<dataDir>/litigation-legal/matters/[slug]/history.md` — seeded with the intake as the first entry.
-7. Append structured row to `<dataDir>/litigation-legal/matters/_log.yaml`.
+5. Create `<dataDir>/matters/[slug]/matter.md` — full narrative intake.
+6. Create `<dataDir>/matters/[slug]/history.md` — seeded with the intake as the first entry.
+7. Append structured row to `<dataDir>/matters/_log.yaml`.
 8. Confirm with the user: "Here's the row I'll write — any edits?"
 
 ---
@@ -26,7 +25,7 @@ Every new matter goes through the same intake so the portfolio stays comparable.
 ## Load context
 
 - the project legal profile — risk calibration (triage thresholds, materiality, settlement ladder), landscape (stakeholders, outside counsel bench).
-- `<dataDir>/litigation-legal/matters/_log.yaml` — to confirm slug uniqueness.
+- `<dataDir>/matters/_log.yaml` — to confirm slug uniqueness.
 
 ## The intake
 
@@ -152,7 +151,7 @@ Lowercase, hyphens, year at the end. Examples: `acme-v-us-2026`, `employment-smi
 
 Confirm slug is unique in `_log.yaml` before writing.
 
-### `<dataDir>/litigation-legal/matters/[slug]/matter.md`
+### `<dataDir>/matters/[slug]/matter.md`
 
 ```markdown
 [WORK-PRODUCT HEADER — per package config ## Outputs — differs by role; see `## Who's using this`]
@@ -223,7 +222,7 @@ Confirm slug is unique in `_log.yaml` before writing.
 | [e.g., complaint] | [path or "not yet shared"] |
 ```
 
-### `<dataDir>/litigation-legal/matters/[slug]/history.md`
+### `<dataDir>/matters/[slug]/history.md`
 
 Seed the history file with the intake as entry zero:
 
@@ -239,7 +238,7 @@ Append-only event log. Most recent at top.
 [Source, who brought it in, initial triage summary, outside counsel assigned, legal hold issued yes/no.]
 ```
 
-### Append to `<dataDir>/litigation-legal/matters/_log.yaml`
+### Append to `<dataDir>/matters/_log.yaml`
 
 Add a row per the schema. Example:
 

@@ -1,9 +1,9 @@
 ---
 name: legal-research
-description: Plan and perform auditable US legal research for lawyers and in-house legal teams, using local materials and any research or web tools already available in Pi. Use for research questions, case-law analysis, statutory or regulatory interpretation, research roadmaps, and internal legal memoranda.
+description: Plan and perform auditable multi-jurisdiction legal research for lawyers and legal teams, using local materials and any research or web tools already available in Pi. Use for research questions, case-law analysis, statutory or regulatory interpretation, comparative law, research roadmaps, and internal legal memoranda.
 ---
 
-# US legal research
+# Legal research
 
 > **Attribution:** Adapted from Anthropic's claude-for-legal at revision 4a6c651889c97cc9140580363c73e0eb17379c2b under Apache-2.0 and modified for Pi. See the package NOTICE.
 
@@ -13,7 +13,9 @@ Produce either a research roadmap or a cited internal memo. This skill does not 
 
 If `.pi/legal-workbench/config.json` exists, resolve and read the profile for jurisdiction, audience, preferred sources, and review standard. A missing profile does not block research, but all material scope questions must be answered in the conversation.
 
-This version is US-first. If the request turns on UK, EEA, EU-member-state, or other non-US law, identify the out-of-scope jurisdiction and ask whether to provide only a research plan or stop for a future jurisdiction module. Do not silently apply US doctrine abroad.
+Support every jurisdiction represented in the installed Claude for Legal workflows. Identify the governing jurisdiction and forum before applying doctrine. Many upstream frameworks are US-centric; adapt them to the actual jurisdiction rather than silently applying US terminology, tests, privilege rules, employment concepts, procedural rules, or authority hierarchies abroad.
+
+When reliable current sources for a jurisdiction are unavailable, continue only at the confidence level the evidence supports: produce a research roadmap, an issue-spotting memo with verification labels, or a comparative framework. Do not call the jurisdiction out of scope merely because it is non-US, and do not invent local law.
 
 ## 1. Frame the assignment
 
@@ -21,7 +23,7 @@ Before substantive research, establish:
 
 - precise question and intended decision or deliverable;
 - material facts and disputed assumptions;
-- governing state(s), forum, court level, and federal circuit where relevant;
+- governing country, state/province/member state, forum, court or tribunal level, regulator, and appellate structure where relevant;
 - relevant date/as-of date and procedural posture;
 - requested depth: quick orientation, standard memo, or deep research;
 - whether the user wants a roadmap, answer, memo, or support for contract review.
@@ -34,7 +36,7 @@ Inventory only capabilities visible in the current Pi session. Prefer:
 
 1. user-provided matter files and project-local approved sources;
 2. official primary sources;
-3. configured legal research systems such as Westlaw/CoCounsel, CourtListener, Trellis, or Descrybe;
+3. configured legal research systems with coverage for the relevant jurisdiction, such as Westlaw/CoCounsel, CourtListener, Trellis, Descrybe, or another approved source;
 4. an available web-search/fetch tool, prioritizing official sites;
 5. model knowledge only as a lead.
 
@@ -47,16 +49,16 @@ If no current external source is available, offer:
 
 Do not imply completeness or currentness in that mode.
 
-CourtListener is useful for opinions and dockets, but it is not proof of current statutes or regulations and is not automatically a citator-equivalent negative-treatment check.
+CourtListener is useful for US opinions and dockets, but it is not proof of current statutes or regulations and is not automatically a citator-equivalent negative-treatment check. Do not use it as a substitute for a jurisdiction-appropriate source elsewhere.
 
 ## 3. Research loop
 
 1. Build an issue tree: elements, standards, defenses, procedure, remedies, preemption, and fact dependencies.
 2. Start with orientation sources only long enough to identify vocabulary and leading authority.
-3. Return to constitutions, enacted law, regulations, official agency materials, and original opinions.
+3. Return to the jurisdiction's constitutions or foundational texts, enacted law, regulations, treaties where applicable, official administrative materials, and original judgments or decisions.
 4. Classify every authority by jurisdiction, court, hierarchy, binding effect, date, and proposition supported.
 5. Search later history, amendments, negative treatment, contrary authority, and material splits.
-6. Shepardize/KeyCite or use another approved citator when the conclusion depends on a case. If unavailable, say `citator check not completed` rather than `good law`.
+6. Use Shepard's, KeyCite, or the jurisdiction-appropriate citator, subsequent-history service, legislation-status source, or official update mechanism when the conclusion depends on an authority. If unavailable, state exactly which treatment/currentness check was not completed rather than describing the authority as current or good law.
 7. Update the issue tree and search until each material proposition is supported or an explicit gap remains.
 
 For detailed source handling, read `references/source-policy.md`.

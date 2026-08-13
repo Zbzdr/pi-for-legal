@@ -2,7 +2,6 @@
 name: legal-ip-clearance
 description: "Trademark clearance first pass — knockout + similar-marks check producing a flag list, not a clearance opinion. Use when a new mark is proposed, when asked whether a mark is available or to run a knockout search, or when assessing likelihood-of-confusion factors before a full professional search. This skill never concludes a mark is clear."
 ---
-
 # /skill:legal-ip-clearance
 
 > **Attribution:** Adapted from Anthropic's `claude-for-legal/ip-legal` at revision `4a6c651889c97cc9140580363c73e0eb17379c2b` under Apache-2.0 and modified for Pi. See the package `NOTICE`.
@@ -69,7 +68,7 @@ the list in review. Stay on the two-way door side.
 
 ## Matter context
 
-**Matter context.** Check `## Matter workspaces` in the practice-level project legal profile. If `Enabled` is `✗` (the default for in-house users), skip the rest of this paragraph — skills use practice-level context and the matter machinery is invisible. If enabled and there is no active matter, ask: "Which matter is this for? Run `/skill:legal-matter-workspace switch <slug>` or say `practice-level`." Load the active matter's `matter.md` for matter-specific context and overrides. Write outputs to the matter folder at `<dataDir>/ip-legal/matters/<matter-slug>/`. Never read another matter's files unless `Cross-matter context` is `on`.
+**Matter context.** Check `## Matter workspaces` in the practice-level project legal profile. If `Enabled` is `✗` (the default for in-house users), skip the rest of this paragraph — skills use practice-level context and the matter machinery is invisible. If enabled and there is no active matter, ask: "Which matter is this for? Run `/skill:legal-matter-workspace switch <slug>` or say `practice-level`." Load the active matter's `matter.md` for matter-specific context and overrides. Write outputs to the matter folder at `<dataDir>/matters/<matter-slug>/`. Never read another matter's files unless `Cross-matter context` is `on`.
 
 ---
 
@@ -88,11 +87,11 @@ If the project legal profile contains `[PLACEHOLDER]` or `[Your Company Name]`, 
 >
 > **Two choices:**
 > - Run `/skill:legal-setup` (2 minutes) to configure your profile, then I'll run this tailored to YOUR practice.
-> - Say **"provisional"** and I'll run this against generic defaults — US jurisdiction, middle risk appetite, lawyer role, no playbook — and tag every output `[PROVISIONAL — configure your profile for tailored output]` so you can see what I do before committing.
+> - Say **"provisional"** and I'll run this against generic defaults — governing jurisdiction from the task/profile, middle risk appetite, lawyer role, no playbook — and tag every output `[PROVISIONAL — configure your profile for tailored output]` so you can see what I do before committing.
 
 ### Provisional mode
 
-If the user says "provisional," run the clearance normally using these generic defaults: middle risk appetite, lawyer role, US jurisdiction (USPTO + common-law), no playbook (do the full analysis rather than matching against a position list). Tag the reviewer note and every finding block with `[PROVISIONAL]`. At the end of the output, append:
+If the user says "provisional," run the clearance normally using these generic defaults: middle risk appetite, lawyer role, governing jurisdiction from the task/profile, no playbook (do the full analysis rather than matching against a position list). Tag the reviewer note and every finding block with `[PROVISIONAL]`. At the end of the output, append:
 
 > "That was a generic run against default assumptions. Run `/skill:legal-setup` to get output calibrated to YOUR practice — your playbook, your jurisdiction, your risk appetite. 2 minutes."
 
@@ -453,7 +452,7 @@ Deliver the full triage memo alongside the brief. Do not withhold the analysis.
 ## Output location
 
 If matter workspaces are enabled and a matter is active, write the output to
-`<dataDir>/ip-legal/matters/<matter-slug>/outputs/clearance-<mark-slug>-YYYY-MM-DD.md`.
+`<dataDir>/matters/<matter-slug>/outputs/clearance-<mark-slug>-YYYY-MM-DD.md`.
 Otherwise write to
 `<dataDir>/ip-legal/outputs/clearance-<mark-slug>-YYYY-MM-DD.md`
 and surface the path to the user.

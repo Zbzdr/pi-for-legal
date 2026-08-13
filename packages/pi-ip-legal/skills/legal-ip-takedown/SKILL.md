@@ -2,7 +2,6 @@
 name: legal-ip-takedown
 description: "Draft a DMCA takedown notice, triage one you received, or draft a §512(g) counter-notice. Use when asserting copyright through a §512(c)(3) takedown with the fair-use and perjury gates, when an incoming takedown needs triage into comply / counter / engage / ignore options, or when drafting a §512(g)(3) counter-notice with the consent-to-federal-jurisdiction gate."
 ---
-
 # /skill:legal-ip-takedown
 
 > **Attribution:** Adapted from Anthropic's `claude-for-legal/ip-legal` at revision `4a6c651889c97cc9140580363c73e0eb17379c2b` under Apache-2.0 and modified for Pi. See the package `NOTICE`.
@@ -69,7 +68,7 @@ DMCA §512 is **US federal law**. It runs against service providers subject to U
 ## Load context
 
 - the project legal profile → `## IP practice profile` (copyright registrations if any), `## Enforcement posture` → `Approval matrix → DMCA takedown (ordinary)` row, `## Outputs` (work-product header, role), `## Who's using this` (role — lawyer vs. non-lawyer)
-- **Matter context.** Check `## Matter workspaces` in the practice-level project legal profile. If `Enabled` is `✗` (in-house default), skip matter machinery. If enabled and no active matter, ask: "Which matter? Run `/skill:legal-matter-workspace switch <slug>` or say `practice-level`." Write outputs to the active matter's folder at `<dataDir>/ip-legal/matters/<matter-slug>/takedown/<slug>/` (or `takedown/<slug>/` at practice level). Never read another matter's files unless `Cross-matter context` is `on`.
+- **Matter context.** Check `## Matter workspaces` in the practice-level project legal profile. If `Enabled` is `✗` (in-house default), skip matter machinery. If enabled and no active matter, ask: "Which matter? Run `/skill:legal-matter-workspace switch <slug>` or say `practice-level`." Write outputs to the active matter's folder at `<dataDir>/matters/<matter-slug>/takedown/<slug>/` (or `takedown/<slug>/` at practice level). Never read another matter's files unless `Cross-matter context` is `on`.
 
 ## Send mode — drafting a §512(c)(3) takedown notice
 

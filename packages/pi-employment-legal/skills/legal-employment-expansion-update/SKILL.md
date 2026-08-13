@@ -2,7 +2,6 @@
 name: legal-employment-expansion-update
 description: "Update the status of an in-progress international expansion project — recalculates what is now unblocked, flags anything overdue, and surfaces the next priorities. Use when work has happened since the last session and the expansion tracker needs to reflect the current state."
 ---
-
 # /skill:legal-employment-expansion-update
 
 > **Attribution:** Adapted from Anthropic's `claude-for-legal/employment-legal` at revision `4a6c651889c97cc9140580363c73e0eb17379c2b` under Apache-2.0 and modified for Pi. See the package `NOTICE`.
@@ -66,5 +65,5 @@ Next priority: [top open item].
 ```
 
 > Detailed tracker schema, item-status rules, and dependency logic live in the
-> `international-expansion` reference skill — load it before doing substantive
+> `../legal-employment-international-expansion/SKILL.md` — load it before doing substantive
 > work.

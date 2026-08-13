@@ -144,6 +144,28 @@ await runScenario(
 );
 
 await runScenario(
+  "playbook-auto-trigger",
+  "我们刚刚签完一份供应商合同。最终责任上限接受了过去十二个月费用，但现有 playbook 标准是二十四个月；法务负责人批准了这个 fallback，而且认为以后同类低风险供应商可以继续接受。不要写任何文件，只说明这个已确认结果下一步应该进入什么流程，以及写入前需要我确认什么。",
+  undefined,
+  [
+    (output) => assert.match(output, /playbook|deviation|偏差|capture|记录/i),
+    (output) => assert.match(output, /确认|confirm|写入前|before.*writ/i),
+    (output) => assert.doesNotMatch(output, /已经写入|已写入|has been written|recorded successfully/i),
+  ],
+);
+
+await runScenario(
+  "research-england-scope",
+  "/skill:legal-research 研究英格兰法下B2B合同责任限制条款。不要检索，也不要给实体结论；只确认范围并给出下一步应核对的英格兰权威来源类型。不要因为不是美国法而停止工作。",
+  undefined,
+  [
+    (output) => assert.match(output, /英格兰|England|English law/i),
+    (output) => assert.match(output, /立法|statute|legislation|判例|case|UKSC|Court/i),
+    (output) => assert.doesNotMatch(output, /out[- ]of[- ]scope|future jurisdiction module|未来法域模块/i),
+  ],
+);
+
+await runScenario(
   "privacy-dsar-intake-gate",
   "/skill:legal-privacy-dsar-response 我们收到一封美国用户要求删除全部数据的邮件，但我没有提供收件日期、用户所在州或身份核验情况。不要检索、不要写文件、不要计算或声称任何法定截止日；只完成正式处理前的 intake gate。",
   undefined,

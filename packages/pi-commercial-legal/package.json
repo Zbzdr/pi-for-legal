@@ -1,7 +1,7 @@
 {
   "name": "@zbzdr/pi-commercial-legal",
-  "version": "0.1.0",
-  "description": "US commercial contract, NDA, SaaS, amendment, and renewal review skills for Pi.",
+  "version": "0.2.0",
+  "description": "Commercial contract, NDA, SaaS, DOCX redline, amendment, and renewal review skills for Pi.",
   "type": "module",
   "license": "Apache-2.0",
   "repository": {
@@ -42,7 +42,7 @@
       "@zbzdr/pi-legal-core"
     ],
     "upstreamRevision": "4a6c651889c97cc9140580363c73e0eb17379c2b",
-    "skillCount": 6
+    "skillCount": 7
   },
   "pi": {
     "skills": [

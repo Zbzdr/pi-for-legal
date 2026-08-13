@@ -2,7 +2,6 @@
 name: legal-regulatory-feed-watcher
 description: "Check regulatory feeds now and report what's new since the last check, filtered by your materiality threshold. Use when the user says \"check the feeds\", \"what's new\", \"regulatory update\", when running from the scheduled agent, or when manually pasting a regulatory development for classification and diff."
 ---
-
 # /skill:legal-regulatory-feed-watcher
 
 > **Attribution:** Adapted from Anthropic's `claude-for-legal/regulatory-legal` at revision `4a6c651889c97cc9140580363c73e0eb17379c2b` under Apache-2.0 and modified for Pi. See the package `NOTICE`.

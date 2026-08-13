@@ -3,15 +3,16 @@
 共享的 Pi 法律基础包，包含：
 
 - 项目级法律实践 profile setup/customize；
-- 美国法律研究与来源审查；
+- 多法域法律研究与来源审查；
 - matter 隔离；
+- 成交偏差记录与 playbook 更新提案；
 - 升级说明；
 - 业务摘要与人工复核规则。
 
 项目级安装：
 
 ```bash
-pi install -l npm:@zbzdr/pi-legal-core@0.1.0
+pi install -l npm:@zbzdr/pi-legal-core@0.2.0
 ```
 
 本地开发：

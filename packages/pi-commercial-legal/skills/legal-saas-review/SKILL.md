@@ -1,13 +1,14 @@
 ---
 name: legal-saas-review
-description: Apply a SaaS, cloud, data, security, subscription, and renewal overlay to a US commercial agreement after the general vendor review. Use for SaaS MSAs, cloud subscriptions, recurring software orders, SLAs, DPAs, and AI-enabled services.
+description: Apply a SaaS, cloud, data, security, subscription, and renewal overlay to a commercial agreement after the general vendor review. Use for SaaS MSAs, cloud subscriptions, recurring software orders, SLAs, DPAs, and AI-enabled services.
+disable-model-invocation: true
 ---
 
 # SaaS agreement overlay
 
 > **Attribution:** Adapted from Anthropic's claude-for-legal/commercial-legal at revision 4a6c651889c97cc9140580363c73e0eb17379c2b under Apache-2.0 and modified for Pi. See the package NOTICE.
 
-This is an overlay, not a replacement for `/skill:legal-vendor-review`.
+This is an overlay worker normally loaded by `/skill:legal-contract-review`. Pi still permits explicit `/skill:legal-saas-review` invocation. On direct invocation, first perform the router's profile, source-manifest, document-structure, side, amendment, and routing checks, then read and apply `../legal-vendor-review/SKILL.md` before this overlay. Do not issue a SaaS-only memo that omits the base agreement review.
 
 ## Context
 

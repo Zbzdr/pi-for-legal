@@ -2,14 +2,13 @@
 name: legal-litigation-matter-update
 description: "Append a dated event to a matter's history file and refresh the log row — captures new developments, status changes, risk re-assessments, deadline shifts, and settlement authority changes. Use when the user wants to log an update on a matter, note a development, or record a status change against the portfolio."
 ---
-
 # /skill:legal-litigation-matter-update
 
 > **Attribution:** Adapted from Anthropic's `claude-for-legal/litigation-legal` at revision `4a6c651889c97cc9140580363c73e0eb17379c2b` under Apache-2.0 and modified for Pi. See the package `NOTICE`.
 1. Follow the workflow and reference below.
-2. Confirm slug exists in `<dataDir>/litigation-legal/matters/` and `_log.yaml`.
+2. Confirm slug exists in `<dataDir>/matters/` and `_log.yaml`.
 3. Prompt for event type, date (default today), summary, and any log field updates (risk change, status change, next deadline shift, materiality reclassification).
-4. Append dated entry to `<dataDir>/litigation-legal/matters/[slug]/history.md`.
+4. Append dated entry to `<dataDir>/matters/[slug]/history.md`.
 5. Update `_log.yaml` — set `last_updated` to today, apply any field updates.
 6. Confirm.
 
@@ -23,9 +22,9 @@ The portfolio only stays useful if it stays current. This skill makes logging an
 
 ## Load context
 
-- `<dataDir>/litigation-legal/matters/_log.yaml` — find the row
-- `<dataDir>/litigation-legal/matters/[slug]/history.md` — append target
-- `<dataDir>/litigation-legal/matters/[slug]/matter.md` — reference (don't rewrite)
+- `<dataDir>/matters/_log.yaml` — find the row
+- `<dataDir>/matters/[slug]/history.md` — append target
+- `<dataDir>/matters/[slug]/matter.md` — reference (don't rewrite)
 - the project legal profile — risk calibration (if re-assessing risk)
 
 **Conflicts gate — unbypassable.** Before logging an update, check `_log.yaml` for the matter slug. If the matter is not in `_log.yaml`, refuse and route:
@@ -114,7 +113,7 @@ If the update references a document (order, filing, correspondence), ask if ther
 
 ## Writing
 
-### Append to `<dataDir>/litigation-legal/matters/[slug]/history.md`
+### Append to `<dataDir>/matters/[slug]/history.md`
 
 Most recent at top, directly under the `---` that follows the header.
 
@@ -132,7 +131,7 @@ Most recent at top, directly under the `---` that follows the header.
 
 If no fields changed, omit the "Fields changed" block.
 
-### Update `<dataDir>/litigation-legal/matters/_log.yaml`
+### Update `<dataDir>/matters/_log.yaml`
 
 - Apply any field changes.
 - Set `last_updated: [today]` (or the event date if the user overrode — the log tracks when the record was last touched).

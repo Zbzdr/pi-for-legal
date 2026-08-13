@@ -1,6 +1,6 @@
 {
   "name": "@zbzdr/pi-legal-suite",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "All-in-one bundle of the implemented Pi legal core and practice-area skills.",
   "type": "module",
   "license": "Apache-2.0",
@@ -43,6 +43,6 @@
   },
   "piLegal": {
     "upstreamRevision": "4a6c651889c97cc9140580363c73e0eb17379c2b",
-    "skillCount": 86
+    "skillCount": 88
   }
 }

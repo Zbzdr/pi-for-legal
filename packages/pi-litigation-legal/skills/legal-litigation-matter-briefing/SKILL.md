@@ -2,13 +2,12 @@
 name: legal-litigation-matter-briefing
 description: "Deep briefing on one matter — current posture, what's changed, next deadline, open questions, and a risk re-assessment check, ready before a GC update or outside counsel call. Use when the user says \"brief me on [matter]\", \"where are we on [matter]\", or needs a read on a specific matter."
 ---
-
 # /skill:legal-litigation-matter-briefing
 
 > **Attribution:** Adapted from Anthropic's `claude-for-legal/litigation-legal` at revision `4a6c651889c97cc9140580363c73e0eb17379c2b` under Apache-2.0 and modified for Pi. See the package `NOTICE`.
 1. Load the project legal profile → risk calibration + relevant stakeholders.
 2. Follow the workflow and reference below.
-3. Read `<dataDir>/litigation-legal/matters/[slug]/matter.md` + `<dataDir>/litigation-legal/matters/[slug]/history.md` + log row from `_log.yaml`.
+3. Read `<dataDir>/matters/[slug]/matter.md` + `<dataDir>/matters/[slug]/history.md` + log row from `_log.yaml`.
 4. Produce briefing: current posture, what's changed since last update, next deadline, open questions, risk re-assessment check ("does the `risk:` field still reflect reality?").
 5. Flag staleness: if `last_updated` > 30 days, say so.
 
@@ -22,9 +21,9 @@ Give the counsel a clean read on one matter in the time it takes to walk to a co
 
 ## Load context
 
-- `<dataDir>/litigation-legal/matters/_log.yaml` — structured row
-- `<dataDir>/litigation-legal/matters/[slug]/matter.md` — narrative intake
-- `<dataDir>/litigation-legal/matters/[slug]/history.md` — event log
+- `<dataDir>/matters/_log.yaml` — structured row
+- `<dataDir>/matters/[slug]/matter.md` — narrative intake
+- `<dataDir>/matters/[slug]/history.md` — event log
 - the project legal profile — risk calibration (so "risk: high" means something specific, not generic)
 
 **Conflicts gate — unbypassable.** Before briefing, check `_log.yaml` for the matter slug. If the matter is not in `_log.yaml`, refuse and route:

@@ -2,7 +2,6 @@
 name: legal-litigation-matter-close
 description: "Close a matter — capture outcome, final exposure, and lessons, then archive it out of the active portfolio without deleting the record. Use when the user wants to close a matter, says \"[matter] is done\", or needs to record a settlement, dismissal, judgment, withdrawal, or consolidation outcome."
 ---
-
 # /skill:legal-litigation-matter-close
 
 > **Attribution:** Adapted from Anthropic's `claude-for-legal/litigation-legal` at revision `4a6c651889c97cc9140580363c73e0eb17379c2b` under Apache-2.0 and modified for Pi. See the package `NOTICE`.
@@ -10,8 +9,8 @@ description: "Close a matter — capture outcome, final exposure, and lessons, t
 2. Confirm slug and current status.
 3. Capture outcome: resolution type (settled, dismissed, judgment for/against, withdrawn, consolidated), date, final exposure/cost, lessons.
 4. Update `_log.yaml`: `status: closed`, add `closed: YYYY-MM-DD` and `outcome:` fields.
-5. Append final entry to `<dataDir>/litigation-legal/matters/[slug]/history.md`.
-6. Matter stays in `_log.yaml` and `<dataDir>/litigation-legal/matters/[slug]/` — not deleted. `/portfolio-status` filters it from active rollups.
+5. Append final entry to `<dataDir>/matters/[slug]/history.md`.
+6. Matter stays in `_log.yaml` and `<dataDir>/matters/[slug]/` — not deleted. `/portfolio-status` filters it from active rollups.
 
 ---
 
@@ -23,9 +22,9 @@ Matters end. The outcome is the single most valuable data point the portfolio ge
 
 ## Load context
 
-- `<dataDir>/litigation-legal/matters/_log.yaml` — find the row
-- `<dataDir>/litigation-legal/matters/[slug]/matter.md` — reference (intake context)
-- `<dataDir>/litigation-legal/matters/[slug]/history.md` — append target
+- `<dataDir>/matters/_log.yaml` — find the row
+- `<dataDir>/matters/[slug]/matter.md` — reference (intake context)
+- `<dataDir>/matters/[slug]/history.md` — append target
 
 **Conflicts gate — unbypassable.** Before closing, check `_log.yaml` for the matter slug. If the matter is not in `_log.yaml`, refuse and route:
 
@@ -79,7 +78,7 @@ Settlement agreement, final order, dismissal — path if available. Not required
 
 Do not write the close fields or append the close entry without an explicit yes.
 
-### Update `<dataDir>/litigation-legal/matters/_log.yaml`
+### Update `<dataDir>/matters/_log.yaml`
 
 ```yaml
 status: closed
@@ -91,7 +90,7 @@ last_updated: [today]   # close is the last touch; record it
 
 Retain all existing fields. Do not delete the row.
 
-### Append final entry to `<dataDir>/litigation-legal/matters/[slug]/history.md`
+### Append final entry to `<dataDir>/matters/[slug]/history.md`
 
 ```markdown
 ## [YYYY-MM-DD] — Matter closed: [resolution-type]
@@ -107,7 +106,7 @@ Retain all existing fields. Do not delete the row.
 **Related doc:** [settlement agreement / final order / etc., if provided]
 ```
 
-### Touch `<dataDir>/litigation-legal/matters/[slug]/matter.md`
+### Touch `<dataDir>/matters/[slug]/matter.md`
 
 Add a closing block at the end (don't modify earlier sections — they're the historical intake):
 

@@ -2,18 +2,17 @@
 name: legal-litigation-chronology
 description: "Build or update a chronology from declared document sources and uploads — dated events extracted, de-duped, and tagged by significance per the matter theory. Use when the user asks to build a chronology or timeline from a production or matter file, says \"chron from the production\" or \"what happened when\", or needs a working, statement-of-facts, or witness-specific timeline."
 ---
-
 # /skill:legal-litigation-chronology
 
 > **Attribution:** Adapted from Anthropic's `claude-for-legal/litigation-legal` at revision `4a6c651889c97cc9140580363c73e0eb17379c2b` under Apache-2.0 and modified for Pi. See the package `NOTICE`.
-1. Load `<dataDir>/litigation-legal/matters/[slug]/matter.md` → theory, pivot fact, key facts.
+1. Load `<dataDir>/matters/[slug]/matter.md` → theory, pivot fact, key facts.
 2. Load the project legal profile → Document storage sources, default matter folder pattern.
 3. Follow the workflow and reference below.
 4. Identify sources in order: user-provided paths this session, default matter folder, declared sources from the project legal profile.
 5. For readable sources: extract dated events. For unreachable sources: note in Gaps.
 6. De-dupe, merge with sources list per event.
 7. Tag significance (🔴/🟡/⚪) per matter theory.
-8. Write `<dataDir>/litigation-legal/matters/[slug]/chronology.md` (or format variant per flag).
+8. Write `<dataDir>/matters/[slug]/chronology.md` (or format variant per flag).
 9. If prior version exists: version number increments, diff summary presented to user.
 10. Confirm before finalizing: "Here's what I built. Scan the 🔴 entries — anything I miscalled?"
 
@@ -64,14 +63,14 @@ Common:
 - Any files the user uploads or paths they provide in-session.
 
 `--matter` mode also reads:
-- `<dataDir>/litigation-legal/matters/[slug]/matter.md` → case theory, key facts, pivot fact (for significance tagging), key dates.
+- `<dataDir>/matters/[slug]/matter.md` → case theory, key facts, pivot fact (for significance tagging), key dates.
 - Default matter folder pattern from project legal profile → where docs for this slug live.
 
 `--documents` mode also reads:
 - eDiscovery platform metadata if a connector is available (Everlaw, Relativity, DISCO, Aurora) — by custodian + date range.
 - Bates-range manifest or production index if the user points at one.
 
-**Conflicts gate — unbypassable (`--matter` mode).** Before building the chronology, check `<dataDir>/litigation-legal/matters/_log.yaml` for the matter slug. If the matter is not in `_log.yaml`, refuse and route:
+**Conflicts gate — unbypassable (`--matter` mode).** Before building the chronology, check `<dataDir>/matters/_log.yaml` for the matter slug. If the matter is not in `_log.yaml`, refuse and route:
 
 > "I don't see [matter slug] in the matter log. Run `/skill:legal-litigation-matter-intake` first so the conflicts check runs and the matter workspace is set up. I won't build a chronology on a matter that hasn't been intaken — the conflicts check is the gate."
 
@@ -173,7 +172,7 @@ Default output is the working chronology. Variants on request.
 
 ### Working chronology (default)
 
-Location: `<dataDir>/litigation-legal/matters/[slug]/chronology.md`. Complete, tagged, annotated. The reference doc counsel works from.
+Location: `<dataDir>/matters/[slug]/chronology.md`. Complete, tagged, annotated. The reference doc counsel works from.
 
 ```markdown
 [WORK-PRODUCT HEADER — per package config ## Outputs — differs by role; see `## Who's using this`]

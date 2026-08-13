@@ -2,7 +2,6 @@
 name: legal-litigation-demand-draft
 description: "Draft a demand letter from a completed intake, gated on a privilege / FRE 408 / waiver / admission checklist, with a .docx output, post-send checklist, and an offer to create a matter. Use when the user says \"draft the demand\", \"write the [type] letter\", or has a finished demand intake ready to turn into a sendable draft."
 ---
-
 # /skill:legal-litigation-demand-draft
 
 > **Attribution:** Adapted from Anthropic's `claude-for-legal/litigation-legal` at revision `4a6c651889c97cc9140580363c73e0eb17379c2b` under Apache-2.0 and modified for Pi. See the package `NOTICE`.
@@ -81,7 +80,7 @@ This draft assumes the jurisdiction identified in the intake and the forum's app
 
 - `<dataDir>/litigation-legal/demand-letters/[slug]/intake.md` — required; refuse to proceed if missing
 - the project legal profile → Demand-letter practice (seed-doc paths, insurance-tender timing, materiality threshold for matter creation), house style (privilege markings, outside counsel directive format for tone reference). **Tone, compliance period, marking, and signer come from `## Posture for this matter` — they are matter-level, not practice-level.**
-- `<dataDir>/litigation-legal/matters/_log.yaml` — to check for existing related matters (same counterparty) and offer cross-link
+- `<dataDir>/matters/_log.yaml` — to check for existing related matters (same counterparty) and offer cross-link
 
 ### Strategic-block skipped handling
 
@@ -332,7 +331,7 @@ After drafting and writing the checklist, assess materiality per heuristic:
 
 Present the call:
 > Materiality heuristic: [result]. [One-sentence reason.]
-> Create a tracked matter in `<dataDir>/litigation-legal/matters/_log.yaml`? (default: [yes/no])
+> Create a tracked matter in `<dataDir>/matters/_log.yaml`? (default: [yes/no])
 
 If user accepts: trigger `matter-intake` with fields pre-populated from the intake (counterparty, type, jurisdiction, `source: demand-letter`, initial theory, internal stakeholders). User reviews pre-filled fields and confirms.
 

@@ -2,14 +2,13 @@
 name: legal-litigation-subpoena-triage
 description: "Triage a subpoena served on the company — classify it, analyze scope/burden/privilege, cross-check the portfolio, and produce an objections framework, compliance plan, and deadline calendar. Use when the user says \"we got a subpoena\", \"served with a subpoena\", or shares a subpoena, CID, or third-party document request to evaluate."
 ---
-
 # /skill:legal-litigation-subpoena-triage
 
 > **Attribution:** Adapted from Anthropic's `claude-for-legal/litigation-legal` at revision `4a6c651889c97cc9140580363c73e0eb17379c2b` under Apache-2.0 and modified for Pi. See the package `NOTICE`.
 1. Read the subpoena from provided path.
 2. Classify (third-party-docs / third-party-depo / party / CID / grand-jury).
 3. If grand jury → stop, escalate per the project legal profile. Otherwise continue.
-4. Load `<dataDir>/litigation-legal/matters/_log.yaml` for cross-check. Load the project legal profile → landscape, privilege conventions, escalation norms.
+4. Load `<dataDir>/matters/_log.yaml` for cross-check. Load the project legal profile → landscape, privilege conventions, escalation norms.
 5. Follow the workflow and reference below.
 6. Extract key fields, analyze scope/burden/privilege, produce objections framework + compliance plan + deadline calendar.
 7. Write `<dataDir>/litigation-legal/inbound/[slug]/triage.md`. Copy or link subpoena to `<dataDir>/litigation-legal/inbound/[slug]/incoming.[ext]`.
@@ -34,7 +33,7 @@ This skill is inherently defensive — a subpoena has been served on the recipie
 ## Load context
 
 - The subpoena document (user provides path or drops it in-session)
-- `<dataDir>/litigation-legal/matters/_log.yaml` — for related matter lookup and legal hold status
+- `<dataDir>/matters/_log.yaml` — for related matter lookup and legal hold status
 - the project legal profile → landscape (regulators we deal with), house privilege conventions, escalation norms
 
 ## Workflow

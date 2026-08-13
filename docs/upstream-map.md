@@ -32,12 +32,19 @@ Each domain omits its duplicate `cold-start-interview`, `customize`, and `matter
 
 - Claude commands are Agent Skills commands (`/skill:<domain-prefixed-name>`).
 - Claude global profile paths resolve through project `.pi/legal-workbench/config.json`.
-- only `name` and `description` remain in skill frontmatter so Pi receives clean trigger metadata;
+- Pi-standard frontmatter is retained; upstream internal workers use `disable-model-invocation: true` for progressive disclosure and are read by their public router or mode Skill;
 - MCP declarations, hooks, agents, scheduled tasks, and vendor integrations are not packaged;
 - skills use visible capabilities, but never infer that a connector works without a successful call;
 - file writes are previewed and external sends, filings, signatures, legal-hold changes, risk acceptance, and system-of-record changes require explicit confirmation;
-- non-US propositions require current authoritative verification or are limited to issue spotting/research planning;
-- references needed by one workflow are copied inside that skill and checked for missing or orphaned links.
+- jurisdiction-specific workflows and knowledge are preserved across US, UK, EEA/EU, and cross-border areas; every workflow identifies the applicable legal system and uses its authority hierarchy without silently applying US doctrine elsewhere;
+- references needed by one workflow are copied inside that skill and checked for missing or orphaned links;
+- duplicate domain setup/customize/matter workflows are centralized in core, and every domain uses the shared `<dataDir>/matters/` contract.
+
+## Skill and tool boundary
+
+The current packages intentionally expose legal judgment workflows as Agent Skills rather than custom Pi tools. Skill descriptions provide automatic routing metadata, while full instructions and references load only when relevant. Registering every workflow as a tool would keep dozens of schemas in the model context and would turn open-ended legal judgment into misleadingly rigid parameter contracts.
+
+Deterministic operations remain bundled scripts invoked under their governing Skill. This includes DOCX mutation and the project-local Python environment bootstrap. Stateful playbook learning remains a Skill because comparability, reuse, and policy changes require legal judgment and explicit confirmation. A future all-in-one extension may register narrowly scoped tools for deterministic capture, validation, or file mutation, but should not replace the review Skills themselves.
 
 ## Excluded upstream areas
 
@@ -47,4 +54,4 @@ Each domain omits its duplicate `cold-start-interview`, `customize`, and `matter
 - `managed-agent-cookbooks`: scheduled/subagent orchestration, outside this pure-skills layer;
 - third-party `external_plugins`: only general research guardrails were incorporated into core; no vendor connector is bundled.
 
-The reproducible adapter is `scripts/import-upstream-domains.mjs`. Generated output must still pass package, reference, RPC, installation, and behavior tests before release.
+The reproducible adapter is `scripts/import-upstream-domains.mjs`. Generated output must still pass package, reference, RPC, installation, and behavior tests before release. The original commercial `review-proposals` loop is represented by the on-demand core `legal-playbook-learning` Skill; the scheduled agents remain outside the pure-Skills package.

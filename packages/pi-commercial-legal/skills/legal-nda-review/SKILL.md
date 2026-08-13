@@ -1,11 +1,14 @@
 ---
 name: legal-nda-review
-description: Triage and review a standalone NDA or confidentiality agreement against the project's configured US contract playbook, producing GREEN, YELLOW, or RED with exact quotes and next actions. Use directly or when routed by legal-contract-review.
+description: Triage and review a standalone NDA or confidentiality agreement against the project's configured contract playbook, producing GREEN, YELLOW, or RED with exact quotes and next actions. Use directly or when routed by legal-contract-review.
+disable-model-invocation: true
 ---
 
 # NDA review
 
 > **Attribution:** Adapted from Anthropic's claude-for-legal/commercial-legal at revision 4a6c651889c97cc9140580363c73e0eb17379c2b under Apache-2.0 and modified for Pi. See the package NOTICE.
+
+This is a worker Skill normally loaded by `/skill:legal-contract-review`. Pi still permits explicit `/skill:legal-nda-review` invocation. On direct invocation, first perform the router's profile, source-manifest, document-structure, side, amendment, and routing checks. Continue only when the NDA is the main agreement; otherwise return to the integrated contract router.
 
 ## Profile first
 
@@ -15,7 +18,7 @@ The profile decides what GREEN, YELLOW, and RED mean. This skill supplies catego
 
 ## Intake
 
-Confirm the NDA is the main agreement. If confidentiality terms sit inside an MSA, route to `/skill:legal-vendor-review`. Read the whole NDA, attachments, and referenced policies. Record missing or unread material.
+Confirm the NDA is the main agreement. If confidentiality terms sit inside an MSA, route to `/skill:legal-contract-review`. Read the whole NDA, attachments, and referenced policies. Record missing or unread material.
 
 ## Review
 

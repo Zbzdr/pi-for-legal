@@ -49,7 +49,7 @@ Capture the minimum needed for reliable contract work:
 
 1. user role: lawyer/legal professional, legal operations or supervised non-lawyer;
 2. practice setting: in-house, firm/solo, government/legal aid/clinic;
-3. organization or client context and primary US jurisdictions;
+3. organization or client context, governing-law footprint, courts, regulators, and other relevant forums;
 4. contract side: sales, purchasing, or both;
 5. an existing playbook, clause matrix, delegation-of-authority document, or representative agreements, if available;
 6. the "one thing" that blocks a deal on each active side;
@@ -64,7 +64,19 @@ When an existing team document answers a question, extract the answer, quote or 
 
 After the shared questions, offer only the modules relevant to the user's work: commercial, privacy, regulatory, AI governance, employment, corporate, litigation, IP, and product. Read `references/domain-modules.md` and run each selected module as a short, resumable interview. Prefer the user's playbooks, policies, templates, prior work product, and delegation documents over generic defaults. Keep each module under its own heading in the same project profile so separately installed packages can share one source of truth.
 
-When a field is unknown, write `Not configured — ask at use time`. Do not turn an industry practice, model assumption, or stale legal threshold into company policy. Cross-border privacy and AI questions may be captured as operational facts, but non-US legal conclusions require current jurisdiction-specific research.
+When a field is unknown in full setup, write `Not configured — ask at use time`. Do not turn an industry practice, model assumption, or stale legal threshold into company policy. Capture every jurisdiction the user actually works in, including cross-border privacy, AI, employment, commercial, corporate, IP, regulatory, and disputes work.
+
+### Quick defaults
+
+For quick setup, read `references/quick-defaults.md`. Ask the minimum identity, practice-setting, jurisdiction, active-side, and module questions, then offer the generic defaults as a visible package:
+
+1. show the defaults that will materially affect work;
+2. let the user accept all, edit selected defaults, or leave selected fields unconfigured;
+3. write each accepted item with a `[DEFAULT — generic starting point]` label;
+4. never describe a default as the user's policy, settled legal conclusion, delegated authority, or accepted market position;
+5. require matter-specific facts and current jurisdiction-specific authority before relying on a default for a consequential decision.
+
+Quick setup should make the package usable immediately. Full setup replaces defaults with the user's documents, playbook, thresholds, templates, and instructions. `/skill:legal-customize` may replace one default at a time.
 
 ### Full setup
 
@@ -95,4 +107,4 @@ After writing:
 3. offer a first run: contract review or legal research;
 4. remind the user that `/skill:legal-customize` can update one section later.
 
-Do not create MCP configuration, global Pi settings, scheduled tasks, or redline tooling.
+Do not create MCP configuration, global Pi settings, scheduled tasks, or redline tooling during setup.
