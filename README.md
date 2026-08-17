@@ -95,6 +95,7 @@ pi install -l npm:@zbzdr/pi-privacy-legal
 
 ## 未来更新路线图
 
+- 优化工作区内按照session来隔离任务context的策略；
 - 深化 CN 及其他法域的本地化资料、来源策略和专门模板；
 - 从轻量精确替换扩展到复杂 DOCX redline、批注和格式保真；
 - 实现法律检索 MCP的接入和配置，必要时依赖第三方 MCP adapter；
