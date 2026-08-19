@@ -1,5 +1,6 @@
 {
   "name": "@zbzdr/pi-privacy-legal",
+  "private": true,
   "version": "0.2.0",
   "description": "Pi legal skills for privacy & data protection workflows, adapted from claude-for-legal.",
   "type": "module",

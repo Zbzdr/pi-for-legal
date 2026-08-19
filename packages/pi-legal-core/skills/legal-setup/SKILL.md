@@ -1,42 +1,55 @@
 ---
 name: legal-setup
-description: Set up or resume the project-local legal practice profile used by pi-legal-workbench. Use after installation, when a review lacks a playbook, when the user asks to configure the legal package, or when profile storage must be changed.
+description: Initialize, migrate, complete, or update the project-local Pi Legal workspace and practice profile. Use after installation, when setup is incomplete, when a review lacks a playbook, when the user asks to configure legal workflows, or when visible matter storage must change.
 ---
 
 # Legal workbench setup
 
 > **Attribution:** Adapted from Anthropic's claude-for-legal at revision 4a6c651889c97cc9140580363c73e0eb17379c2b under Apache-2.0 and modified for Pi. See the package NOTICE.
 
-Build a useful practice profile through conversation. This is an interview, not a configuration dump. Ask one coherent question at a time, use documents the user supplies, and do not re-ask facts already known.
+Initialize the workspace boundary, then build a useful practice profile through conversation. Ask one coherent question at a time, use documents the user supplies, and do not re-ask facts already known.
 
 ## Storage gate — always first
 
-Look for `.pi/legal-workbench/config.json` in the current project.
+Look for `.pi/legal-workbench/config.json` in the current workspace.
 
-If it does not exist, ask where the user wants this project's legal profile stored before asking substantive questions:
+If it does not exist, ask where the user wants visible legal work stored before asking substantive profile questions:
 
-1. project-local (recommended): `.pi/legal-workbench/profile.md` with data in `.pi/legal-workbench/data/`; or
-2. a custom path supplied by the user.
+1. project-local default: reusable state in `.pi/legal-workbench/`, substantive data in `legal-workbench/`, and matters in `legal-workbench/matters/`; or
+2. another visible project-relative data directory supplied by the user.
 
-Explain that project-local storage travels with the project if committed, so confidential profile/data files should normally remain gitignored. Never silently choose a global path and never write to `~/.pi` by default.
+Explain that `.pi/` contains only reusable configuration, the profile, status, and a metadata-only matter index. Client facts, downloads, research, drafts, redlines, and work product stay in visible matter directories outside `.pi/`. Project-local material travels with the project if committed, so confidential paths should normally remain gitignored. Never choose a global path or write to `~/.pi` by default.
 
-Before the first write, show the exact config, profile, and data paths and ask for confirmation. Then write `.pi/legal-workbench/config.json`:
+Before the first write, show all exact paths and ask for confirmation. After confirmation, run `scripts/init_workspace.mjs` with the current workspace and chosen visible data directory. The script installs `references/append-system-template.md` as a managed section while preserving other `.pi/APPEND_SYSTEM.md` content, creates the profile and state files, and initializes visible practice and matter roots. It does not change Pi's session settings or create a client matter.
+
+Default command:
+
+```bash
+node <skill-root>/scripts/init_workspace.mjs --workspace <workspace-absolute-path> --data-dir legal-workbench --phase initialize
+```
+
+The resulting config is:
 
 ```json
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "profilePath": ".pi/legal-workbench/profile.md",
-  "dataDir": ".pi/legal-workbench/data"
+  "statusPath": ".pi/legal-workbench/status.json",
+  "indexPath": ".pi/legal-workbench/matter-index.json",
+  "dataDir": "legal-workbench",
+  "matterRoot": "legal-workbench/matters"
 }
 ```
 
-Relative paths resolve from the current project. For custom storage, record the chosen absolute or project-relative paths. Do not store credentials, tokens, client secrets, or private keys.
+The data directory must be visible, project-relative, and inside the workspace. Do not store credentials, tokens, client secrets, or private keys.
+
+If schema version 1 exists, explain the proposed migration before changing anything. Moving existing substantive data out of `.pi/` requires a separate, confirmed file plan; never delete or silently relocate it. The deterministic initializer intentionally refuses to overwrite a different config.
 
 ## Resume and update
 
-- If config and profile exist, read both before asking anything.
+- If config, status, and profile exist, read them before asking anything.
 - If the profile contains `SETUP PAUSED AT`, offer to resume there or start over.
-- If setup is complete, ask whether the user wants to update one section, check integrations, or redo the interview. Do not overwrite a populated profile without explicit confirmation.
+- If setup is complete, ask whether the user wants to update one section, check integrations, change storage, or redo the interview. Do not overwrite a populated profile without explicit confirmation.
 - On pause, save answered sections and add `<!-- SETUP PAUSED AT: section -->`. Mark unanswered fields `Not configured — ask at use time`, not invented defaults.
 
 ## Interview mode
@@ -56,7 +69,7 @@ Capture the minimum needed for reliable contract work:
 7. core positions for liability, indemnity, data protection, term/termination, and governing law;
 8. escalation owner and automatic escalation triggers;
 9. whether routing should be confirmed before review; and
-10. preferred memo audience, tone, and output location.
+10. preferred memo audience and tone. Matter work product always goes under the active visible matter directory.
 
 When an existing team document answers a question, extract the answer, quote or anchor its source, and ask only about gaps. Keep sales-side and purchasing-side positions separate.
 
@@ -80,7 +93,7 @@ Quick setup should make the package usable immediately. Full setup replaces defa
 
 ### Full setup
 
-Add team composition, volume, contract systems, detailed fallback positions, NDA triage rules, SaaS/data/AI positions, matter isolation for firm users, renewal ownership, research subscriptions, source preferences, and representative executed agreements. Distinguish stated policy from terms the team actually accepts.
+Add team composition, volume, contract systems, detailed fallback positions, NDA triage rules, SaaS/data/AI positions, matter naming and metadata conventions, renewal ownership, research subscriptions, source preferences, and representative executed agreements. Distinguish stated policy from terms the team actually accepts.
 
 Use `references/profile-template.md` as the profile structure and `references/domain-modules.md` for selected domain sections. Preserve the user's language where possible. A profile is prose a lawyer can edit, not an opaque schema.
 
@@ -100,11 +113,18 @@ If the user supplies a statute, deadline, threshold, case, or jurisdiction-speci
 
 ## Completion
 
-After writing:
+After the interview is complete, update the profile, remove any pause marker, and run:
 
-1. summarize the paths and the five or six decisions that will materially change future output;
+```bash
+node <skill-root>/scripts/init_workspace.mjs --workspace <workspace-absolute-path> --data-dir <confirmed-data-dir> --phase complete
+```
+
+This marks setup complete without overwriting a populated profile. Then:
+
+1. summarize the config, profile, visible data, and matter paths plus the decisions that materially change future output;
 2. state which sections remain `Not configured — ask at use time`;
-3. offer a first run: contract review or legal research;
-4. remind the user that `/skill:legal-customize` can update one section later.
+3. explain that the newly created `.pi/APPEND_SYSTEM.md` takes effect after `/reload` or a Pi restart;
+4. explain that the next new session will ask to create or reuse a matter before substantive work;
+5. remind the user that `/skill:legal-customize` can update one section later.
 
 Do not create MCP configuration, global Pi settings, scheduled tasks, or redline tooling during setup.

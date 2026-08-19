@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.0 — 2026-08-19
+
+- 新增项目级 legal workspace 初始化：`.pi/` 只保存可复用状态，matter 数据、研究和工作产品保存在可见目录。
+- 新增 core extension，在新 session 首轮执行 metadata-only matter 匹配，并通过 `legal_matter_session` 创建或绑定事务。
+- 保留 Pi 默认 session 存储方式，仅在 matter README 中记录关联 session ID。
+- 为内置 write/edit 增加 active-matter 路径护栏，并保留已有 `.pi/settings.json` 和 `APPEND_SYSTEM.md` 内容。
+- 收敛为唯一维护和发布的 `@zbzdr/pi-legal-suite`；原 core/领域包停止更新并在 suite 发布后标记 deprecated。
+
 ## 0.2.0 — 2026-08-13
 
 - 将法律研究和领域工作流调整为多法域口径，保留上游涉及美国、英国、EEA/EU 和跨境事项的内容。

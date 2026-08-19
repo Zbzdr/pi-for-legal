@@ -8,17 +8,17 @@ import { RpcClient } from "@earendil-works/pi-coding-agent";
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const cliPath = join(root, "node_modules", "@earendil-works", "pi-coding-agent", "dist", "cli.js");
 const results = [];
-const scenarioFilter = process.env.PI_LEGAL_BEHAVIOR_SCENARIO;
+const scenarioFilter = process.env.PI_LEGAL_BEHAVIOR_SCENARIO ?? process.argv[2];
 
-function skillPaths(packageNames) {
-  return packageNames.map((packageName) => resolve(root, "packages", packageName, "skills"));
+function skillPaths() {
+  return [resolve(root, "packages", "pi-legal-suite", "skills")];
 }
 
-async function runScenario(name, prompt, prepare, checks, packageNames = ["pi-legal-core", "pi-commercial-legal"]) {
+async function runScenario(name, prompt, prepare, checks, useCoreExtension = false) {
   if (scenarioFilter && scenarioFilter !== name) return;
   const cwd = mkdtempSync(join(tmpdir(), `pi-legal-${name}-`));
   if (prepare) prepare(cwd);
-  const selectedSkillPaths = skillPaths(packageNames);
+  const selectedSkillPaths = skillPaths();
 
   const client = new RpcClient({
     cliPath,
@@ -31,6 +31,7 @@ async function runScenario(name, prompt, prepare, checks, packageNames = ["pi-le
       "--no-session",
       "--approve",
       "--no-extensions",
+      ...(useCoreExtension ? ["--extension", resolve(root, "packages", "pi-legal-suite", "extensions", "legal-workbench.ts")] : []),
       "--no-skills",
       ...selectedSkillPaths.flatMap((path) => ["--skill", path]),
       "--no-prompt-templates",
@@ -66,9 +67,71 @@ await runScenario(
   "/skill:legal-setup 这是自动化体验测试。不要创建或修改任何文件，也不要开始实体访谈；只向我提出实际 setup 时的第一个问题。",
   undefined,
   [
-    (output) => assert.match(output, /保存|存储|storage|store/i),
-    (output) => assert.match(output, /\.pi\/legal-workbench\/profile\.md/),
+    (output) => assert.match(output, /保存|存储|存放|storage|store/i),
+    (output) => assert.match(output, /legal-workbench\/|可见|visible/i),
+    (output) => assert.match(output, /\.pi\/legal-workbench\/|\.pi/i),
   ],
+);
+
+await runScenario(
+  "new-session-matter-match",
+  "请继续 Acme 在 California 的 CCPA 删除请求事项。不要开始实体研究；只执行新 session 的 matter 选择步骤。",
+  (cwd) => {
+    const configDir = join(cwd, ".pi", "legal-workbench");
+    mkdirSync(configDir, { recursive: true });
+    mkdirSync(join(cwd, "legal-workbench", "matters"), { recursive: true });
+    mkdirSync(join(cwd, "legal-workbench", "practice"), { recursive: true });
+    writeFileSync(join(configDir, "config.json"), JSON.stringify({
+      schemaVersion: 2,
+      profilePath: ".pi/legal-workbench/profile.md",
+      statusPath: ".pi/legal-workbench/status.json",
+      indexPath: ".pi/legal-workbench/matter-index.json",
+      dataDir: "legal-workbench",
+      matterRoot: "legal-workbench/matters",
+    }, null, 2));
+    writeFileSync(join(configDir, "profile.md"), "# Legal Workbench Practice Profile\n\n- Setup complete.\n");
+    writeFileSync(join(configDir, "status.json"), JSON.stringify({
+      schemaVersion: 2,
+      setupStatus: "complete",
+      lastUpdated: "2026-08-19T00:00:00.000Z",
+    }, null, 2));
+    writeFileSync(join(configDir, "matter-index.json"), JSON.stringify({
+      schemaVersion: 1,
+      updatedAt: "2026-08-19T00:00:00.000Z",
+      matters: [
+        {
+          slug: "acme-ccpa",
+          name: "Acme CCPA Requests",
+          client: "Acme Corp",
+          clientAliases: ["Acme"],
+          jurisdictions: ["California"],
+          issueKeywords: ["CCPA", "deletion request"],
+          status: "active",
+          path: "legal-workbench/matters/acme-ccpa",
+          openedAt: "2026-08-01T00:00:00.000Z",
+          updatedAt: "2026-08-19T00:00:00.000Z",
+        },
+        {
+          slug: "confidential-merger",
+          name: "Confidential Merger",
+          client: "Other Client",
+          clientAliases: [],
+          jurisdictions: ["Delaware"],
+          issueKeywords: ["merger control"],
+          status: "active",
+          path: "legal-workbench/matters/confidential-merger",
+          openedAt: "2026-08-01T00:00:00.000Z",
+          updatedAt: "2026-08-19T00:00:00.000Z",
+        },
+      ],
+    }, null, 2));
+  },
+  [
+    (output) => assert.match(output, /acme-ccpa|Acme CCPA/i),
+    (output) => assert.match(output, /复用|绑定|reuse|bind|新建|create/i),
+    (output) => assert.doesNotMatch(output, /confidential-merger|Confidential Merger|Other Client/i),
+  ],
+  true,
 );
 
 await runScenario(
@@ -174,7 +237,6 @@ await runScenario(
     (output) => assert.match(output, /收到|receipt|date|日期/i),
     (output) => assert.match(output, /身份|identity|verify/i),
   ],
-  ["pi-legal-core", "pi-privacy-legal"],
 );
 
 await runScenario(
@@ -186,7 +248,6 @@ await runScenario(
     (output) => assert.match(output, /休假|leave|protected|保护/i),
     (output) => assert.match(output, /合同|contract|文件|document/i),
   ],
-  ["pi-legal-core", "pi-employment-legal"],
 );
 
 await runScenario(
@@ -198,7 +259,6 @@ await runScenario(
     (output) => assert.match(output, /律师|counsel|attorney/i),
     (output) => assert.match(output, /保全|preserv|hold|销毁/i),
   ],
-  ["pi-legal-core", "pi-litigation-legal"],
 );
 
 await runScenario(
@@ -210,7 +270,6 @@ await runScenario(
     (output) => assert.match(output, /USPTO|检索|search/i),
     (output) => assert.match(output, /商品|服务|goods|services|class/i),
   ],
-  ["pi-legal-core", "pi-ip-legal"],
 );
 
 await runScenario(
@@ -222,7 +281,6 @@ await runScenario(
     (output) => assert.match(output, /当前|current|核验|核对|现行|官方|一手|verify|权威|primary/i),
     (output) => assert.match(output, /角色|提供者|部署者|运营主体|部署地点|招聘|筛选|role|provider|deployer|用途|use/i),
   ],
-  ["pi-legal-core", "pi-ai-governance-legal"],
 );
 
 console.log(JSON.stringify({ ok: true, scenarioCount: results.length, results }, null, 2));

@@ -1,5 +1,6 @@
 {
   "name": "@zbzdr/pi-corporate-legal",
+  "private": true,
   "version": "0.2.0",
   "description": "Pi legal skills for corporate workflows, adapted from claude-for-legal.",
   "type": "module",

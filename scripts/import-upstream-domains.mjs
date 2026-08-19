@@ -13,7 +13,6 @@ import { fileURLToPath } from "node:url";
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const upstreamRoot = process.argv[2];
 const revision = "4a6c651889c97cc9140580363c73e0eb17379c2b";
-const workspaceVersion = JSON.parse(readFileSync(join(root, "package.json"), "utf8")).version;
 
 if (!upstreamRoot || !existsSync(join(upstreamRoot, ".git"))) {
   console.error("Usage: node scripts/import-upstream-domains.mjs /path/to/claude-for-legal");
@@ -25,7 +24,6 @@ const sharedSkills = new Set(["cold-start-interview", "customize", "matter-works
 const domains = [
   {
     upstream: "privacy-legal",
-    packageName: "@zbzdr/pi-privacy-legal",
     alias: "privacy",
     prefix: "legal-privacy-",
     title: "Privacy & Data Protection",
@@ -33,7 +31,6 @@ const domains = [
   },
   {
     upstream: "regulatory-legal",
-    packageName: "@zbzdr/pi-regulatory-legal",
     alias: "regulatory",
     prefix: "legal-regulatory-",
     title: "Regulatory",
@@ -46,7 +43,6 @@ const domains = [
   },
   {
     upstream: "ai-governance-legal",
-    packageName: "@zbzdr/pi-ai-governance-legal",
     alias: "ai-governance",
     prefix: "legal-ai-",
     title: "AI Governance",
@@ -59,7 +55,6 @@ const domains = [
   },
   {
     upstream: "employment-legal",
-    packageName: "@zbzdr/pi-employment-legal",
     alias: "employment",
     prefix: "legal-employment-",
     title: "Employment",
@@ -67,7 +62,6 @@ const domains = [
   },
   {
     upstream: "corporate-legal",
-    packageName: "@zbzdr/pi-corporate-legal",
     alias: "corporate",
     prefix: "legal-corporate-",
     title: "Corporate",
@@ -75,7 +69,6 @@ const domains = [
   },
   {
     upstream: "litigation-legal",
-    packageName: "@zbzdr/pi-litigation-legal",
     alias: "litigation",
     prefix: "legal-litigation-",
     title: "Litigation",
@@ -83,7 +76,6 @@ const domains = [
   },
   {
     upstream: "ip-legal",
-    packageName: "@zbzdr/pi-ip-legal",
     alias: "ip",
     prefix: "legal-ip-",
     title: "Intellectual Property",
@@ -92,7 +84,6 @@ const domains = [
   },
   {
     upstream: "product-legal",
-    packageName: "@zbzdr/pi-product-legal",
     alias: "product",
     prefix: "legal-product-",
     title: "Product",
@@ -188,7 +179,9 @@ function adaptText(text, domain) {
     .replaceAll("Task tool", "an available subagent tool")
     .replaceAll("AskUserQuestion", "the current conversation")
     .replaceAll("WebSearch", "an available web-search capability")
-    .replaceAll("WebFetch", "an available web-fetch capability");
+    .replaceAll("WebFetch", "an available web-fetch capability")
+    .replace(/,?\s+if the package is installed/gi, "")
+    .replaceAll("regulatory-legal package", "regulatory workflow in this suite");
 
   output = output
     .replaceAll(`<dataDir>/${domain.upstream}/matters/`, "<dataDir>/matters/")
@@ -241,47 +234,8 @@ function copyReferences(sourceSkillRoot, destinationSkillRoot, body, domain) {
   }
 }
 
-function packageManifest(domain, skillCount) {
-  const packageDirectory = domain.packageName.slice(domain.packageName.indexOf("/") + 1);
-  return {
-    name: domain.packageName,
-    version: workspaceVersion,
-    description: `Pi legal skills for ${domain.title.toLowerCase()} workflows, adapted from claude-for-legal.`,
-    type: "module",
-    license: "Apache-2.0",
-    repository: {
-      type: "git",
-      url: "git+https://github.com/Zbzdr/pi-for-legal.git",
-      directory: `packages/${packageDirectory}`,
-    },
-    homepage: "https://github.com/Zbzdr/pi-for-legal#readme",
-    bugs: { url: "https://github.com/Zbzdr/pi-for-legal/issues" },
-    engines: { node: ">=20" },
-    keywords: ["pi-package", "pi", "agent-skills", "legal", domain.alias],
-    files: ["skills", "README.md", "LICENSE", "NOTICE"],
-    scripts: { prepack: "node ../../scripts/prepare-package.mjs" },
-    publishConfig: {
-      access: "public",
-      registry: "https://registry.npmjs.org/",
-    },
-    pi: { skills: ["./skills"] },
-    piLegal: {
-      companionPackages: ["@zbzdr/pi-legal-core"],
-      upstreamRevision: revision,
-      skillCount,
-    },
-  };
-}
-
-function packageReadme(domain, names) {
-  return `# ${domain.packageName}\n\n${domain.summary}。这是一个纯 Pi Agent Skills package，不内置 MCP、connector、extension 或运行时依赖。\n\n## 安装\n\n推荐安装到当前项目（\`-l\`），并同时安装共享 setup、profile、法律研究与 matter 能力：\n\n\`\`\`bash\npi install -l npm:@zbzdr/pi-legal-core@${workspaceVersion}\npi install -l npm:${domain.packageName}@${workspaceVersion}\n\`\`\`\n\n不带 \`-l\` 的用户全局安装属于次要支持模式，会让该 package 出现在该用户的所有 Pi 项目中；仍需在每个项目单独运行 setup，并避免与项目中重复安装 suite/领域包。\n\n## Skills（${names.length}）\n\n${names.map((name) => `- \`/skill:${name}\``).join("\n")}\n\n首次使用先运行 \`/skill:legal-setup\`。本包保留上游工作流覆盖的美国、英国、EEA/EU 及跨境法律框架；处理任何法域时均应识别适用法、使用相应权威来源，并标明未完成的核实。所有实质输出均需合格律师复核。\n`;
-}
-
 for (const domain of domains) {
-  const packageDirectory = domain.packageName.slice(domain.packageName.indexOf("/") + 1);
-  const packageRoot = join(root, "packages", packageDirectory);
-  const destinationSkills = join(packageRoot, "skills");
-  rmSync(destinationSkills, { recursive: true, force: true });
+  const destinationSkills = join(root, "packages", "pi-legal-suite", "skills");
   mkdirSync(destinationSkills, { recursive: true });
   const names = [];
 
@@ -291,6 +245,7 @@ for (const domain of domains) {
     const { description, body, internalWorker } = parseSkill(readFileSync(join(sourceSkillRoot, "SKILL.md"), "utf8"));
     const name = destinationName(domain, sourceName);
     const destinationSkillRoot = join(destinationSkills, name);
+    rmSync(destinationSkillRoot, { recursive: true, force: true });
     mkdirSync(destinationSkillRoot, { recursive: true });
 
     const adaptedDescription = adaptText(description, domain)
@@ -330,10 +285,7 @@ for (const domain of domains) {
     names.push(name);
   }
 
-  mkdirSync(packageRoot, { recursive: true });
-  writeFileSync(join(packageRoot, "package.json"), `${JSON.stringify(packageManifest(domain, names.length), null, 2)}\n`);
-  writeFileSync(join(packageRoot, "README.md"), packageReadme(domain, names.sort()));
-  console.log(`Imported ${domain.packageName}: ${names.length} skills from ${relative(upstreamRoot, join(upstreamRoot, domain.upstream))}.`);
+  console.log(`Imported ${names.length} ${domain.alias} skills into @zbzdr/pi-legal-suite from ${relative(upstreamRoot, join(upstreamRoot, domain.upstream))}.`);
 }
 
 function walkFiles(directory) {

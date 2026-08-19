@@ -1,0 +1,35 @@
+---
+name: legal-employment-investigation-summary
+description: "Draft an audience-specific summary from the privileged investigation memo — HR, leadership, or outside counsel versions. Use when an investigation memo needs to be communicated to an audience that should not see the full privileged work product."
+---
+# /skill:legal-employment-investigation-summary
+
+> **Attribution:** Adapted from Anthropic's `claude-for-legal/employment-legal` at revision `4a6c651889c97cc9140580363c73e0eb17379c2b` under Apache-2.0 and modified for Pi. See the package `NOTICE`.
+Drafts a stripped-down, audience-appropriate summary from the privileged
+investigation memo. HR summaries contain no privilege analysis. Leadership
+summaries are high-level. Outside counsel briefings include full context.
+
+## Instructions
+
+1. Load `../legal-employment-internal-investigation/SKILL.md` and run Mode 5 (Audience summary).
+2. If no memo exists yet, offer to draft the memo first.
+3. HR summaries must not include attorney mental impressions, credibility
+   methodology, or legal exposure analysis.
+
+## Examples
+
+```
+/skill:legal-employment-investigation-summary [matter name] hr
+```
+
+```
+/skill:legal-employment-investigation-summary [matter name] leadership
+```
+
+```
+/skill:legal-employment-investigation-summary [matter name] outside-counsel
+```
+
+> Detailed audience-stripping rules and summary templates live in the
+> `../legal-employment-internal-investigation/SKILL.md` — load it before doing substantive
+> work.

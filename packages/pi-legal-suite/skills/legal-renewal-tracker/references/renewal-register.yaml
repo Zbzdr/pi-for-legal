@@ -1,0 +1,27 @@
+# Attribution: Adapted from Anthropic's claude-for-legal/commercial-legal at revision 4a6c651889c97cc9140580363c73e0eb17379c2b under Apache-2.0 and modified for Pi. See the package NOTICE.
+schema_version: 1
+renewals:
+  - id: counterparty-agreement-yyyy
+    counterparty: ""
+    agreement: ""
+    our_side: sales | purchasing | other
+    owner: ""
+    status: active | pending | nonrenewing | terminated | archived
+    effective_date: YYYY-MM-DD | unknown
+    initial_term_end: YYYY-MM-DD | unknown
+    renewal_type: automatic | optional | none | unclear
+    renewal_period: ""
+    renewal_date: YYYY-MM-DD | unknown
+    nonrenewal_notice: ""
+    cancel_by: YYYY-MM-DD | unknown
+    cancel_by_calculation: ""
+    notice_method_and_address: ""
+    price_change_terms: ""
+    annual_value: ""
+    source:
+      file: ""
+      section_or_page: ""
+      quote: ""
+    verification: verified_from_document | needs_verification
+    last_reviewed: YYYY-MM-DD
+    notes: ""

@@ -2,21 +2,11 @@
 
 Packages are adapted from Anthropic's `claude-for-legal` revision `4a6c651889c97cc9140580363c73e0eb17379c2b` (2026-07-23).
 
-## Package boundaries
+## Package boundary
 
-- `@zbzdr/pi-legal-core`: shared project profile, research, matter isolation, escalation, and stakeholder-output guardrails.
-- `@zbzdr/pi-commercial-legal`: `commercial-legal` contract workflows.
-- `@zbzdr/pi-privacy-legal`: `privacy-legal` substantive workflows.
-- `@zbzdr/pi-regulatory-legal`: `regulatory-legal`; the non-invocable upstream gap engine and thin `/gaps` wrapper are combined into one exposed Pi skill.
-- `@zbzdr/pi-ai-governance-legal`: `ai-governance-legal` substantive workflows.
-- `@zbzdr/pi-employment-legal`: `employment-legal` substantive workflows.
-- `@zbzdr/pi-corporate-legal`: `corporate-legal` substantive workflows.
-- `@zbzdr/pi-litigation-legal`: `litigation-legal` substantive workflows.
-- `@zbzdr/pi-ip-legal`: `ip-legal` substantive workflows.
-- `@zbzdr/pi-product-legal`: `product-legal` substantive workflows, added after discovering it was omitted from the initial package sketch.
-- `@zbzdr/pi-legal-suite`: build-time union of every source package above.
+Only `@zbzdr/pi-legal-suite` is maintained and published. Its `skills/` directory contains the shared, commercial, privacy, regulatory, AI governance, employment, corporate, litigation, IP, and product workflows; its `extensions/` directory contains the single lifecycle extension.
 
-Each domain omits its duplicate `cold-start-interview`, `customize`, and `matter-workspace`; those are centralized in core. All other source workflows remain distinct and use domain-prefixed Pi skill names.
+The former core and domain directories remain private historical snapshots during the transition. They are not npm workspaces, test inputs, build inputs, or publish targets. Each imported domain omits its duplicate `cold-start-interview`, `customize`, and `matter-workspace`; those workflows are centralized in the suite.
 
 ## Preserved design
 
@@ -38,13 +28,27 @@ Each domain omits its duplicate `cold-start-interview`, `customize`, and `matter
 - file writes are previewed and external sends, filings, signatures, legal-hold changes, risk acceptance, and system-of-record changes require explicit confirmation;
 - jurisdiction-specific workflows and knowledge are preserved across US, UK, EEA/EU, and cross-border areas; every workflow identifies the applicable legal system and uses its authority hierarchy without silently applying US doctrine elsewhere;
 - references needed by one workflow are copied inside that skill and checked for missing or orphaned links;
-- duplicate domain setup/customize/matter workflows are centralized in core, and every domain uses the shared `<dataDir>/matters/` contract.
+- duplicate domain setup/customize/matter workflows are centralized in the suite, and every domain uses the shared `<dataDir>/matters/` contract.
+
+## Workspace and session lifecycle
+
+Upstream Claude for Legal provides the component concepts used here: a cold-start interview, shared practice profile, matter folders, active-matter context, history/notes/outputs, and cross-matter isolation. It does not provide Pi session lifecycle hooks, a one-time first-turn matter gate, session-to-matter binding, a project `APPEND_SYSTEM.md`, metadata-only candidate matching, or a visible-outside-`.pi` storage boundary.
+
+The suite adds those Pi-specific behaviors through one extension and one deterministic setup script:
+
+- setup creates reusable state under `.pi/legal-workbench/` and visible data under the confirmed `dataDir`;
+- Pi retains raw JSONL sessions in its default location; setup does not change session settings or copy session files;
+- a new session compares only explicit first-prompt metadata with `.pi/legal-workbench/matter-index.json` and never reads unmatched matter contents;
+- `legal_matter_session` creates or binds a visible matter and records associated session IDs in its README;
+- the built-in write/edit guard keeps legal file writes under the active matter or approved practice/state paths. Shell commands remain subject to the same prompt-level rule and are not an operating-system sandbox.
+
+Pi owns the raw session lifecycle. The legal workspace records only session IDs and never moves or duplicates session files.
 
 ## Skill and tool boundary
 
-The current packages intentionally expose legal judgment workflows as Agent Skills rather than custom Pi tools. Skill descriptions provide automatic routing metadata, while full instructions and references load only when relevant. Registering every workflow as a tool would keep dozens of schemas in the model context and would turn open-ended legal judgment into misleadingly rigid parameter contracts.
+The suite exposes legal judgment workflows as Agent Skills rather than custom Pi tools. Skill descriptions provide automatic routing metadata, while full instructions and references load only when relevant. Registering every workflow as a tool would keep dozens of schemas in the model context and would turn open-ended legal judgment into misleadingly rigid parameter contracts.
 
-Deterministic operations remain bundled scripts invoked under their governing Skill. This includes DOCX mutation and the project-local Python environment bootstrap. Stateful playbook learning remains a Skill because comparability, reuse, and policy changes require legal judgment and explicit confirmation. A future all-in-one extension may register narrowly scoped tools for deterministic capture, validation, or file mutation, but should not replace the review Skills themselves.
+Deterministic operations remain bundled scripts invoked under their governing Skill. This includes workspace initialization, DOCX mutation, and the project-local Python environment bootstrap. The core extension registers only `legal_matter_session`, where structured file and session-state changes benefit from a narrow schema. Stateful playbook learning remains a Skill because comparability, reuse, and policy changes require legal judgment and explicit confirmation. Future tools should remain narrowly scoped and should not replace review Skills.
 
 ## Excluded upstream areas
 

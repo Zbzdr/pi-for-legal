@@ -13,30 +13,27 @@ if (isDryRun === isPublish) {
   process.exit(2);
 }
 
-const sourceDirectories = JSON.parse(readFileSync(join(root, "suite-packages.json"), "utf8")).packages;
-const packageDirectories = [...sourceDirectories, "pi-legal-suite"];
+const packageDirectory = "pi-legal-suite";
 const cache = join(root, "node_modules", ".cache", "pi-legal-npm");
 
-for (const packageDirectory of packageDirectories) {
-  const manifest = JSON.parse(readFileSync(join(root, "packages", packageDirectory, "package.json"), "utf8"));
-  if (!manifest.name.startsWith("@zbzdr/")) throw new Error(`Refusing to publish outside @zbzdr: ${manifest.name}`);
-  if (manifest.publishConfig?.access !== "public") throw new Error(`Package is not configured public: ${manifest.name}`);
+const manifest = JSON.parse(readFileSync(join(root, "packages", packageDirectory, "package.json"), "utf8"));
+if (manifest.name !== "@zbzdr/pi-legal-suite") throw new Error(`Refusing to publish unexpected package: ${manifest.name}`);
+if (manifest.publishConfig?.access !== "public") throw new Error(`Package is not configured public: ${manifest.name}`);
 
-  const tarballBase = manifest.name.replace(/^@/, "").replaceAll("/", "-");
-  const tarball = join(root, "dist", `${tarballBase}-${manifest.version}.tgz`);
-  if (!existsSync(tarball)) throw new Error(`Missing tarball; run npm run pack:all first: ${tarball}`);
+const tarballBase = manifest.name.replace(/^@/, "").replaceAll("/", "-");
+const tarball = join(root, "dist", `${tarballBase}-${manifest.version}.tgz`);
+if (!existsSync(tarball)) throw new Error(`Missing tarball; run npm run pack first: ${tarball}`);
 
-  const args = [
-    "publish",
-    tarball,
-    "--access",
-    "public",
-    "--registry",
-    "https://registry.npmjs.org/",
-    "--cache",
-    cache,
-  ];
-  if (isDryRun) args.push("--dry-run");
-  console.log(`${isDryRun ? "Checking" : "Publishing"} ${manifest.name}@${manifest.version}`);
-  execFileSync("npm", args, { cwd: root, stdio: "inherit" });
-}
+const args = [
+  "publish",
+  tarball,
+  "--access",
+  "public",
+  "--registry",
+  "https://registry.npmjs.org/",
+  "--cache",
+  cache,
+];
+if (isDryRun) args.push("--dry-run");
+console.log(`${isDryRun ? "Checking" : "Publishing"} ${manifest.name}@${manifest.version}`);
+execFileSync("npm", args, { cwd: root, stdio: "inherit" });

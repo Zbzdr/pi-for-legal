@@ -1,5 +1,6 @@
 {
   "name": "@zbzdr/pi-ip-legal",
+  "private": true,
   "version": "0.2.0",
   "description": "Pi legal skills for intellectual property workflows, adapted from claude-for-legal.",
   "type": "module",

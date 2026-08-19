@@ -13,7 +13,7 @@ Pi for Legal 是 [Anthropic Claude for Legal](https://github.com/anthropics/clau
 - 经确认后生成带自动备份的轻量 DOCX tracked redline；
 - 在没有可靠外部来源时明确标记验证缺口，不把模型记忆包装成已完成的法律检索。
 
-目前的 all-in-one 包包含 88 个 Skills，不内置 MCP、web access、邮件、Slack、todo 或其他 Pi extensions。
+目前唯一维护和发布的 all-in-one 包包含 88 个 Skills 和一个项目级 extension，不内置 MCP、web access、邮件、Slack、todo 或其他 Pi extensions。
 
 DOCX redline 首次使用时会在当前项目的 `.pi/legal-workbench/venvs/docx-redline/` 建立 Python 虚拟环境，并在用户确认后安装固定版本的 `python-docx` 和 `lxml`；不会改动系统 Python。
 
@@ -31,7 +31,7 @@ pi install -l npm:@zbzdr/pi-legal-suite
 /skill:legal-setup
 ```
 
-Setup 会询问实践类型、法域、审查偏好和数据目录，并在写入前展示准确路径。推荐把配置保存在当前项目的 `.pi/legal-workbench/`。
+Setup 会询问实践类型、法域、审查偏好和数据目录，并在写入前展示准确路径。按提示完成 setup 后，重新加载或重启 Pi，在新 session 中描述任务；根据提示选择或创建事务，然后开始研究、审查或起草工作。
 
 接下来可以直接描述任务，也可以显式调用 Skill：
 
@@ -39,11 +39,8 @@ Setup 会询问实践类型、法域、审查偏好和数据目录，并在写�
 /skill:legal-research 比较纽约法与英格兰法下这个免责条款的可执行性
 /skill:legal-contract-review review ./contracts/vendor-msa.pdf
 /skill:legal-docx-redline ./contracts/inbound-nda.docx
-/skill:legal-privacy-dpa-review review ./contracts/dpa.pdf
-/skill:legal-product-launch-review review ./launch/new-feature.md
 /skill:legal-litigation-matter-intake
 /skill:legal-playbook-learning capture
-/skill:legal-stakeholder-summary
 /skill:legal-customize
 ```
 
@@ -67,25 +64,19 @@ pi update --extensions
 
 更新完成后，在正在运行的 Pi 中输入 `/reload`，或重新启动 Pi。
 
-带版本号的安装会锁定版本。例如 `npm:@zbzdr/pi-legal-suite@0.2.0` 不会被上述命令自动升级；需要改用新的版本号重新安装：
+带版本号的安装会锁定版本。例如 `npm:@zbzdr/pi-legal-suite@0.3.0` 不会被上述命令自动升级；需要改用新的版本号重新安装：
 
 ```bash
 pi install -l npm:@zbzdr/pi-legal-suite@<new-version>
 ```
 
-## 只安装需要的领域
+## 旧包迁移
 
-不想安装全部 Skills，可以安装 core 加一个或多个领域包：
+法律领域现在统一包含在 suite 中，不再单独维护或发布 core/领域 package。此前安装旧包的用户应先用 `pi list` 确认来源，逐一通过 `pi remove -l <source>` 移除，再安装 suite。旧 npm 包不会 unpublish；已有版本会保留并标记为 deprecated，既不影响旧 lockfile，也能把新用户引导到 suite。仓库内的旧目录仅作历史快照，不进入 workspace、测试、打包或发布流程。
 
-```bash
-pi install -l npm:@zbzdr/pi-legal-core
-pi install -l npm:@zbzdr/pi-commercial-legal
-pi install -l npm:@zbzdr/pi-privacy-legal
-```
+如果曾使用开发中的项目 session 目录方案，再运行一次 `/skill:legal-setup`。迁移脚本只会移除它原先写入的 `legal-workbench/sessions` 设置，使 Pi 恢复默认 session 位置；其他自定义 session 设置不会被改动，已有 session 文件也不会被移动或删除。
 
-可选领域包包括 `commercial`、`privacy`、`regulatory`、`ai-governance`、`employment`、`corporate`、`litigation`、`ip` 和 `product`。不要同时安装 suite 和其中的单包，否则 Pi 会发现重复 Skills。
-
-不带 `-l` 的用户全局安装也可以使用，但属于次要支持模式。项目本地安装更容易控制能力范围，也不会影响其他 Pi 项目。
+项目本地安装仍然优先。无 `-l` 的全局安装属于次要支持模式，会让 suite 出现在该用户的所有 Pi 项目中；setup、profile 和 matter 仍按当前 workspace 分开维护。
 
 ## 来源与许可
 

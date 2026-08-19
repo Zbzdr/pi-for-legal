@@ -1,6 +1,6 @@
 {
   "name": "@zbzdr/pi-legal-suite",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "All-in-one bundle of the implemented Pi legal core and practice-area skills.",
   "type": "module",
   "license": "Apache-2.0",
@@ -23,6 +23,7 @@
     "node": ">=20"
   },
   "files": [
+    "extensions",
     "skills",
     "README.md",
     "LICENSE",
@@ -30,19 +31,26 @@
     "package.json"
   ],
   "scripts": {
-    "prepack": "node ../../scripts/prepare-package.mjs --suite"
+    "prepack": "node ../../scripts/prepare-package.mjs"
   },
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*"
+  },
   "pi": {
+    "extensions": [
+      "./extensions"
+    ],
     "skills": [
       "./skills"
     ]
   },
   "piLegal": {
     "upstreamRevision": "4a6c651889c97cc9140580363c73e0eb17379c2b",
+    "extensionCount": 1,
     "skillCount": 88
   }
 }

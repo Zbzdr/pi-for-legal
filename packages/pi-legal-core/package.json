@@ -1,5 +1,6 @@
 {
   "name": "@zbzdr/pi-legal-core",
+  "private": true,
   "version": "0.2.0",
   "description": "Shared project profile, multi-jurisdiction legal research, matter isolation, playbook learning, escalation, and review guardrails for Pi legal workflows.",
   "type": "module",

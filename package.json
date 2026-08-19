@@ -1,8 +1,8 @@
 {
   "name": "pi-for-legal-workspace",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
-  "description": "Workspace for modular Pi legal packages.",
+  "description": "Workspace for the all-in-one Pi for Legal package.",
   "type": "module",
   "license": "Apache-2.0",
   "repository": {
@@ -14,35 +14,25 @@
     "url": "https://github.com/Zbzdr/pi-for-legal/issues"
   },
   "workspaces": [
-    "packages/*"
+    "packages/pi-legal-suite"
   ],
   "engines": {
     "node": ">=20"
   },
   "scripts": {
-    "prepare:packages": "node scripts/prepare-all-packages.mjs",
+    "prepare:package": "node scripts/prepare-all-packages.mjs",
     "sync:upstream-domains": "node scripts/import-upstream-domains.mjs",
-    "check": "npm run prepare:packages && node scripts/validate-package.mjs",
-    "pretest": "npm run prepare:packages",
+    "check": "npm run prepare:package && node scripts/validate-package.mjs",
+    "pretest": "npm run prepare:package",
     "test": "node --test test/*.test.mjs",
     "test:rpc": "node scripts/rpc-smoke.mjs",
     "test:package": "node scripts/package-e2e.mjs",
     "test:behavior": "node scripts/behavior-eval.mjs",
-    "pack:select": "node scripts/pack-packages.mjs",
-    "pack:core": "node scripts/pack-packages.mjs core",
-    "pack:commercial": "node scripts/pack-packages.mjs commercial",
-    "pack:privacy": "node scripts/pack-packages.mjs privacy",
-    "pack:regulatory": "node scripts/pack-packages.mjs regulatory",
-    "pack:ai-governance": "node scripts/pack-packages.mjs ai-governance",
-    "pack:employment": "node scripts/pack-packages.mjs employment",
-    "pack:corporate": "node scripts/pack-packages.mjs corporate",
-    "pack:litigation": "node scripts/pack-packages.mjs litigation",
-    "pack:ip": "node scripts/pack-packages.mjs ip",
-    "pack:product": "node scripts/pack-packages.mjs product",
-    "pack:suite": "node scripts/pack-packages.mjs suite",
-    "pack:all": "node scripts/pack-packages.mjs core commercial privacy regulatory ai-governance employment corporate litigation ip product suite",
+    "pack": "node scripts/pack-packages.mjs",
     "publish:dry-run": "node scripts/publish-packages.mjs --dry-run",
-    "publish:all": "node scripts/publish-packages.mjs --publish"
+    "publish": "node scripts/publish-packages.mjs --publish",
+    "deprecate:legacy": "node scripts/deprecate-legacy-packages.mjs",
+    "deprecate:legacy:apply": "node scripts/deprecate-legacy-packages.mjs --apply"
   },
   "devDependencies": {
     "@earendil-works/pi-coding-agent": "0.84.1"
