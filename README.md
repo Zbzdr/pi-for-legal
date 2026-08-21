@@ -31,7 +31,15 @@ pi install -l npm:@zbzdr/pi-legal-suite
 /skill:legal-setup
 ```
 
-Setup 会询问实践类型、法域、审查偏好和数据目录，并在写入前展示准确路径。按提示完成 setup 后，重新加载或重启 Pi，在新 session 中描述任务；根据提示选择或创建事务，然后开始研究、审查或起草工作。
+Setup 会询问实践类型、法域、审查偏好和数据目录，并在写入前展示准确路径。
+
+按提示完成 setup 后，重启或重新加载 Pi：
+
+```text
+/skill:legal-setup
+```
+
+然后可以在原 session 或新 session 中描述任务；根据提示选择或创建事务，然后开始研究、审查或起草工作。
 
 接下来可以直接描述任务，也可以显式调用 Skill：
 
