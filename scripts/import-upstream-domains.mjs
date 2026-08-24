@@ -186,6 +186,10 @@ function adaptText(text, domain) {
   output = output
     .replaceAll(`<dataDir>/${domain.upstream}/matters/`, "<dataDir>/matters/")
     .replaceAll(`<dataDir>/${domain.upstream}/matters`, "<dataDir>/matters")
+    .replaceAll("Write outputs to the matter folder at `<dataDir>/matters/<matter-slug>/`.", "Write outputs under `<dataDir>/matters/<matter-slug>/outputs/`.")
+    .replaceAll("write outputs to the matter folder at `<dataDir>/matters/<matter-slug>/`", "write outputs under `<dataDir>/matters/<matter-slug>/outputs/`")
+    .replaceAll("<matter>/research/<domain>/", "<matter>/outputs/<domain>/")
+    .replaceAll("<matter>/work-product/<domain>/", "<matter>/outputs/<domain>/")
     .replaceAll("generic defaults — US jurisdiction,", "generic defaults — governing jurisdiction from the task/profile,")
     .replaceAll("middle risk appetite, lawyer role, US jurisdiction (CCPA + common federal sectoral baselines),", "middle risk appetite, lawyer role, governing jurisdiction from the task/profile,")
     .replaceAll("middle risk appetite, lawyer role, US jurisdiction (USPTO + common-law),", "middle risk appetite, lawyer role, governing jurisdiction from the task/profile,")

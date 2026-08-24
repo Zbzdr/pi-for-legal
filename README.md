@@ -2,7 +2,7 @@
 
 Pi for Legal 是 [Anthropic Claude for Legal](https://github.com/anthropics/claude-for-legal) 在 Pi 上的独立移植。本项目主要工作由ChatGPT5.6-sol完成。
 
-项目默认采用 workspace-first：package 安装在当前项目，profile、matter 和工作材料也保存在项目目录中。外部检索和协作工具由用户按需配置。
+项目默认采用 workspace-first：package 安装在当前项目，实践 profile、matter 和工作材料也保存在项目目录中。外部检索和协作工具由用户按需配置。
 
 ## 它目前能做什么
 
@@ -33,13 +33,20 @@ pi install -l npm:@zbzdr/pi-legal-suite
 
 Setup 会询问实践类型、法域、审查偏好和数据目录，并在写入前展示准确路径。
 
-按提示完成 setup 后，重启或重新加载 Pi：
+按提示完成 setup 后，重启 Pi，或在当前 Pi 中重新加载：
 
 ```text
-/skill:legal-setup
+/reload
 ```
 
 然后可以在原 session 或新 session 中描述任务；根据提示选择或创建事务，然后开始研究、审查或起草工作。
+
+## Setup 后会发生什么
+
+- 项目根目录会有 Pi 自动加载的 `AGENTS.md`，用于保存法律实践 profile；
+- `.pi/APPEND_SYSTEM.md` 会追加法律工作区的固定规则，并保留原有项目规则；
+- 可见的 `legal-workbench/matters/` 和 `legal-workbench/logs/` 会被初始化，但不会自动创建具体 matter；
+- 每个新 session 首先询问复用或创建哪个 matter，之后的资料和输出放在对应 matter 的 `outputs/` 下；Pi 原始 session 仍使用默认位置。
 
 接下来可以直接描述任务，也可以显式调用 Skill：
 
@@ -72,17 +79,11 @@ pi update --extensions
 
 更新完成后，在正在运行的 Pi 中输入 `/reload`，或重新启动 Pi。
 
-带版本号的安装会锁定版本。例如 `npm:@zbzdr/pi-legal-suite@0.3.0` 不会被上述命令自动升级；需要改用新的版本号重新安装：
+带版本号的安装会锁定版本。例如 `npm:@zbzdr/pi-legal-suite@0.4.0` 不会被上述命令自动升级；需要改用新的版本号重新安装：
 
 ```bash
 pi install -l npm:@zbzdr/pi-legal-suite@<new-version>
 ```
-
-## 旧包迁移
-
-法律领域现在统一包含在 suite 中，不再单独维护或发布 core/领域 package。此前安装旧包的用户应先用 `pi list` 确认来源，逐一通过 `pi remove -l <source>` 移除，再安装 suite。旧 npm 包不会 unpublish；已有版本会保留并标记为 deprecated，既不影响旧 lockfile，也能把新用户引导到 suite。仓库内的旧目录仅作历史快照，不进入 workspace、测试、打包或发布流程。
-
-如果曾使用开发中的项目 session 目录方案，再运行一次 `/skill:legal-setup`。迁移脚本只会移除它原先写入的 `legal-workbench/sessions` 设置，使 Pi 恢复默认 session 位置；其他自定义 session 设置不会被改动，已有 session 文件也不会被移动或删除。
 
 项目本地安装仍然优先。无 `-l` 的全局安装属于次要支持模式，会让 suite 出现在该用户的所有 Pi 项目中；setup、profile 和 matter 仍按当前 workspace 分开维护。
 

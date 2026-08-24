@@ -27,7 +27,7 @@ const GENERIC_ISSUES = new Set([
 ]);
 
 interface WorkbenchConfig {
-	schemaVersion: 2;
+	schemaVersion: 3;
 	profilePath: string;
 	statusPath: string;
 	indexPath: string;
@@ -55,7 +55,7 @@ interface MatterIndex {
 }
 
 interface WorkbenchStatus {
-	schemaVersion: 2;
+	schemaVersion: 3;
 	setupStatus: "not-started" | "in-progress" | "complete";
 	lastUpdated: string;
 }
@@ -114,7 +114,7 @@ function loadConfig(cwd: string): WorkbenchConfig | undefined {
 	const path = resolve(cwd, CONFIG_PATH);
 	if (!existsSync(path)) return undefined;
 	const config = readJson<WorkbenchConfig>(path);
-	if (config.schemaVersion !== 2) throw new Error("Legal workbench config needs migration through /skill:legal-setup");
+	if (config.schemaVersion !== 3) throw new Error("Legal workbench config uses an older or unsupported layout; back up the workspace and run /skill:legal-setup again");
 	for (const key of ["profilePath", "statusPath", "indexPath", "dataDir", "matterRoot"] as const) {
 		if (typeof config[key] !== "string" || !config[key]) throw new Error(`Invalid legal workbench config field: ${key}`);
 	}
@@ -128,9 +128,12 @@ function loadConfig(cwd: string): WorkbenchConfig | undefined {
 
 function loadStatus(cwd: string, config: WorkbenchConfig): WorkbenchStatus {
 	const path = resolveWorkspacePath(cwd, config.statusPath, "statusPath");
-	return existsSync(path)
-		? readJson<WorkbenchStatus>(path)
-		: { schemaVersion: 2, setupStatus: "not-started", lastUpdated: new Date().toISOString() };
+	if (!existsSync(path)) return { schemaVersion: 3, setupStatus: "not-started", lastUpdated: new Date().toISOString() };
+	const status = readJson<WorkbenchStatus>(path);
+	if (status.schemaVersion !== 3 || !["not-started", "in-progress", "complete"].includes(status.setupStatus)) {
+		throw new Error("Legal workbench status uses an older or unsupported layout; run /skill:legal-setup again");
+	}
+	return status;
 }
 
 function loadIndex(cwd: string, config: WorkbenchConfig): MatterIndex {
@@ -203,17 +206,17 @@ function validatedSessionBinding(ctx: ExtensionContext): MatterBinding | undefin
 	}
 }
 
-function appendSessionToReadme(readmePath: string, sessionId: string, boundAt: string): void {
-	let content = readFileSync(readmePath, "utf8");
+function appendSessionToMatter(matterPath: string, sessionId: string, boundAt: string): void {
+	let content = readFileSync(matterPath, "utf8");
 	if (content.includes(`| ${sessionId} |`)) return;
 	const marker = "<!-- pi-legal:sessions:end -->";
 	const row = `| ${sessionId} | ${boundAt.slice(0, 10)} | active |\n`;
-	if (!content.includes(marker)) throw new Error(`Matter README is missing session marker: ${readmePath}`);
+	if (!content.includes(marker)) throw new Error(`Matter file is missing session marker: ${matterPath}`);
 	content = content.replace(marker, `${row}${marker}`);
-	writeFileSync(readmePath, content, "utf8");
+	writeFileSync(matterPath, content, "utf8");
 }
 
-function matterReadme(record: MatterRecord, scope: string): string {
+function matterFile(record: MatterRecord, scope: string): string {
 	return `# Matter: ${record.name}\n\n` +
 		`- Slug: ${record.slug}\n` +
 		`- Client/organization: ${record.client || "Not specified"}\n` +
@@ -223,10 +226,7 @@ function matterReadme(record: MatterRecord, scope: string): string {
 		`- Legal issues: ${record.issueKeywords.join(", ") || "Not specified"}\n` +
 		`- Scope: ${scope || "Not specified"}\n\n` +
 		`## Current State\n\n- Objectives:\n- Material facts:\n- Open questions:\n- Deadlines:\n- Next action:\n\n` +
-		`## Working Directories\n\n` +
-		`- \`sources/\`: source documents and fetched material\n` +
-		`- \`research/\`: research notes and authorities\n` +
-		`- \`work-product/\`: memos, reviews, drafts, redlines, and deliverables\n` +
+		`## Outputs\n\nStore matter work product in \`outputs/\` or a clearly named subfolder below it.\n\n` +
 		`## Associated Pi Sessions\n\n| Session ID | Bound | Status |\n|---|---|---|\n` +
 		`<!-- pi-legal:sessions:start -->\n<!-- pi-legal:sessions:end -->\n\n` +
 		`## Work Product Index\n\n| Date | Deliverable | Path | Status |\n|---|---|---|---|\n`;
@@ -243,12 +243,12 @@ function bindMatter(pi: ExtensionAPI, ctx: ExtensionContext, config: WorkbenchCo
 	const matterRoot = resolveWorkspacePath(ctx.cwd, config.matterRoot, "matterRoot", true);
 	if (!isWithin(matterRoot, matterPath)) throw new Error("Indexed matter path is outside matterRoot");
 	if (!existsSync(matterPath)) throw new Error(`Matter directory does not exist: ${record.path}`);
-	const readmePath = join(matterPath, "README.md");
-	if (!existsSync(readmePath)) throw new Error(`Matter README does not exist: ${record.path}/README.md`);
+	const matterFilePath = join(matterPath, "matter.md");
+	if (!existsSync(matterFilePath)) throw new Error(`Matter file does not exist: ${record.path}/matter.md`);
 
 	const boundAt = new Date().toISOString();
 	const sessionId = ctx.sessionManager.getSessionId();
-	appendSessionToReadme(readmePath, sessionId, boundAt);
+	appendSessionToMatter(matterFilePath, sessionId, boundAt);
 
 	const binding = { slug: record.slug, path: record.path, name: record.name, boundAt };
 	pi.appendEntry(BINDING_ENTRY, binding);
@@ -284,6 +284,7 @@ const matterParameters = {
 export default function legalWorkbench(pi: ExtensionAPI): void {
 	let bootstrapPending = false;
 	let activeBinding: MatterBinding | undefined;
+	let listRequestedForPrompt = false;
 
 	pi.on("session_start", (_event, ctx) => {
 		activeBinding = validatedSessionBinding(ctx);
@@ -297,6 +298,7 @@ export default function legalWorkbench(pi: ExtensionAPI): void {
 	});
 
 	pi.on("before_agent_start", (event, ctx) => {
+		listRequestedForPrompt = /(?:\/skill:legal-matter-workspace\s+list|\b(?:list|show|enumerate)\s+(?:all\s+)?matters?\b|事务列表|列出(?:所有)?事务|查看(?:所有)?事务)/iu.test(event.prompt);
 		if (!bootstrapPending) return;
 		bootstrapPending = false;
 
@@ -340,6 +342,7 @@ export default function legalWorkbench(pi: ExtensionAPI): void {
 		promptGuidelines: [
 			"Before substantive legal work in a configured workspace, bind the session to a matter with legal_matter_session.",
 			"Do not list or inspect unrelated matters merely to guess context; use candidates injected on the first turn or an explicit user request.",
+			"The list action is available only when the user's current message explicitly asks to list matters.",
 		],
 		parameters: matterParameters,
 		executionMode: "sequential",
@@ -361,6 +364,8 @@ export default function legalWorkbench(pi: ExtensionAPI): void {
 					return jsonResult(`Legal setup is ${status.setupStatus}. Complete /skill:legal-setup first.`, { error: true });
 				}
 				if (params.action === "list") {
+					if (!listRequestedForPrompt) return jsonResult("Matter listing requires an explicit user request in the current message.", { error: true });
+					listRequestedForPrompt = false;
 					const matters = index.matters.map(({ slug, name, client, jurisdictions, issueKeywords, status: matterStatus, path }) => ({
 						slug, name, client, jurisdictions, issueKeywords, status: matterStatus, path,
 					}));
@@ -380,7 +385,7 @@ export default function legalWorkbench(pi: ExtensionAPI): void {
 					const now = new Date().toISOString();
 					record.status = "closed";
 					record.updatedAt = now;
-					for (const filename of ["README.md", "matter.md"]) replaceMatterStatus(join(matterPath, filename), "closed");
+					replaceMatterStatus(join(matterPath, "matter.md"), "closed");
 					const historyPath = join(matterPath, "history.md");
 					writeFileSync(historyPath, `${readFileSync(historyPath, "utf8").trimEnd()}\n- ${now} Matter closed; files retained in place.\n`, "utf8");
 					index.updatedAt = now;
@@ -414,11 +419,10 @@ export default function legalWorkbench(pi: ExtensionAPI): void {
 						openedAt: now,
 						updatedAt: now,
 					};
-					for (const directory of ["sources", "research", "work-product"]) {
+					for (const directory of ["outputs"]) {
 						mkdirSync(join(matterPath, directory), { recursive: true });
 					}
-					writeFileSync(join(matterPath, "README.md"), matterReadme(record, params.scope?.trim() ?? ""), "utf8");
-					writeFileSync(join(matterPath, "matter.md"), matterReadme(record, params.scope?.trim() ?? ""), "utf8");
+					writeFileSync(join(matterPath, "matter.md"), matterFile(record, params.scope?.trim() ?? ""), "utf8");
 					writeFileSync(join(matterPath, "history.md"), `# Matter History\n\n- ${now} Matter created.\n`, "utf8");
 					writeFileSync(join(matterPath, "notes.md"), "# Matter Notes\n\n", "utf8");
 					index.matters.push(record);
@@ -447,11 +451,11 @@ export default function legalWorkbench(pi: ExtensionAPI): void {
 			const target = resolveWorkspacePath(ctx.cwd, inputPath, "write path");
 			const allowedControlFiles = [CONFIG_PATH, config.profilePath, config.statusPath, config.indexPath, ".pi/APPEND_SYSTEM.md", ".pi/settings.json"]
 				.map((path) => resolveWorkspacePath(ctx.cwd, path, "control path"));
-			const practiceRoot = resolveWorkspacePath(ctx.cwd, join(config.dataDir, "practice"), "practice directory", true);
+			const logsRoot = resolveWorkspacePath(ctx.cwd, join(config.dataDir, "logs"), "logs directory", true);
 			const matterRoot = activeBinding
 				? resolveWorkspacePath(ctx.cwd, activeBinding.path, "active matter path", true)
 				: undefined;
-			if (allowedControlFiles.includes(target) || isWithin(practiceRoot, target) || (matterRoot && isWithin(matterRoot, target))) return;
+			if (allowedControlFiles.includes(target) || isWithin(logsRoot, target) || (matterRoot && isWithin(matterRoot, target))) return;
 			return {
 				block: true,
 				reason: activeBinding

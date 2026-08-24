@@ -116,7 +116,7 @@
 - Redline tone:
 - Memo audience and length:
 - Stakeholder summary audience and length:
-- Work-product convention: active matter `work-product/` directory
+- Work-product convention: active matter `outputs/` directory
 - Renewal owner and alert destination:
 - Privilege/confidentiality marking approved by counsel:
 
@@ -144,12 +144,13 @@
 
 [Insert only the selected module sections from `references/domain-modules.md`. Do not infer positions for unconfigured modules.]
 
-## Matter workspace
+## Matter workspaces
 
 - Visible data directory: legal-workbench | [confirmed relative path]
 - Matter root: [data directory]/matters
+- Enabled: yes | no
 - Matter required before substantive work: yes
-- Active matter: session-bound through `legal_matter_session` (not stored in this shared profile)
+- Active matter: none (session-bound through `legal_matter_session`, not stored in this shared profile)
 - Cross-matter access: off | on with explicit approval
 - Matter slug and metadata conventions: [rules]
 

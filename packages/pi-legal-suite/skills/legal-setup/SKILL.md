@@ -18,9 +18,9 @@ If it does not exist, ask where the user wants visible legal work stored before 
 1. project-local default: reusable state in `.pi/legal-workbench/`, substantive data in `legal-workbench/`, and matters in `legal-workbench/matters/`; or
 2. another visible project-relative data directory supplied by the user.
 
-Explain that `.pi/` contains only reusable configuration, the profile, status, and a metadata-only matter index. Client facts, downloads, research, drafts, redlines, and work product stay in visible matter directories outside `.pi/`. Project-local material travels with the project if committed, so confidential paths should normally remain gitignored. Never choose a global path or write to `~/.pi` by default.
+Explain that `.pi/` contains Pi-specific configuration, status, and a metadata-only matter index. The reusable practice profile is the project-root `AGENTS.md`, which Pi loads as a context file; client facts, downloads, research, drafts, redlines, and work product stay in visible matter directories outside `.pi/`. Project-local material travels with the project if committed, so confidential paths should normally remain gitignored. Never choose a global path or write to `~/.pi` by default.
 
-Before the first write, show all exact paths and ask for confirmation. After confirmation, run `scripts/init_workspace.mjs` with the current workspace and chosen visible data directory. The script installs `references/append-system-template.md` as a managed section while preserving other `.pi/APPEND_SYSTEM.md` content, creates the profile and state files, and initializes visible practice and matter roots. It does not create a client matter. It leaves Pi session settings untouched except that migration removes the exact legacy plugin-managed value `<dataDir>/sessions`, restoring Pi's default session location; any other user-defined `sessionDir` remains unchanged.
+Before the first write, show all exact paths and ask for confirmation. After confirmation, run `scripts/init_workspace.mjs` with the current workspace and chosen visible data directory. The script installs `references/append-system-template.md` as a managed section while preserving other `.pi/APPEND_SYSTEM.md` content, creates the project-root `AGENTS.md`, and initializes `matters/` and `logs/`. It does not create a client matter and does not change Pi's session settings.
 
 Default command:
 
@@ -32,8 +32,8 @@ The resulting config is:
 
 ```json
 {
-  "schemaVersion": 2,
-  "profilePath": ".pi/legal-workbench/profile.md",
+  "schemaVersion": 3,
+  "profilePath": "AGENTS.md",
   "statusPath": ".pi/legal-workbench/status.json",
   "indexPath": ".pi/legal-workbench/matter-index.json",
   "dataDir": "legal-workbench",
@@ -43,7 +43,7 @@ The resulting config is:
 
 The data directory must be visible, project-relative, and inside the workspace. Do not store credentials, tokens, client secrets, or private keys.
 
-If schema version 1 exists, explain the proposed migration before changing anything. Moving existing substantive data out of `.pi/` requires a separate, confirmed file plan; never delete or silently relocate it. The deterministic initializer intentionally refuses to overwrite a different config.
+If an older or different config exists, stop and ask the user to back it up and rerun setup after deciding what to retain. This release does not migrate or delete old configuration or matter files, and the deterministic initializer refuses to overwrite a different config.
 
 ## Resume and update
 
@@ -69,7 +69,7 @@ Capture the minimum needed for reliable contract work:
 7. core positions for liability, indemnity, data protection, term/termination, and governing law;
 8. escalation owner and automatic escalation triggers;
 9. whether routing should be confirmed before review; and
-10. preferred memo audience and tone. Matter work product always goes under the active visible matter directory.
+10. preferred memo audience and tone. Matter work product always goes under the active visible matter's `outputs/` directory.
 
 When an existing team document answers a question, extract the answer, quote or anchor its source, and ask only about gaps. Keep sales-side and purchasing-side positions separate.
 

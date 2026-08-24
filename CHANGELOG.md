@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.0 — 2026-08-24
+
+- 统一通用工作区命名：项目级 profile 使用 Pi 原生的 `AGENTS.md`，matter 使用 `matters/<slug>/matter.md`、`history.md`、`notes.md` 和 `outputs/`。
+- 移除自动创建的 `practice/`、`sources/`、`research/` 和 `work-product/` matter 目录；playbook learning 改用 `logs/learning/`。
+- 将 legal workbench 配置 schema 升至 3。旧配置不自动迁移，需要备份后重新运行 setup。
+- 更新领域 Skill 的 matter 输出路径和导入脚本，避免后续同步重新生成旧目录。
+
 ## 0.3.0 — 2026-08-19
 
 - 新增项目级 legal workspace 初始化：`.pi/` 只保存可复用状态，matter 数据、研究和工作产品保存在可见目录。

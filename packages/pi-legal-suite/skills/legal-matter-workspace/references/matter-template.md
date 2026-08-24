@@ -26,11 +26,10 @@
 
 [Only rules that differ from the practice profile.]
 
-## Working Directories
+## Outputs
 
-- `sources/`: source documents and fetched material
-- `research/`: research notes and authorities
-- `work-product/`: memos, reviews, drafts, redlines, and deliverables
+Store source documents, fetched material, research notes, memos, reviews, drafts, redlines, and deliverables in `outputs/` or a clearly named subfolder below it.
+
 ## Associated Pi Sessions
 
 | Session ID | Bound | Status |
@@ -43,4 +42,4 @@
 
 Significant events are appended to the separate `history.md`. Working notes stay in `notes.md`.
 
-Pi keeps raw sessions in its default location. The matter README records only associated session IDs. The workspace also creates a compatibility `matter.md` with the same initial metadata so adapted domain Skills that still request it remain usable. Maintain `README.md` as the human-facing index and update `matter.md` when a workflow expressly relies on its matter facts or overrides.
+Pi keeps raw sessions in its default location. This `matter.md` records associated session IDs, matter facts, and overrides. Significant events are kept in `history.md`; working notes stay in `notes.md`.

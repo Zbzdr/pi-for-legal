@@ -67,6 +67,29 @@ function createOrConfirm(path, content, force, label) {
 	return "replaced";
 }
 
+function installProfile(path, content, force) {
+	const start = "<!-- pi-legal-workbench:profile:start -->";
+	const end = "<!-- pi-legal-workbench:profile:end -->";
+	const managed = `${start}\n${content.trim()}\n${end}\n`;
+	if (!existsSync(path)) {
+		writeFileSync(path, managed, "utf8");
+		return "created";
+	}
+
+	const existing = readFileSync(path, "utf8");
+	const startIndex = existing.indexOf(start);
+	const endIndex = existing.indexOf(end);
+	if (startIndex >= 0 && endIndex > startIndex) {
+		if (!force) return "preserved";
+		const next = `${existing.slice(0, startIndex)}${managed}${existing.slice(endIndex + end.length)}`;
+		writeFileSync(path, next, "utf8");
+		return "updated-managed-profile";
+	}
+	if (existing.includes("# Legal Workbench Practice Profile")) return "preserved";
+	writeFileSync(path, `${existing.trimEnd()}\n\n${managed}`, "utf8");
+	return "appended-managed-profile";
+}
+
 function mergeManagedSystem(path, template) {
 	const start = "<!-- pi-legal-workbench:start -->";
 	const end = "<!-- pi-legal-workbench:end -->";
@@ -93,47 +116,31 @@ const data = visibleWorkspacePath(workspace, options.dataDir, "dataDir");
 const matterRoot = `${data.relative}/matters`;
 const stateDir = join(workspace, ".pi", "legal-workbench");
 const configPath = join(stateDir, "config.json");
-const settingsPath = join(workspace, ".pi", "settings.json");
 const systemPath = join(workspace, ".pi", "APPEND_SYSTEM.md");
-const profilePath = join(stateDir, "profile.md");
 const statusPath = join(stateDir, "status.json");
 const indexPath = join(stateDir, "matter-index.json");
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const referencesDir = resolve(scriptDir, "..", "references");
 
 mkdirSync(stateDir, { recursive: true });
-for (const directory of [data.absolute, join(data.absolute, "practice"), join(data.absolute, "matters")]) {
+for (const directory of [data.absolute, join(data.absolute, "matters"), join(data.absolute, "logs")]) {
 	mkdirSync(directory, { recursive: true });
 }
-
 const config = {
-	schemaVersion: 2,
-	profilePath: ".pi/legal-workbench/profile.md",
+	schemaVersion: 3,
+	profilePath: "AGENTS.md",
 	statusPath: ".pi/legal-workbench/status.json",
 	indexPath: ".pi/legal-workbench/matter-index.json",
 	dataDir: data.relative,
 	matterRoot,
-};
-
+	};
 if (existsSync(configPath)) {
 	const existing = JSON.parse(readFileSync(configPath, "utf8"));
-	const { sessionDir: _legacySessionDir, ...existingWithoutSessionDir } = existing;
-	if (JSON.stringify(existingWithoutSessionDir) !== JSON.stringify(config)) {
-		throw new Error("config.json already exists with different paths or schema; migrate it explicitly instead of overwriting it");
+	if (JSON.stringify(existing) !== JSON.stringify(config)) {
+		throw new Error("config.json already exists with an older or different layout; remove the old legal workspace after backing it up, then run /skill:legal-setup again");
 	}
-	if (_legacySessionDir !== undefined) writeJsonAtomic(configPath, config);
 } else {
 	writeJsonAtomic(configPath, config);
-}
-
-let sessionSettingMigration = "unchanged";
-if (existsSync(settingsPath)) {
-	const settings = JSON.parse(readFileSync(settingsPath, "utf8"));
-	if (settings.sessionDir === `${data.relative}/sessions`) {
-		delete settings.sessionDir;
-		writeJsonAtomic(settingsPath, settings);
-		sessionSettingMigration = "removed-legacy-managed-value";
-	}
 }
 
 const systemTemplate = readFileSync(join(referencesDir, "append-system-template.md"), "utf8");
@@ -143,25 +150,25 @@ const systemResult = options.forceSystem
 
 const today = new Date().toISOString().slice(0, 10);
 const profileTemplate = readFileSync(join(referencesDir, "profile-template.md"), "utf8").replaceAll("[date]", today);
-const profileResult = createOrConfirm(profilePath, profileTemplate, options.forceProfile, "practice profile");
+const profilePath = join(workspace, config.profilePath);
+const profileResult = installProfile(profilePath, profileTemplate, options.forceProfile);
 
 if (!existsSync(indexPath)) {
 	writeJsonAtomic(indexPath, { schemaVersion: 1, updatedAt: new Date().toISOString(), matters: [] });
 }
 
 const setupStatus = options.phase === "complete" ? "complete" : "in-progress";
-writeJsonAtomic(statusPath, { schemaVersion: 2, setupStatus, lastUpdated: new Date().toISOString() });
+writeJsonAtomic(statusPath, { schemaVersion: 3, setupStatus, lastUpdated: new Date().toISOString() });
 
 const workspaceReadme = join(data.absolute, "README.md");
 if (!existsSync(workspaceReadme)) {
-	writeFileSync(workspaceReadme, `# Legal Workbench\n\n- \`matters/\`: substantive files separated by matter\n- \`practice/\`: approved reusable, non-client-specific material\n\nConfiguration and the metadata-only matter index are stored under \`.pi/legal-workbench/\`. Pi stores raw sessions in its default session location.\n`, "utf8");
+	writeFileSync(workspaceReadme, `# Legal Workbench\n\n- \`AGENTS.md\`: project-level practice profile loaded by Pi\n- \`matters/\`: matter folders; each contains \`matter.md\`, \`history.md\`, \`notes.md\`, and \`outputs/\`\n- \`logs/\`: approved project-level append-only logs, such as playbook learning records\n\nPi-specific configuration and the metadata-only matter index are stored under \`.pi/legal-workbench/\`. Pi stores raw sessions in its default session location.\n`, "utf8");
 }
 
 console.log(JSON.stringify({
 	ok: true,
 	phase: options.phase,
 	paths: config,
-	sessionSettingMigration,
 	systemPrompt: systemResult,
 	profile: profileResult,
 }, null, 2));

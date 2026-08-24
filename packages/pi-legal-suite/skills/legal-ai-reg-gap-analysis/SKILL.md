@@ -199,8 +199,8 @@ systems → those feed here when a regulation is new or coverage is uncertain.
 **From use case triage:** Newly triaged use cases that hit regulatory triggers →
 gap analysis runs on the specific requirement for that use case type.
 
-**To the regulatory workflow in this suite:** This skill is the manual
-version. The monitor workflow watches feeds and triggers this analysis automatically
+**To regulatory workflow in this suite:** This skill is the manual
+version. The monitor package watches feeds and triggers this analysis automatically
 when something relevant changes.
 
 ---
@@ -228,7 +228,7 @@ End with the next-steps decision tree per project legal profile `## Outputs`. Cu
   When the reg is genuinely ambiguous: say so, state the conservative read, and
   flag for outside counsel if the issue is material.
 - It doesn't track regulatory changes proactively. It runs when you point it at a
-  change. For proactive monitoring, use `/skill:legal-regulatory-feed-watcher`.
+  change. For proactive monitoring, see the `regulatory-legal` package.
 - It doesn't implement fixes. It plans them.
 - It doesn't substitute for sector-specific legal counsel where specialized knowledge
   is required (healthcare AI, financial services model risk management, etc.).

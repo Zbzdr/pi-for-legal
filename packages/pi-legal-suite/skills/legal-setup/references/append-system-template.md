@@ -3,7 +3,7 @@
 
 # Pi Legal Workspace
 
-This trusted project uses Pi for Legal. Treat `.pi/legal-workbench/config.json` as the path source of truth and `.pi/legal-workbench/profile.md` as reusable practice context. Use applicable legal Skills for research, commercial, privacy, regulatory, AI governance, employment, corporate, litigation, IP, product, escalation, playbook learning, and stakeholder summaries.
+This trusted project uses Pi for Legal. Treat `.pi/legal-workbench/config.json` as the path source of truth and the project-root `AGENTS.md` as reusable practice context. Use applicable legal Skills for research, commercial, privacy, regulatory, AI governance, employment, corporate, litigation, IP, product, escalation, playbook learning, and stakeholder summaries.
 
 ## Session And Matter Gate
 
@@ -13,16 +13,16 @@ Candidate matching is metadata-only. Never open, summarize, name, or search unma
 
 ## Storage Boundary
 
-- Keep reusable configuration, profile, status, and the metadata-only matter index under `.pi/legal-workbench/`.
+- Keep Pi-specific configuration, status, and the metadata-only matter index under `.pi/legal-workbench/`; keep the reusable practice profile at the project-root `AGENTS.md`.
 - Let Pi keep raw session files in its default session location. Do not copy or move them into the legal workspace.
 - Keep client facts, source documents, downloads, fetched data, research, notes, drafts, redlines, memos, and deliverables inside the active visible matter directory.
-- Keep genuinely reusable, non-client-specific practice materials under the configured visible `practice/` directory only with user approval.
+- Keep genuinely reusable, non-client-specific learning records under the configured visible `logs/` directory only with user approval.
 - Do not place substantive matter material under `.pi/` or in an unmatched matter.
 - Do not overwrite source documents. Make a backup before an approved modification and write the result as a new file in the active matter.
 
-After material work, update the active matter `README.md` current state and work-product index concisely, and append significant events to `history.md`. A matter may bind several Pi sessions; record only their session IDs in the matter README. Raw session files remain in Pi's default location.
+After material work, update the active matter `matter.md` current state and work-product index concisely, put deliverables under `outputs/`, and append significant events to `history.md`. A matter may bind several Pi sessions; record only their session IDs in `matter.md`. Raw session files remain in Pi's default location.
 
-Some adapted Skills still express paths using the upstream `<dataDir>/domain/...` convention or ask for an `Active matter` field in the profile. Under schema version 2, the current session binding is the active-matter source of truth. Redirect matter-specific legacy paths into the bound matter's `research/` or `work-product/` subtree, and read the matter's compatibility `matter.md` when a Skill requests it. Do not write a session-specific active slug into the shared practice profile.
+Some adapted Skills still express project-level trackers using their upstream `<dataDir>/domain/...` convention. Keep those domain trackers where their Skill specifies them. For matter-specific material, use the bound matter's `outputs/` subtree and `matter.md`, `history.md`, and `notes.md`; do not create parallel `sources/`, `research/`, or `work-product/` roots. Do not write a session-specific active slug into the shared practice profile.
 
 The extension blocks out-of-matter paths for Pi's built-in `write` and `edit` tools. This is a workflow guardrail, not an operating-system sandbox. Apply the same boundary to shell commands and scripts that can create or modify files.
 

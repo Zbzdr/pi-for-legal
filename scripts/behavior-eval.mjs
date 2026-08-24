@@ -80,18 +80,25 @@ await runScenario(
     const configDir = join(cwd, ".pi", "legal-workbench");
     mkdirSync(configDir, { recursive: true });
     mkdirSync(join(cwd, "legal-workbench", "matters"), { recursive: true });
-    mkdirSync(join(cwd, "legal-workbench", "practice"), { recursive: true });
+    mkdirSync(join(cwd, "legal-workbench", "logs"), { recursive: true });
+    for (const slug of ["acme-ccpa", "confidential-merger"]) {
+      const matterDir = join(cwd, "legal-workbench", "matters", slug);
+      mkdirSync(join(matterDir, "outputs"), { recursive: true });
+      writeFileSync(join(matterDir, "matter.md"), `# Matter: ${slug}\n\n- Status: active\n\n## Associated Pi Sessions\n\n| Session ID | Bound | Status |\n|---|---|---|\n<!-- pi-legal:sessions:start -->\n<!-- pi-legal:sessions:end -->\n`);
+      writeFileSync(join(matterDir, "history.md"), "# Matter History\n");
+      writeFileSync(join(matterDir, "notes.md"), "# Matter Notes\n");
+    }
     writeFileSync(join(configDir, "config.json"), JSON.stringify({
-      schemaVersion: 2,
-      profilePath: ".pi/legal-workbench/profile.md",
+      schemaVersion: 3,
+      profilePath: "AGENTS.md",
       statusPath: ".pi/legal-workbench/status.json",
       indexPath: ".pi/legal-workbench/matter-index.json",
       dataDir: "legal-workbench",
       matterRoot: "legal-workbench/matters",
     }, null, 2));
-    writeFileSync(join(configDir, "profile.md"), "# Legal Workbench Practice Profile\n\n- Setup complete.\n");
+    writeFileSync(join(cwd, "AGENTS.md"), "# Legal Workbench Practice Profile\n\n- Setup complete.\n");
     writeFileSync(join(configDir, "status.json"), JSON.stringify({
-      schemaVersion: 2,
+      schemaVersion: 3,
       setupStatus: "complete",
       lastUpdated: "2026-08-19T00:00:00.000Z",
     }, null, 2));
@@ -152,11 +159,15 @@ await runScenario(
     const configDir = join(cwd, ".pi", "legal-workbench");
     mkdirSync(configDir, { recursive: true });
     writeFileSync(join(configDir, "config.json"), JSON.stringify({
-      schemaVersion: 1,
-      profilePath: ".pi/legal-workbench/profile.md",
-      dataDir: ".pi/legal-workbench/data",
+      schemaVersion: 3,
+      profilePath: "AGENTS.md",
+      statusPath: ".pi/legal-workbench/status.json",
+      indexPath: ".pi/legal-workbench/matter-index.json",
+      dataDir: "legal-workbench",
+      matterRoot: "legal-workbench/matters",
     }, null, 2));
-    writeFileSync(join(configDir, "profile.md"), `# Legal Workbench Practice Profile
+    mkdirSync(join(cwd, "legal-workbench"), { recursive: true });
+    writeFileSync(join(cwd, "AGENTS.md"), `# Legal Workbench Practice Profile
 
 ## Who we are
 - User role: lawyer/legal professional

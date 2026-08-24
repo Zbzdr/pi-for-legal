@@ -156,7 +156,7 @@ For each category relevant to the new regulation, **research the currently opera
 
 **From PIA generation:** PIAs flag privacy policy inconsistencies → those feed here as known gaps.
 
-**To the regulatory-legal package (if installed):** This skill is the manual version. The monitor package watches feeds and triggers this analysis automatically when something changes.
+**To the regulatory workflow in this suite (if installed):** This skill is the manual version. The monitor package watches feeds and triggers this analysis automatically when something changes.
 
 ## Output
 
@@ -175,5 +175,5 @@ End with the next-steps decision tree per project legal profile `## Outputs`. Cu
 ## What this skill does not do
 
 - It doesn't interpret ambiguous regulatory language authoritatively. When the reg is unclear, say so: "Section X could be read as [A] or [B]. [A] is the conservative read. Suggest outside counsel if this is material."
-- It doesn't track regulatory changes proactively. It runs when you point it at a change. For proactive monitoring, see the regulatory-legal package.
+- It doesn't track regulatory changes proactively. It runs when you point it at a change. For proactive monitoring, see the regulatory workflow in this suite.
 - It doesn't implement fixes. It plans them.

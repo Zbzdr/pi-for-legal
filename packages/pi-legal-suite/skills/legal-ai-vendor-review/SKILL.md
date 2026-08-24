@@ -21,7 +21,7 @@ description: "Review vendor AI terms — agreement, addendum, or ToS AI provisio
 
 ## Matter context
 
-**Matter context.** Check `## Matter workspaces` in the practice-level project legal profile. If `Enabled` is `✗` (the default for in-house users), skip the rest of this paragraph — skills use practice-level context and the matter machinery is invisible. If enabled and there is no active matter, ask: "Which matter is this for? Run `/skill:legal-matter-workspace switch <slug>` or say `practice-level`." Load the active matter's `matter.md` for matter-specific context and overrides. Write outputs to the matter folder at `<dataDir>/matters/<matter-slug>/`. Never read another matter's files unless `Cross-matter context` is `on`.
+**Matter context.** Check `## Matter workspaces` in the practice-level project legal profile. If `Enabled` is `✗` (the default for in-house users), skip the rest of this paragraph — skills use practice-level context and the matter machinery is invisible. If enabled and there is no active matter, ask: "Which matter is this for? Run `/skill:legal-matter-workspace switch <slug>` or say `practice-level`." Load the active matter's `matter.md` for matter-specific context and overrides. Write outputs under `<dataDir>/matters/<matter-slug>/outputs/`. Never read another matter's files unless `Cross-matter context` is `on`.
 
 ---
 
@@ -310,7 +310,7 @@ End with the next-steps decision tree per project legal profile `## Outputs`. Cu
 ## What this skill does not do
 
 - It doesn't review the DPA provisions of the same agreement — run
-  `/skill:legal-privacy-dpa-review` for that.
+  `/skill:legal-privacy-dpa-review`, for that.
 - It doesn't decide whether to accept terms outside the fallbacks. It routes those
   per the escalation table in the project legal profile.
 - It doesn't evaluate vendor security posture beyond what's in the agreement —

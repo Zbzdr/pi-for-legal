@@ -16,6 +16,13 @@ pi install -l npm:@zbzdr/pi-legal-suite
 
 按提示完成 setup 后，重新加载或重启 Pi，在新 session 中描述任务；根据提示选择或创建事务，然后开始研究、审查或起草工作。
 
+## Setup 后会发生什么
+
+- 项目根目录会有 Pi 自动加载的 `AGENTS.md`，用于保存法律实践 profile；
+- `.pi/APPEND_SYSTEM.md` 会追加法律工作区的固定规则，并保留原有项目规则；
+- `legal-workbench/matters/` 和 `legal-workbench/logs/` 会被初始化，但不会自动创建具体 matter；
+- 新 session 会先询问复用或创建 matter，之后的资料和输出放在对应 matter 的 `outputs/` 下；Pi 原始 session 仍使用默认位置。
+
 然后直接描述任务，或显式调用：
 
 ```text
@@ -47,11 +54,7 @@ pi update npm:@zbzdr/pi-legal-suite
 - 不内置 MCP、web access、邮件、Slack、todo 或其他 extensions；
 - 没有可靠外部来源时会保留验证标签；实质法律结论仍需充分核实。
 
-setup 后，`.pi/legal-workbench/` 只保存 profile、status、matter index 等可复用状态；matter 资料、下载内容、研究记录和工作产品保存在可见的 `legal-workbench/matters/<slug>/` 下。原始 Pi sessions 使用默认存储位置，matter README 记录绑定的 session ID。
-
-曾使用开发中的 `legal-workbench/sessions` 设置时，再运行一次 `/skill:legal-setup` 即可恢复 Pi 默认 session 位置。迁移不会移动或删除已有 session 文件。
-
-此前的 core 和领域包停止维护。npm 上已有版本会保留并标记为 deprecated，仓库内对应目录仅作历史快照；它们不再参与测试、打包或发布。
+setup 后，`.pi/legal-workbench/` 只保存 Pi 配置、status、matter index 等内部状态；项目根目录的 `AGENTS.md` 保存实践 profile，matter 资料、下载内容、研究记录和工作产品保存在 `legal-workbench/matters/<slug>/` 下。每个 matter 使用 `matter.md`、`history.md`、`notes.md` 和 `outputs/`。原始 Pi sessions 使用默认存储位置，`matter.md` 记录绑定的 session ID。
 
 后续计划包括更深入的 CN 及其他法域本地化、完整 DOCX/redline，以及一个项目级整合 MCP、web access、todo 和交互能力的独立工作台包。
 

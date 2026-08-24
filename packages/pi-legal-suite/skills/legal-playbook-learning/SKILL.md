@@ -11,12 +11,12 @@ Run an on-demand learning loop using project-local files. This Skill replaces th
 
 ## Resolve storage
 
-Read `.pi/legal-workbench/config.json`, resolve the profile and visible `dataDir`, and use the approved reusable practice area:
+Read `.pi/legal-workbench/config.json`, resolve the project-root `AGENTS.md` profile and visible `dataDir`, and use the approved project-level log area:
 
 ```text
-<dataDir>/practice/learning/deviations.jsonl
-<dataDir>/practice/learning/pending-playbook-proposals.md
-<dataDir>/practice/learning/decisions.jsonl
+<dataDir>/logs/learning/deviations.jsonl
+<dataDir>/logs/learning/pending-playbook-proposals.md
+<dataDir>/logs/learning/decisions.jsonl
 ```
 
 Show exact paths before the first write and confirm that the user wants the normalized result promoted from the active matter into reusable practice data. Never copy contract text, personal data, client confidences, or privileged analysis into the learning log unless necessary; prefer a clause category, normalized outcome, source matter slug, and source-file anchor.

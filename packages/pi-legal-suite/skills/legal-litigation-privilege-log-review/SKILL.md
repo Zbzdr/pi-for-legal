@@ -26,7 +26,7 @@ Confirm: "This use is within the proceedings in which the documents were disclos
 
 ## Matter context
 
-**Matter context.** Check `## Matter workspaces` in the practice-level project legal profile. For litigation-legal the default is `Enabled: ✓` — every case gets its own matter workspace. If `Enabled` is `✗` (you turned it off because you work one case at a time), skip the rest of this paragraph and use practice-level context. If enabled and there is no active matter, ask: "Which matter is this for? Run `/skill:legal-matter-workspace switch <slug>` or say `practice-level`." Load the active matter's `matter.md` for matter-specific context and overrides. Write outputs to the matter folder at `<dataDir>/matters/<matter-slug>/`. Never read another matter's files unless `Cross-matter context` is `on`.
+**Matter context.** Check `## Matter workspaces` in the practice-level project legal profile. For litigation-legal the default is `Enabled: ✓` — every case gets its own matter workspace. If `Enabled` is `✗` (you turned it off because you work one case at a time), skip the rest of this paragraph and use practice-level context. If enabled and there is no active matter, ask: "Which matter is this for? Run `/skill:legal-matter-workspace switch <slug>` or say `practice-level`." Load the active matter's `matter.md` for matter-specific context and overrides. Write outputs under `<dataDir>/matters/<matter-slug>/outputs/`. Never read another matter's files unless `Cross-matter context` is `on`.
 
 ---
 

@@ -19,7 +19,7 @@ description: "Classify a proposed AI use case against your registry — approved
 
 ## Matter context
 
-**Matter context.** Check `## Matter workspaces` in the practice-level project legal profile. If `Enabled` is `✗` (the default for in-house users), skip the rest of this paragraph — skills use practice-level context and the matter machinery is invisible. If enabled and there is no active matter, ask: "Which matter is this for? Run `/skill:legal-matter-workspace switch <slug>` or say `practice-level`." Load the active matter's `matter.md` for matter-specific context and overrides. Write outputs to the matter folder at `<dataDir>/matters/<matter-slug>/`. Never read another matter's files unless `Cross-matter context` is `on`.
+**Matter context.** Check `## Matter workspaces` in the practice-level project legal profile. If `Enabled` is `✗` (the default for in-house users), skip the rest of this paragraph — skills use practice-level context and the matter machinery is invisible. If enabled and there is no active matter, ask: "Which matter is this for? Run `/skill:legal-matter-workspace switch <slug>` or say `practice-level`." Load the active matter's `matter.md` for matter-specific context and overrides. Write outputs under `<dataDir>/matters/<matter-slug>/outputs/`. Never read another matter's files unless `Cross-matter context` is `on`.
 
 ---
 
@@ -231,14 +231,14 @@ for every no.
 customer data, behavioral data — flag it:
 
 > "This use case involves personal data. A PIA is likely required in addition to
-> an AI impact assessment. Use `/skill:legal-privacy-pia-generation [use case]` to run
-> that in parallel."
+> an AI impact assessment. Use `/skill:legal-privacy-pia-generation [use case]`, if the
+> package is installed, to run that in parallel."
 
 **Product counsel handoff:** If this is a new product feature involving AI:
 
 > "If this use case is part of a product launch, loop in product counsel.
-> Use `/skill:legal-product-launch-review` — it will detect the AI component and route
-> back to this workflow."
+> Use `/skill:legal-product-launch-review` — it will detect
+> the AI component and route to this package."
 
 Only flag handoffs that are actually relevant. Don't append both as boilerplate
 to every triage.
