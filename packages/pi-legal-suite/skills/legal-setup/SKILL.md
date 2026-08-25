@@ -1,6 +1,6 @@
 ---
 name: legal-setup
-description: Initialize, migrate, complete, or update the project-local Pi Legal workspace and practice profile. Use after installation, when setup is incomplete, when a review lacks a playbook, when the user asks to configure legal workflows, or when visible matter storage must change.
+description: Initialize, complete, or update the project-local Pi Legal workspace and practice profile. Use after installation, when setup is incomplete, when a review lacks a playbook, when the user asks to configure legal workflows, or when visible matter storage must change.
 ---
 
 # Legal workbench setup
@@ -15,7 +15,7 @@ Look for `.pi/legal-workbench/config.json` in the current workspace.
 
 If it does not exist, ask where the user wants visible legal work stored before asking substantive profile questions:
 
-1. project-local default: reusable state in `.pi/legal-workbench/`, substantive data in `legal-workbench/`, and matters in `legal-workbench/matters/`; or
+1. project-local default: reusable state in `.pi/legal-workbench/`, substantive data in the project root, and matters in `matters/`; or
 2. another visible project-relative data directory supplied by the user.
 
 Explain that `.pi/` contains Pi-specific configuration, status, and a metadata-only matter index. The reusable practice profile is the project-root `AGENTS.md`, which Pi loads as a context file; client facts, downloads, research, drafts, redlines, and work product stay in visible matter directories outside `.pi/`. Project-local material travels with the project if committed, so confidential paths should normally remain gitignored. Never choose a global path or write to `~/.pi` by default.
@@ -25,25 +25,27 @@ Before the first write, show all exact paths and ask for confirmation. After con
 Default command:
 
 ```bash
-node <skill-root>/scripts/init_workspace.mjs --workspace <workspace-absolute-path> --data-dir legal-workbench --phase initialize
+node <skill-root>/scripts/init_workspace.mjs --workspace <workspace-absolute-path> --data-dir . --phase initialize
 ```
 
 The resulting config is:
 
 ```json
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "profilePath": "AGENTS.md",
   "statusPath": ".pi/legal-workbench/status.json",
   "indexPath": ".pi/legal-workbench/matter-index.json",
-  "dataDir": "legal-workbench",
-  "matterRoot": "legal-workbench/matters"
+  "dataDir": ".",
+  "matterRoot": "matters"
 }
 ```
 
+The default setup creates `matters/` and `logs/` at the project root. It does not create a visible `legal-workbench/` wrapper directory. `.pi/legal-workbench/` remains the Pi state directory. If the project already contains `matters/` or `logs/`, confirm that those directories belong to this workspace before proceeding; setup does not delete or overwrite their existing files.
+
 The data directory must be visible, project-relative, and inside the workspace. Do not store credentials, tokens, client secrets, or private keys.
 
-If an older or different config exists, stop and ask the user to back it up and rerun setup after deciding what to retain. This release does not migrate or delete old configuration or matter files, and the deterministic initializer refuses to overwrite a different config.
+If an older or different config exists, stop and ask the user to back it up and rerun setup after deciding what to retain. This release does not migrate or delete old configuration or matter files, and the deterministic initializer refuses to overwrite a different config. It does not migrate the prior visible `legal-workbench/` layout; back up any existing matter files and move them manually if needed.
 
 ## Resume and update
 

@@ -44,6 +44,7 @@ try {
   assert.deepEqual(loaded.errors, []);
   assert.equal(loaded.extensions.length, 1);
   assert.equal(loaded.extensions[0].tools.has("legal_matter_session"), true);
+  assert.equal(loaded.extensions[0].tools.has("legal_time"), true);
 
   await client.start();
   const commands = await client.getCommands();

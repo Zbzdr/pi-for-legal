@@ -7,7 +7,7 @@ description: Create, list, bind, update, and close isolated project-local legal 
 
 > **Attribution:** Adapted from Anthropic's claude-for-legal at revision 4a6c651889c97cc9140580363c73e0eb17379c2b under Apache-2.0 and modified for Pi. See the package NOTICE.
 
-Resolve the schema-v3 project config, project-root `AGENTS.md` profile, and `matterRoot`. Matter workspaces live in a visible directory outside `.pi/`. The metadata-only index lives at `.pi/legal-workbench/matter-index.json`; never use it as a substitute for matter files.
+Resolve the schema-v4 project config, project-root `AGENTS.md` profile, and `matterRoot`. By default, matter workspaces live at the project root under `matters/`, outside `.pi/`. The metadata-only index lives at `.pi/legal-workbench/matter-index.json`; never use it as a substitute for matter files.
 
 For `new`, `bind`, `close`, `status`, and explicit `list` operations, use `legal_matter_session`. The tool performs deterministic file and session-state changes. Do not recreate those operations with ad hoc shell commands.
 

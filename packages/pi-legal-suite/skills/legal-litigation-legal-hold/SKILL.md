@@ -5,15 +5,16 @@ description: "Issue, refresh, release, or report on legal holds — drafts the h
 # /skill:legal-litigation-legal-hold
 
 > **Attribution:** Adapted from Anthropic's `claude-for-legal/litigation-legal` at revision `4a6c651889c97cc9140580363c73e0eb17379c2b` under Apache-2.0 and modified for Pi. See the package `NOTICE`.
-1. If `--status` (no slug): read `_log.yaml`, produce portfolio-wide hold report.
-2. Otherwise: load `<dataDir>/matters/[slug]/matter.md` + log row.
-3. Load the project legal profile → privilege markings, hold template pointer, escalation norms.
-4. Follow the workflow and reference below.
-5. Route by flag:
+1. Call `legal_time` before generating a status report or writing a system-recorded hold date. If the user supplies an event or issuance date, preserve that date and its source separately.
+2. If `--status` (no slug): read `_log.yaml`, produce portfolio-wide hold report.
+3. Otherwise: load `<dataDir>/matters/[slug]/matter.md` + log row.
+4. Load the project legal profile → privilege markings, hold template pointer, escalation norms.
+5. Follow the workflow and reference below.
+6. Route by flag:
    - `--issue`: capture scope, custodians, date range, systems. Draft `legal-hold-v1.docx`. Update `legal_hold` fields. Append history entry. Set `next_refresh` (default +6mo).
    - `--refresh`: capture scope/custodian changes. Draft next version. Update `last_refresh` + `next_refresh`. Flag departed custodians.
    - `--release`: capture release date, retention instruction. Draft release notice. Set `released:` field.
-6. Confirm before writing. Show the user the draft notice and the log diff.
+7. Confirm before writing. Show the user the draft notice and the log diff.
 
 ---
 
@@ -156,7 +157,7 @@ release. You may be asked to reaffirm compliance at periodic intervals.
 
 ### `--refresh` — periodic reaffirmation
 
-Refresh cadence: default 6 months; adjustable per matter. When `next_refresh < today` (or user invokes manually), the skill drafts a refresh notice.
+Refresh cadence: default 6 months; adjustable per matter. When `next_refresh < [current date from `legal_time`]` (or user invokes manually), the skill drafts a refresh notice.
 
 **Inputs:**
 1. Any **scope changes** since last refresh (new topics surfaced in discovery, new custodians, new systems).
@@ -203,7 +204,7 @@ Do not send the release notice without an explicit yes.
 Read `_log.yaml`. Produce a report:
 
 ```markdown
-# Legal Hold Status — [today]
+# Legal Hold Status — [YYYY-MM-DD from `legal_time`]
 
 ## Active holds
 
@@ -213,7 +214,7 @@ Read `_log.yaml`. Produce a report:
 
 ## ⚠️ Attention
 
-- **Refresh overdue:** [list slugs where next_refresh < today]
+- **Refresh overdue:** [list slugs where next_refresh < current date from `legal_time`]
 - **Refresh due within 30 days:** [list]
 - **Matters active without hold issued:** [list — high/critical risk first]
 - **Matters closed with hold still active:** [list — consider release]

@@ -135,7 +135,7 @@ flag.** The user has to decide; the skill presents options.
 ```
 DRAFT FOR INTERNAL LEGAL REVIEW — NOT FOR DISTRIBUTION
 Prepared for: [firm / company name from practice profile]
-Date: [today's date]
+Date: [YYYY-MM-DD from `legal_time`; system recording date]
 Prepared by: ai-governance-legal policy-starter skill, adapted from published model policies
 Not for adoption, distribution, posting, or reliance until reviewed, adapted, and approved by [attorney / GC / managing partner / executive committee per the governance team section of the practice profile].
 ```

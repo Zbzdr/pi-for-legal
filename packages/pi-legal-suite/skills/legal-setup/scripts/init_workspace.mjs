@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import { execFileSync } from "node:child_process";
 import {
 	existsSync,
 	mkdirSync,
@@ -15,6 +16,16 @@ function usage(message) {
 	if (message) console.error(message);
 	console.error("Usage: node init_workspace.mjs --workspace <path> --data-dir <visible-relative-path> [--phase initialize|complete] [--force-system] [--force-profile]");
 	process.exit(2);
+}
+
+function systemDate() {
+	try {
+		const value = execFileSync("bash", ["-c", "date +%Y-%m-%d"], { encoding: "utf8" }).trim();
+		if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) throw new Error(`unexpected date output: ${value}`);
+		return value;
+	} catch (error) {
+		throw new Error(`Pi Legal requires a Unix shell with the date command; could not read the system date: ${error instanceof Error ? error.message : String(error)}`);
+	}
 }
 
 function parseArguments(argv) {
@@ -43,10 +54,10 @@ function isWithin(parent, child) {
 function visibleWorkspacePath(workspace, input, label) {
 	if (isAbsolute(input)) throw new Error(`${label} must be relative to the workspace`);
 	const target = resolve(workspace, input);
-	if (!isWithin(workspace, target) || target === workspace) throw new Error(`${label} must stay inside the workspace`);
+	if (!isWithin(workspace, target)) throw new Error(`${label} must stay inside the workspace`);
 	const rel = relative(workspace, target);
 	if (rel.split(sep)[0]?.startsWith(".")) throw new Error(`${label} must be visible and cannot start with a dot-directory`);
-	return { absolute: target, relative: rel.split(sep).join("/") };
+	return { absolute: target, relative: rel ? rel.split(sep).join("/") : "." };
 }
 
 function writeJsonAtomic(path, value) {
@@ -113,7 +124,7 @@ const options = parseArguments(process.argv.slice(2));
 if (!existsSync(options.workspace)) throw new Error(`Workspace does not exist: ${options.workspace}`);
 const workspace = realpathSync(options.workspace);
 const data = visibleWorkspacePath(workspace, options.dataDir, "dataDir");
-const matterRoot = `${data.relative}/matters`;
+const matterRoot = join(data.relative, "matters").split(sep).join("/");
 const stateDir = join(workspace, ".pi", "legal-workbench");
 const configPath = join(stateDir, "config.json");
 const systemPath = join(workspace, ".pi", "APPEND_SYSTEM.md");
@@ -127,7 +138,7 @@ for (const directory of [data.absolute, join(data.absolute, "matters"), join(dat
 	mkdirSync(directory, { recursive: true });
 }
 const config = {
-	schemaVersion: 3,
+	schemaVersion: 4,
 	profilePath: "AGENTS.md",
 	statusPath: ".pi/legal-workbench/status.json",
 	indexPath: ".pi/legal-workbench/matter-index.json",
@@ -148,20 +159,20 @@ const systemResult = options.forceSystem
 	? createOrConfirm(systemPath, systemTemplate, true, ".pi/APPEND_SYSTEM.md")
 	: mergeManagedSystem(systemPath, systemTemplate);
 
-const today = new Date().toISOString().slice(0, 10);
+const today = systemDate();
 const profileTemplate = readFileSync(join(referencesDir, "profile-template.md"), "utf8").replaceAll("[date]", today);
 const profilePath = join(workspace, config.profilePath);
 const profileResult = installProfile(profilePath, profileTemplate, options.forceProfile);
 
 if (!existsSync(indexPath)) {
-	writeJsonAtomic(indexPath, { schemaVersion: 1, updatedAt: new Date().toISOString(), matters: [] });
+	writeJsonAtomic(indexPath, { schemaVersion: 2, updatedAt: today, matters: [] });
 }
 
 const setupStatus = options.phase === "complete" ? "complete" : "in-progress";
-writeJsonAtomic(statusPath, { schemaVersion: 3, setupStatus, lastUpdated: new Date().toISOString() });
+writeJsonAtomic(statusPath, { schemaVersion: 4, setupStatus, lastUpdated: today });
 
-const workspaceReadme = join(data.absolute, "README.md");
-if (!existsSync(workspaceReadme)) {
+const workspaceReadme = data.relative === "." ? undefined : join(data.absolute, "README.md");
+if (workspaceReadme && !existsSync(workspaceReadme)) {
 	writeFileSync(workspaceReadme, `# Legal Workbench\n\n- \`AGENTS.md\`: project-level practice profile loaded by Pi\n- \`matters/\`: matter folders; each contains \`matter.md\`, \`history.md\`, \`notes.md\`, and \`outputs/\`\n- \`logs/\`: approved project-level append-only logs, such as playbook learning records\n\nPi-specific configuration and the metadata-only matter index are stored under \`.pi/legal-workbench/\`. Pi stores raw sessions in its default session location.\n`, "utf8");
 }
 

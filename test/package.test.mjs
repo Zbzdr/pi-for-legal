@@ -74,7 +74,7 @@ test("workspace initializer creates the project workspace and leaves Pi settings
   const run = (phase) => execFileSync(process.execPath, [
     setupScript,
     "--workspace", temporary,
-    "--data-dir", "legal-workbench",
+    "--data-dir", ".",
     "--phase", phase,
   ], { encoding: "utf8" });
 
@@ -83,21 +83,21 @@ test("workspace initializer creates the project workspace and leaves Pi settings
   assert.deepEqual(JSON.parse(readFileSync(join(piDirectory, "settings.json"), "utf8")), originalSettings);
   const config = JSON.parse(readFileSync(join(piDirectory, "legal-workbench", "config.json"), "utf8"));
   assert.deepEqual(config, {
-    schemaVersion: 3,
+    schemaVersion: 4,
     profilePath: "AGENTS.md",
     statusPath: ".pi/legal-workbench/status.json",
     indexPath: ".pi/legal-workbench/matter-index.json",
-    dataDir: "legal-workbench",
-    matterRoot: "legal-workbench/matters",
+    dataDir: ".",
+    matterRoot: "matters",
   });
   assert.equal(existsSync(join(temporary, "AGENTS.md")), true);
   assert.equal(existsSync(join(temporary, "legal-workbench", "AGENTS.md")), false);
   assert.match(readFileSync(join(temporary, "AGENTS.md"), "utf8"), /Existing Agent Rule/);
   assert.match(readFileSync(join(temporary, "AGENTS.md"), "utf8"), /Legal Workbench Practice Profile/);
-  assert.equal(existsSync(join(temporary, "legal-workbench", "matters")), true);
-  assert.equal(existsSync(join(temporary, "legal-workbench", "logs")), true);
-  assert.equal(existsSync(join(temporary, "legal-workbench", "practice")), false);
-  assert.equal(existsSync(join(temporary, "legal-workbench", "sessions")), false);
+  assert.equal(existsSync(join(temporary, "matters")), true);
+  assert.equal(existsSync(join(temporary, "logs")), true);
+  assert.equal(existsSync(join(temporary, "legal-workbench")), false);
+  assert.equal(existsSync(join(temporary, "README.md")), false);
   const appendSystem = readFileSync(join(piDirectory, "APPEND_SYSTEM.md"), "utf8");
   assert.match(appendSystem, /Existing Project Rule/);
   assert.equal((appendSystem.match(/pi-legal-workbench:start/g) ?? []).length, 1);
@@ -123,7 +123,7 @@ test("workspace initializer rejects an older layout instead of migrating it", (t
     matterRoot: "legal-workbench/matters",
     sessionDir: "legal-workbench/sessions",
   }, null, 2));
-  assert.throws(() => execFileSync(process.execPath, [setupScript, "--workspace", temporary, "--data-dir", "legal-workbench"], { stdio: "pipe" }));
+  assert.throws(() => execFileSync(process.execPath, [setupScript, "--workspace", temporary, "--data-dir", "."], { stdio: "pipe" }));
   assert.equal(JSON.parse(readFileSync(join(stateDirectory, "config.json"), "utf8")).schemaVersion, 2);
 });
 
@@ -145,14 +145,14 @@ test("legal workbench bootstraps once, binds session IDs, and guards matter writ
   execFileSync(process.execPath, [
     setupScript,
     "--workspace", temporary,
-    "--data-dir", "legal-workbench",
+    "--data-dir", ".",
     "--phase", "complete",
   ]);
 
   const indexPath = join(temporary, ".pi", "legal-workbench", "matter-index.json");
   writeFileSync(indexPath, `${JSON.stringify({
-    schemaVersion: 1,
-    updatedAt: "2026-08-19T00:00:00.000Z",
+    schemaVersion: 2,
+    updatedAt: "2026-08-19",
     matters: [
       {
         slug: "acme-privacy",
@@ -162,9 +162,9 @@ test("legal workbench bootstraps once, binds session IDs, and guards matter writ
         jurisdictions: ["California"],
         issueKeywords: ["CCPA"],
         status: "active",
-        path: "legal-workbench/matters/acme-privacy",
-        openedAt: "2026-08-19T00:00:00.000Z",
-        updatedAt: "2026-08-19T00:00:00.000Z"
+        path: "matters/acme-privacy",
+        openedAt: "2026-08-19",
+        updatedAt: "2026-08-19"
       },
       {
         slug: "secret-merger",
@@ -174,20 +174,20 @@ test("legal workbench bootstraps once, binds session IDs, and guards matter writ
         jurisdictions: ["Delaware"],
         issueKeywords: ["merger control"],
         status: "active",
-        path: "legal-workbench/matters/secret-merger",
-        openedAt: "2026-08-19T00:00:00.000Z",
-        updatedAt: "2026-08-19T00:00:00.000Z"
+        path: "matters/secret-merger",
+        openedAt: "2026-08-19",
+        updatedAt: "2026-08-19"
       }
     ]
   }, null, 2)}\n`);
 
   const entries = [];
   const handlers = new Map();
-  let matterTool;
+  const tools = new Map();
   let sessionName;
   const pi = {
     on(event, handler) { handlers.set(event, handler); },
-    registerTool(tool) { matterTool = tool; },
+    registerTool(tool) { tools.set(tool.name, tool); },
     appendEntry(customType, data) { entries.push({ type: "custom", customType, data }); },
     setSessionName(name) { sessionName = name; },
   };
@@ -202,6 +202,10 @@ test("legal workbench bootstraps once, binds session IDs, and guards matter writ
 
   const extension = await import(`../packages/pi-legal-suite/extensions/legal-workbench.ts?test=${Date.now()}`);
   extension.default(pi);
+  const matterTool = tools.get("legal_matter_session");
+  const timeTool = tools.get("legal_time");
+  assert.ok(matterTool);
+  assert.ok(timeTool);
   handlers.get("session_start")({ reason: "startup" }, context);
   const bootstrap = handlers.get("before_agent_start")({
     prompt: "Please review Acme's California CCPA issue.",
@@ -229,7 +233,7 @@ test("legal workbench bootstraps once, binds session IDs, and guards matter writ
     confirmed: true,
   }, undefined, undefined, context);
   assert.match(createResult.content[0].text, /Session bound to new-york-nda/);
-  const matterPath = join(temporary, "legal-workbench", "matters", "new-york-nda");
+  const matterPath = join(temporary, "matters", "new-york-nda");
   for (const path of ["matter.md", "history.md", "notes.md", "outputs"]) {
     assert.equal(existsSync(join(matterPath, path)), true, `missing matter path: ${path}`);
   }
@@ -241,12 +245,17 @@ test("legal workbench bootstraps once, binds session IDs, and guards matter writ
   assert.match(matterFile, /session-test/);
   assert.doesNotMatch(matterFile, /Raw session/);
   assert.match(sessionName, /new-york-nda/);
+  const timeResult = await timeTool.execute("time-1", {}, undefined, undefined, context);
+  assert.match(timeResult.content[0].text, /System date: \d{4}-\d{2}-\d{2}/);
+  assert.match(timeResult.content[0].text, /Unix date command/);
+  assert.match(readFileSync(join(matterPath, "history.md"), "utf8"), /## \d{4}-\d{2}-\d{2} — Matter opened/);
+  assert.match(readFileSync(join(matterPath, "history.md"), "utf8"), /System record: matter created/);
 
   const blocked = handlers.get("tool_call")({ toolName: "write", input: { path: "outside-matter.md" } }, context);
   assert.equal(blocked.block, true);
   const allowed = handlers.get("tool_call")({
     toolName: "edit",
-    input: { path: "legal-workbench/matters/new-york-nda/matter.md" },
+    input: { path: "matters/new-york-nda/matter.md" },
   }, context);
   assert.equal(allowed, undefined);
 
@@ -257,6 +266,7 @@ test("legal workbench bootstraps once, binds session IDs, and guards matter writ
   }, undefined, undefined, context);
   assert.match(closeResult.content[0].text, /Matter closed/);
   assert.match(readFileSync(join(matterPath, "matter.md"), "utf8"), /- Status: closed/);
+  assert.match(readFileSync(join(matterPath, "history.md"), "utf8"), /## \d{4}-\d{2}-\d{2} — Matter closed/);
 });
 
 test("DOCX redline writes tracked changes, preserves source, and uses a pinned local runtime", (t) => {

@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.5.0 — 2026-08-25
+
+- 将默认可见法律工作区从 `legal-workbench/` 上移到项目根目录的 `matters/` 和 `logs/`。
+- 保留 `.pi/legal-workbench/` 作为 Pi 专用配置、状态和 matter metadata 目录。
+- 将 legal workbench 配置 schema 升至 4；旧的可见目录布局不自动迁移或删除。
+- setup 不再为根目录模式创建额外的 `README.md` 或可见 `legal-workbench/` 包装目录。
+
+## 0.4.1 — 2026-08-25
+
+- 统一系统记录日期为 Unix `bash date +%Y-%m-%d` 返回的短格式，并新增 `legal_time` 工具。
+- 区分事件发生日期与记录日期；无法确认的事件日期保留为 `unknown`，不再默认填写 today、session 日期或文件修改日期。
+- 将 matter 创建/关闭记录改为上游风格的 append-only Markdown history 条目，并标注 `System record`。
+- 将 chronology 输出路径统一到 matter 的 `outputs/chronology.md`。
+- 在 README 中说明当前支持 macOS/Linux Unix 环境，Windows/PowerShell 暂不支持。
+
 ## 0.4.0 — 2026-08-24
 
 - 统一通用工作区命名：项目级 profile 使用 Pi 原生的 `AGENTS.md`，matter 使用 `matters/<slug>/matter.md`、`history.md`、`notes.md` 和 `outputs/`。

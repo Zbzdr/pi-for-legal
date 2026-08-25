@@ -39,7 +39,9 @@ Slug (required). If ambiguous or missing, ask the user to pick from a list of ac
 ```markdown
 [WORK-PRODUCT HEADER — per package config ## Outputs — differs by role; see `## Who's using this`]
 
-# [Matter Name] — Briefing as of [today]
+# [Matter Name] — Briefing as of [YYYY-MM-DD from `legal_time`]
+
+**Report date basis:** Unix date system record. This is the briefing date, not the date of any underlying event.
 
 **Status:** [status / stage]
 **Risk:** [rating] ([severity] × [likelihood])

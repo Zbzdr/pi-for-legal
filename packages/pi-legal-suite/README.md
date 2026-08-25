@@ -4,6 +4,10 @@ Claude for Legal 在 Pi 上的独立移植，也是本项目推荐的 all-in-one
 
 ## Quick start
 
+当前支持 macOS 和 Linux 等带有 `bash` 与 Unix `date` 命令的环境。setup、matter extension 和日期工具会通过 `bash date` 取得本机日历日期；Windows/PowerShell 尚未纳入支持范围，后续再补充适配。
+
+0.5.0 起，默认可见目录为项目根目录下的 `matters/` 和 `logs/`；旧的 `legal-workbench/` 可见目录不会自动迁移。
+
 ```bash
 pi install -l npm:@zbzdr/pi-legal-suite
 ```
@@ -20,8 +24,9 @@ pi install -l npm:@zbzdr/pi-legal-suite
 
 - 项目根目录会有 Pi 自动加载的 `AGENTS.md`，用于保存法律实践 profile；
 - `.pi/APPEND_SYSTEM.md` 会追加法律工作区的固定规则，并保留原有项目规则；
-- `legal-workbench/matters/` 和 `legal-workbench/logs/` 会被初始化，但不会自动创建具体 matter；
+- 项目根目录的 `matters/` 和 `logs/` 会被初始化，但不会自动创建具体 matter；可见的 `legal-workbench/` 包装目录不再创建；
 - 新 session 会先询问复用或创建 matter，之后的资料和输出放在对应 matter 的 `outputs/` 下；Pi 原始 session 仍使用默认位置。
+- 需要记录“今天”或生成报告日期时，extension 提供 `legal_time`，从 Unix `date` 读取短格式 `YYYY-MM-DD`；它只代表系统记录日期，不证明底层法律事件发生在当天。
 
 然后直接描述任务，或显式调用：
 
@@ -53,8 +58,9 @@ pi update npm:@zbzdr/pi-legal-suite
 - 保留上游覆盖的美国、英国、EEA/EU 和跨境工作流，所有实质输出均是供律师复核的工作稿；
 - 不内置 MCP、web access、邮件、Slack、todo 或其他 extensions；
 - 没有可靠外部来源时会保留验证标签；实质法律结论仍需充分核实。
+- 业务日期与记录日期分开处理：事件日期只能来自用户、源文件或已验证来源；无法确定时保留 `unknown`，不会用文件修改时间或当前日期替代。
 
-setup 后，`.pi/legal-workbench/` 只保存 Pi 配置、status、matter index 等内部状态；项目根目录的 `AGENTS.md` 保存实践 profile，matter 资料、下载内容、研究记录和工作产品保存在 `legal-workbench/matters/<slug>/` 下。每个 matter 使用 `matter.md`、`history.md`、`notes.md` 和 `outputs/`。原始 Pi sessions 使用默认存储位置，`matter.md` 记录绑定的 session ID。
+setup 后，`.pi/legal-workbench/` 只保存 Pi 配置、status、matter index 等内部状态；项目根目录的 `AGENTS.md` 保存实践 profile，matter 资料、下载内容、研究记录和工作产品保存在 `matters/<slug>/` 下。每个 matter 使用 `matter.md`、`history.md`、`notes.md` 和 `outputs/`。原始 Pi sessions 使用默认存储位置，`matter.md` 记录绑定的 session ID。
 
 后续计划包括更深入的 CN 及其他法域本地化、完整 DOCX/redline，以及一个项目级整合 MCP、web access、todo 和交互能力的独立工作台包。
 

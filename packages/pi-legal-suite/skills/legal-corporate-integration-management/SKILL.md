@@ -266,7 +266,7 @@ Show summary after generating:
 Integration tracker initialized — [Deal code] / [Target]
 
 Close date: [date]
-Required Consents deadline: [date] ([N] days from today)
+Required Consents deadline: [date] ([N] days from the current date returned by `legal_time`)
 Rep survival expires: [date]
 
 Workplan items: [N] ([N] legal-owns, [N] legal-supports)
@@ -458,7 +458,7 @@ KEY DATES COMING UP
 
 **Manual update:** Attorney tells Pi what changed.
 
-> "We got the Salesforce consent. Mark it obtained, assigned to [name], date today."
+> "We got the Salesforce consent. Mark it obtained, assigned to [name], date today." When the user says today, call `legal_time`; record the user's statement and the system date separately.
 > "The entity rationalization decision is to merge. Update status and add the merger
 > filing to Day 180."
 > "[Counterparty] refused consent. Flag it and note we need outside counsel on

@@ -36,7 +36,7 @@ Upstream Claude for Legal provides the component concepts used here: a cold-star
 
 The suite adds those Pi-specific behaviors through one extension and one deterministic setup script:
 
-- setup creates reusable state under `.pi/legal-workbench/` and visible data under the confirmed `dataDir`;
+- setup creates reusable state under `.pi/legal-workbench/` and visible data under the confirmed `dataDir`; the default `dataDir` is the project root, so matters and logs are created as root-level `matters/` and `logs/`;
 - setup creates the project-root `AGENTS.md`, which Pi loads as the project practice profile;
 - Pi retains raw JSONL sessions in its default location; setup does not change session settings or copy session files;
 - a new session compares only explicit first-prompt metadata with `.pi/legal-workbench/matter-index.json` and never reads unmatched matter contents;

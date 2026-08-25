@@ -40,7 +40,9 @@ Flags:
 ```markdown
 [WORK-PRODUCT HEADER — per package config ## Outputs — differs by role; see `## Who's using this`]
 
-# Portfolio Status — [today]
+# Portfolio Status — [YYYY-MM-DD from `legal_time`]
+
+**Report date basis:** Unix date system record.
 
 **Active matters:** [N]
 **Closed (ytd):** [N] *(shown only with --all)*
@@ -103,12 +105,12 @@ Flags:
 
 These are the checks that make the skill useful rather than decorative:
 
-1. **Overdue deadline:** `next_deadline < today` and `status != closed`
-2. **Stale:** `last_updated < today - 30d` and `status != closed`
+1. **Overdue deadline:** `next_deadline < [current date from `legal_time`]` and `status != closed`
+2. **Stale:** `last_updated < [current date from `legal_time`] - 30d` and `status != closed`
 3. **Conflicts unresolved:** `conflicts.status in [pending, not-run]` and `status != closed`
 3b. **Conflicts override active:** `conflicts.override.by != null` (never auto-clears)
 4. **High-risk uncovered:** `risk in [high, critical]` and `outside_counsel.firm == null`
-5. **Stale reserve:** `materiality == reserved` and `last_updated < today - 60d`
+5. **Stale reserve:** `materiality == reserved` and `last_updated < [current date from `legal_time`] - 60d`
 6. **Hold gap:** `status in [threatened, active, discovery, trial, appeal]` and `legal_hold.issued == false` — preservation duty attaches at reasonable anticipation, so `threatened` matters are in scope.
 7. **Missing fields:** any required field null — `risk`, `materiality`, `status`, `opened`, `conflicts.status`
 

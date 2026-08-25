@@ -1,4 +1,5 @@
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
+import { execFileSync } from "node:child_process";
 import {
 	existsSync,
 	mkdirSync,
@@ -27,7 +28,7 @@ const GENERIC_ISSUES = new Set([
 ]);
 
 interface WorkbenchConfig {
-	schemaVersion: 3;
+	schemaVersion: 4;
 	profilePath: string;
 	statusPath: string;
 	indexPath: string;
@@ -49,13 +50,13 @@ interface MatterRecord {
 }
 
 interface MatterIndex {
-	schemaVersion: 1;
+	schemaVersion: 2;
 	updatedAt: string;
 	matters: MatterRecord[];
 }
 
 interface WorkbenchStatus {
-	schemaVersion: 3;
+	schemaVersion: 4;
 	setupStatus: "not-started" | "in-progress" | "complete";
 	lastUpdated: string;
 }
@@ -69,6 +70,37 @@ interface MatterBinding {
 
 function jsonResult(text: string, details: Record<string, unknown> = {}) {
 	return { content: [{ type: "text" as const, text }], details };
+}
+
+function systemDate(): string {
+	try {
+		const value = execFileSync("bash", ["-c", "date +%Y-%m-%d"], { encoding: "utf8" }).trim();
+		if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) throw new Error(`unexpected date output: ${value}`);
+		return value;
+	} catch (error) {
+		throw new Error(`Pi Legal requires a Unix shell with the date command; could not read the system date: ${error instanceof Error ? error.message : String(error)}`);
+	}
+}
+
+function prependHistoryEntry(path: string, entry: string): void {
+	const content = readFileSync(path, "utf8");
+	const separator = "\n---\n";
+	const separatorIndex = content.indexOf(separator);
+	if (separatorIndex < 0) {
+		const headerEnd = content.indexOf("\n");
+		if (headerEnd >= 0 && content.startsWith("#")) {
+			const header = content.slice(0, headerEnd);
+			const body = content.slice(headerEnd + 1).trim();
+			writeFileSync(path, `${header}\n\nAppend-only event log. Most recent at top.\n\n---\n\n${entry.trim()}${body ? `\n\n${body}` : ""}\n`, "utf8");
+			return;
+		}
+		writeFileSync(path, `${entry.trim()}\n\n${content.trimStart()}`, "utf8");
+		return;
+	}
+	const insertAt = separatorIndex + separator.length;
+	const before = content.slice(0, insertAt);
+	const after = content.slice(insertAt).replace(/^\s*/, "");
+	writeFileSync(path, `${before}\n${entry.trim()}\n\n${after}`, "utf8");
 }
 
 function readJson<T>(path: string): T {
@@ -91,7 +123,7 @@ function workspaceRelative(cwd: string, path: string): string {
 	return relative(realpathSync(cwd), path).split(sep).join("/");
 }
 
-function resolveWorkspacePath(cwd: string, input: string, label: string, visible = false): string {
+function resolveWorkspacePath(cwd: string, input: string, label: string, visible = false, allowWorkspaceRoot = false): string {
 	if (!input?.trim()) throw new Error(`${label} is required`);
 	const workspace = realpathSync(cwd);
 	const target = isAbsolute(input) ? resolve(input) : resolve(workspace, input);
@@ -100,7 +132,7 @@ function resolveWorkspacePath(cwd: string, input: string, label: string, visible
 	while (!existsSync(existing) && existing !== dirname(existing)) existing = dirname(existing);
 	const resolvedExisting = realpathSync(existing);
 	const resolvedTarget = resolve(resolvedExisting, relative(existing, target));
-	if (!isWithin(workspace, resolvedTarget) || resolvedTarget === workspace) {
+	if (!isWithin(workspace, resolvedTarget) || (resolvedTarget === workspace && !allowWorkspaceRoot)) {
 		throw new Error(`${label} must stay inside the current workspace`);
 	}
 	const rel = relative(workspace, resolvedTarget);
@@ -114,23 +146,23 @@ function loadConfig(cwd: string): WorkbenchConfig | undefined {
 	const path = resolve(cwd, CONFIG_PATH);
 	if (!existsSync(path)) return undefined;
 	const config = readJson<WorkbenchConfig>(path);
-	if (config.schemaVersion !== 3) throw new Error("Legal workbench config uses an older or unsupported layout; back up the workspace and run /skill:legal-setup again");
+	if (config.schemaVersion !== 4) throw new Error("Legal workbench config uses an older or unsupported layout; back up the workspace and run /skill:legal-setup again");
 	for (const key of ["profilePath", "statusPath", "indexPath", "dataDir", "matterRoot"] as const) {
 		if (typeof config[key] !== "string" || !config[key]) throw new Error(`Invalid legal workbench config field: ${key}`);
 	}
 	resolveWorkspacePath(cwd, config.profilePath, "profilePath");
 	resolveWorkspacePath(cwd, config.statusPath, "statusPath");
 	resolveWorkspacePath(cwd, config.indexPath, "indexPath");
-	resolveWorkspacePath(cwd, config.dataDir, "dataDir", true);
+	resolveWorkspacePath(cwd, config.dataDir, "dataDir", true, true);
 	resolveWorkspacePath(cwd, config.matterRoot, "matterRoot", true);
 	return config;
 }
 
 function loadStatus(cwd: string, config: WorkbenchConfig): WorkbenchStatus {
 	const path = resolveWorkspacePath(cwd, config.statusPath, "statusPath");
-	if (!existsSync(path)) return { schemaVersion: 3, setupStatus: "not-started", lastUpdated: new Date().toISOString() };
+	if (!existsSync(path)) return { schemaVersion: 4, setupStatus: "not-started", lastUpdated: systemDate() };
 	const status = readJson<WorkbenchStatus>(path);
-	if (status.schemaVersion !== 3 || !["not-started", "in-progress", "complete"].includes(status.setupStatus)) {
+	if (status.schemaVersion !== 4 || !["not-started", "in-progress", "complete"].includes(status.setupStatus)) {
 		throw new Error("Legal workbench status uses an older or unsupported layout; run /skill:legal-setup again");
 	}
 	return status;
@@ -138,9 +170,9 @@ function loadStatus(cwd: string, config: WorkbenchConfig): WorkbenchStatus {
 
 function loadIndex(cwd: string, config: WorkbenchConfig): MatterIndex {
 	const path = resolveWorkspacePath(cwd, config.indexPath, "indexPath");
-	if (!existsSync(path)) return { schemaVersion: 1, updatedAt: new Date().toISOString(), matters: [] };
+	if (!existsSync(path)) return { schemaVersion: 2, updatedAt: systemDate(), matters: [] };
 	const index = readJson<MatterIndex>(path);
-	if (index.schemaVersion !== 1 || !Array.isArray(index.matters)) throw new Error("Invalid legal matter index");
+	if (index.schemaVersion !== 2 || !Array.isArray(index.matters)) throw new Error("Invalid legal matter index");
 	return index;
 }
 
@@ -246,7 +278,7 @@ function bindMatter(pi: ExtensionAPI, ctx: ExtensionContext, config: WorkbenchCo
 	const matterFilePath = join(matterPath, "matter.md");
 	if (!existsSync(matterFilePath)) throw new Error(`Matter file does not exist: ${record.path}/matter.md`);
 
-	const boundAt = new Date().toISOString();
+	const boundAt = systemDate();
 	const sessionId = ctx.sessionManager.getSessionId();
 	appendSessionToMatter(matterFilePath, sessionId, boundAt);
 
@@ -382,12 +414,12 @@ export default function legalWorkbench(pi: ExtensionAPI): void {
 					const matterPath = resolveWorkspacePath(ctx.cwd, record.path, "matter path", true);
 					const matterRoot = resolveWorkspacePath(ctx.cwd, config.matterRoot, "matterRoot", true);
 					if (!isWithin(matterRoot, matterPath)) throw new Error("Indexed matter path is outside matterRoot");
-					const now = new Date().toISOString();
+					const now = systemDate();
 					record.status = "closed";
 					record.updatedAt = now;
 					replaceMatterStatus(join(matterPath, "matter.md"), "closed");
 					const historyPath = join(matterPath, "history.md");
-					writeFileSync(historyPath, `${readFileSync(historyPath, "utf8").trimEnd()}\n- ${now} Matter closed; files retained in place.\n`, "utf8");
+					prependHistoryEntry(historyPath, `## ${now} — Matter closed\n\nSystem record: matter closed in Pi Legal Workbench; files retained in place.`);
 					index.updatedAt = now;
 					writeJsonAtomic(resolveWorkspacePath(ctx.cwd, config.indexPath, "indexPath"), index);
 					if (activeBinding?.slug === record.slug) {
@@ -406,7 +438,7 @@ export default function legalWorkbench(pi: ExtensionAPI): void {
 					if (!isWithin(matterRoot, matterPath)) throw new Error("Matter path escapes matterRoot");
 					if (existsSync(matterPath)) return jsonResult(`Matter directory already exists but is not indexed: ${relative(ctx.cwd, matterPath)}. Resolve it manually.`, { error: true });
 
-					const now = new Date().toISOString();
+					const now = systemDate();
 					record = {
 						slug: params.slug,
 						name: params.name.trim(),
@@ -423,7 +455,7 @@ export default function legalWorkbench(pi: ExtensionAPI): void {
 						mkdirSync(join(matterPath, directory), { recursive: true });
 					}
 					writeFileSync(join(matterPath, "matter.md"), matterFile(record, params.scope?.trim() ?? ""), "utf8");
-					writeFileSync(join(matterPath, "history.md"), `# Matter History\n\n- ${now} Matter created.\n`, "utf8");
+					writeFileSync(join(matterPath, "history.md"), `# Matter History\n\nAppend-only event log. Most recent at top.\n\n---\n\n## ${now} — Matter opened\n\nSystem record: matter created in Pi Legal Workbench.\n`, "utf8");
 					writeFileSync(join(matterPath, "notes.md"), "# Matter Notes\n\n", "utf8");
 					index.matters.push(record);
 					index.updatedAt = now;
@@ -437,6 +469,32 @@ export default function legalWorkbench(pi: ExtensionAPI): void {
 				});
 			} catch (error) {
 				return jsonResult(`Legal matter operation failed: ${error instanceof Error ? error.message : String(error)}`, { error: true });
+			}
+		},
+	});
+
+	pi.registerTool({
+		name: "legal_time",
+		label: "Legal system date",
+		description: "Return the current local calendar date from the Unix date command. This is a recording date, not evidence of when an underlying legal event occurred.",
+		promptSnippet: "Get the current system date when a user explicitly says today or a record needs a system-generated date.",
+		promptGuidelines: [
+			"Call this tool before using the current date in a legal record, report header, comparison, or deadline calculation.",
+			"Use the result as an event date only when the user explicitly said the event happened today.",
+			"Never infer an event date from a file modification time, session date, model knowledge, or this tool alone.",
+		],
+		parameters: { type: "object", additionalProperties: false, properties: {} },
+		executionMode: "sequential",
+
+		async execute() {
+			try {
+				const date = systemDate();
+				return jsonResult(`System date: ${date}\nSource: Unix date command\nUse this as a recording date. It is not evidence of an underlying event date.`, {
+					date,
+					source: "unix date command",
+				});
+			} catch (error) {
+				return jsonResult(`Could not read the system date: ${error instanceof Error ? error.message : String(error)}`, { error: true });
 			}
 		},
 	});

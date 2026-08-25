@@ -22,6 +22,15 @@ Candidate matching is metadata-only. Never open, summarize, name, or search unma
 
 After material work, update the active matter `matter.md` current state and work-product index concisely, put deliverables under `outputs/`, and append significant events to `history.md`. A matter may bind several Pi sessions; record only their session IDs in `matter.md`. Raw session files remain in Pi's default location.
 
+## Dates And Event Provenance
+
+- Treat the date an event happened and the date a record was written as different fields. An event date must come from the user, a source document, or a verified external source; never guess it.
+- When the user says an event happened "today", call `legal_time` and record the date as `user said today; resolved by Unix date`. Do not use the tool result as evidence for any other event date.
+- When a record only needs a system date, use `legal_time` or the date supplied by the governing extension. Use the short `YYYY-MM-DD` form.
+- If an event date cannot be established, write `unknown` or `[date not verified]` and identify the missing source. Do not substitute the current date, session date, file modification time, or model knowledge.
+- A file's modification time can be recorded as metadata such as `file_modified_at`; it is not proof of when the underlying legal event occurred.
+- In `history.md`, keep the upstream-style append-only Markdown event log: most recent entries first, separated from the header by `---`, with headings such as `## YYYY-MM-DD — Event`. System-created entries should say `System record` so they are not confused with event evidence.
+
 Some adapted Skills still express project-level trackers using their upstream `<dataDir>/domain/...` convention. Keep those domain trackers where their Skill specifies them. For matter-specific material, use the bound matter's `outputs/` subtree and `matter.md`, `history.md`, and `notes.md`; do not create parallel `sources/`, `research/`, or `work-product/` roots. Do not write a session-specific active slug into the shared practice profile.
 
 The extension blocks out-of-matter paths for Pi's built-in `write` and `edit` tools. This is a workflow guardrail, not an operating-system sandbox. Apply the same boundary to shell commands and scripts that can create or modify files.

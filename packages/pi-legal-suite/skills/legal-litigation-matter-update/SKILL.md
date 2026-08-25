@@ -7,9 +7,9 @@ description: "Append a dated event to a matter's history file and refresh the lo
 > **Attribution:** Adapted from Anthropic's `claude-for-legal/litigation-legal` at revision `4a6c651889c97cc9140580363c73e0eb17379c2b` under Apache-2.0 and modified for Pi. See the package `NOTICE`.
 1. Follow the workflow and reference below.
 2. Confirm slug exists in `<dataDir>/matters/` and `_log.yaml`.
-3. Prompt for event type, date (default today), summary, and any log field updates (risk change, status change, next deadline shift, materiality reclassification).
+3. Prompt for event type, event date, summary, and any log field updates (risk change, status change, next deadline shift, materiality reclassification). Do not default the event date to today. If the user says today, call `legal_time`; if the date is not established, record `unknown` and the missing source.
 4. Append dated entry to `<dataDir>/matters/[slug]/history.md`.
-5. Update `_log.yaml` — set `last_updated` to today, apply any field updates.
+5. Update `_log.yaml` — set `last_updated` to the system recording date returned by `legal_time`, apply any field updates, and do not substitute it for an event date.
 6. Confirm.
 
 ---
@@ -53,7 +53,7 @@ Or freeform if none fits.
 
 ### 2. Date
 
-Default today. Accept an override (e.g., capturing an event from last week).
+Ask for the date the event actually occurred. Accept an explicit date such as `2026-08-20`, or the user's explicit statement that it happened today. For "today", call `legal_time` before writing. If the event date cannot be established, use `unknown` and ask what source could confirm it. Never infer the event date from the session date, a file modification time, or model knowledge.
 
 ### 3. Summary
 
@@ -118,9 +118,13 @@ If the update references a document (order, filing, correspondence), ask if ther
 Most recent at top, directly under the `---` that follows the header.
 
 ```markdown
-## [YYYY-MM-DD] — [Event type]: [short title]
+## [YYYY-MM-DD or Unknown date] — [Event type]: [short title]
 
 [Paragraph summary.]
+
+**Event date basis:** [user provided / source document: path and pinpoint / user said today; resolved by Unix date / unknown — not established]
+
+**Recorded at:** [YYYY-MM-DD from `legal_time`]
 
 **Fields changed:**
 - [field]: [old → new]
@@ -134,7 +138,7 @@ If no fields changed, omit the "Fields changed" block.
 ### Update `<dataDir>/matters/_log.yaml`
 
 - Apply any field changes.
-- Set `last_updated: [today]` (or the event date if the user overrode — the log tracks when the record was last touched).
+- Set `last_updated: [YYYY-MM-DD from `legal_time`]`. This is the date the record was last touched, not necessarily the date of the event.
 
 ## Confirm
 

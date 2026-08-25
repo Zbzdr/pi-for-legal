@@ -146,7 +146,7 @@
 
 ## Matter workspaces
 
-- Visible data directory: legal-workbench | [confirmed relative path]
+- Visible data directory: . | [confirmed relative path]
 - Matter root: [data directory]/matters
 - Enabled: yes | no
 - Matter required before substantive work: yes

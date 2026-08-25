@@ -68,7 +68,7 @@ await runScenario(
   undefined,
   [
     (output) => assert.match(output, /保存|存储|存放|storage|store/i),
-    (output) => assert.match(output, /legal-workbench\/|可见|visible/i),
+    (output) => assert.match(output, /matters\/|项目根目录|可见|visible|project root/i),
     (output) => assert.match(output, /\.pi\/legal-workbench\/|\.pi/i),
   ],
 );
@@ -79,32 +79,32 @@ await runScenario(
   (cwd) => {
     const configDir = join(cwd, ".pi", "legal-workbench");
     mkdirSync(configDir, { recursive: true });
-    mkdirSync(join(cwd, "legal-workbench", "matters"), { recursive: true });
-    mkdirSync(join(cwd, "legal-workbench", "logs"), { recursive: true });
+    mkdirSync(join(cwd, "matters"), { recursive: true });
+    mkdirSync(join(cwd, "logs"), { recursive: true });
     for (const slug of ["acme-ccpa", "confidential-merger"]) {
-      const matterDir = join(cwd, "legal-workbench", "matters", slug);
+      const matterDir = join(cwd, "matters", slug);
       mkdirSync(join(matterDir, "outputs"), { recursive: true });
       writeFileSync(join(matterDir, "matter.md"), `# Matter: ${slug}\n\n- Status: active\n\n## Associated Pi Sessions\n\n| Session ID | Bound | Status |\n|---|---|---|\n<!-- pi-legal:sessions:start -->\n<!-- pi-legal:sessions:end -->\n`);
       writeFileSync(join(matterDir, "history.md"), "# Matter History\n");
       writeFileSync(join(matterDir, "notes.md"), "# Matter Notes\n");
     }
     writeFileSync(join(configDir, "config.json"), JSON.stringify({
-      schemaVersion: 3,
+      schemaVersion: 4,
       profilePath: "AGENTS.md",
       statusPath: ".pi/legal-workbench/status.json",
       indexPath: ".pi/legal-workbench/matter-index.json",
-      dataDir: "legal-workbench",
-      matterRoot: "legal-workbench/matters",
+      dataDir: ".",
+      matterRoot: "matters",
     }, null, 2));
     writeFileSync(join(cwd, "AGENTS.md"), "# Legal Workbench Practice Profile\n\n- Setup complete.\n");
     writeFileSync(join(configDir, "status.json"), JSON.stringify({
-      schemaVersion: 3,
+      schemaVersion: 4,
       setupStatus: "complete",
       lastUpdated: "2026-08-19T00:00:00.000Z",
     }, null, 2));
     writeFileSync(join(configDir, "matter-index.json"), JSON.stringify({
-      schemaVersion: 1,
-      updatedAt: "2026-08-19T00:00:00.000Z",
+      schemaVersion: 2,
+      updatedAt: "2026-08-19",
       matters: [
         {
           slug: "acme-ccpa",
@@ -114,9 +114,9 @@ await runScenario(
           jurisdictions: ["California"],
           issueKeywords: ["CCPA", "deletion request"],
           status: "active",
-          path: "legal-workbench/matters/acme-ccpa",
-          openedAt: "2026-08-01T00:00:00.000Z",
-          updatedAt: "2026-08-19T00:00:00.000Z",
+          path: "matters/acme-ccpa",
+          openedAt: "2026-08-01",
+          updatedAt: "2026-08-19",
         },
         {
           slug: "confidential-merger",
@@ -126,9 +126,9 @@ await runScenario(
           jurisdictions: ["Delaware"],
           issueKeywords: ["merger control"],
           status: "active",
-          path: "legal-workbench/matters/confidential-merger",
-          openedAt: "2026-08-01T00:00:00.000Z",
-          updatedAt: "2026-08-19T00:00:00.000Z",
+          path: "matters/confidential-merger",
+          openedAt: "2026-08-01",
+          updatedAt: "2026-08-19",
         },
       ],
     }, null, 2));
@@ -159,14 +159,13 @@ await runScenario(
     const configDir = join(cwd, ".pi", "legal-workbench");
     mkdirSync(configDir, { recursive: true });
     writeFileSync(join(configDir, "config.json"), JSON.stringify({
-      schemaVersion: 3,
+      schemaVersion: 4,
       profilePath: "AGENTS.md",
       statusPath: ".pi/legal-workbench/status.json",
       indexPath: ".pi/legal-workbench/matter-index.json",
-      dataDir: "legal-workbench",
-      matterRoot: "legal-workbench/matters",
+      dataDir: ".",
+      matterRoot: "matters",
     }, null, 2));
-    mkdirSync(join(cwd, "legal-workbench"), { recursive: true });
     writeFileSync(join(cwd, "AGENTS.md"), `# Legal Workbench Practice Profile
 
 ## Who we are

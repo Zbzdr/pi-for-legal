@@ -8,7 +8,7 @@ description: "Close a matter — capture outcome, final exposure, and lessons, t
 1. Follow the workflow and reference below.
 2. Confirm slug and current status.
 3. Capture outcome: resolution type (settled, dismissed, judgment for/against, withdrawn, consolidated), date, final exposure/cost, lessons.
-4. Update `_log.yaml`: `status: closed`, add `closed: YYYY-MM-DD` and `outcome:` fields.
+4. Update `_log.yaml`: `status: closed`, add the user-confirmed resolution date (or `unknown`) and `outcome:` fields. Set `last_updated` to the system recording date from `legal_time`.
 5. Append final entry to `<dataDir>/matters/[slug]/history.md`.
 6. Matter stays in `_log.yaml` and `<dataDir>/matters/[slug]/` — not deleted. `/portfolio-status` filters it from active rollups.
 
@@ -85,7 +85,7 @@ status: closed
 closed: [YYYY-MM-DD]
 outcome: [resolution-type]
 final_cost: [dollar amount]
-last_updated: [today]   # close is the last touch; record it
+last_updated: [YYYY-MM-DD from `legal_time`]   # close is the last touch; this is a recording date
 ```
 
 Retain all existing fields. Do not delete the row.
@@ -93,7 +93,7 @@ Retain all existing fields. Do not delete the row.
 ### Append final entry to `<dataDir>/matters/[slug]/history.md`
 
 ```markdown
-## [YYYY-MM-DD] — Matter closed: [resolution-type]
+## [YYYY-MM-DD from `legal_time`] — Matter closed: [resolution-type]
 
 **Resolution:** [narrative — what happened, on what terms]
 **Final cost:** [amount + structural terms if any]
@@ -104,6 +104,8 @@ Retain all existing fields. Do not delete the row.
 [2-3 sentences — honest retrospective]
 
 **Related doc:** [settlement agreement / final order / etc., if provided]
+
+**Date basis:** system recording date from Unix `date`; the resolution date is recorded separately from the user's source or remains `unknown`.
 ```
 
 ### Touch `<dataDir>/matters/[slug]/matter.md`

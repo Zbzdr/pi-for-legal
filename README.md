@@ -19,6 +19,8 @@ DOCX redline 首次使用时会在当前项目的 `.pi/legal-workbench/venvs/doc
 
 ## Quick start
 
+当前支持 macOS 和 Linux 等带有 `bash` 与 Unix `date` 命令的环境。setup、matter extension 和日期工具会通过 `bash date` 取得本机日历日期；Windows/PowerShell 尚未纳入支持范围，后续再补充适配。
+
 在需要使用法律工作流的项目目录里安装：
 
 ```bash
@@ -45,8 +47,11 @@ Setup 会询问实践类型、法域、审查偏好和数据目录，并在写�
 
 - 项目根目录会有 Pi 自动加载的 `AGENTS.md`，用于保存法律实践 profile；
 - `.pi/APPEND_SYSTEM.md` 会追加法律工作区的固定规则，并保留原有项目规则；
-- 可见的 `legal-workbench/matters/` 和 `legal-workbench/logs/` 会被初始化，但不会自动创建具体 matter；
+- 项目根目录的 `matters/` 和 `logs/` 会被初始化，但不会自动创建具体 matter；可见的 `legal-workbench/` 包装目录不再创建；
 - 每个新 session 首先询问复用或创建哪个 matter，之后的资料和输出放在对应 matter 的 `outputs/` 下；Pi 原始 session 仍使用默认位置。
+- 需要记录“今天”或生成报告日期时，extension 提供 `legal_time`，从 Unix `date` 读取短格式 `YYYY-MM-DD`；它只代表系统记录日期，不证明底层法律事件发生在当天。
+
+从 0.5.0 起，默认可见目录已改为项目根目录下的 `matters/` 和 `logs/`；旧的 `legal-workbench/` 可见目录不会自动迁移。
 
 接下来可以直接描述任务，也可以显式调用 Skill：
 

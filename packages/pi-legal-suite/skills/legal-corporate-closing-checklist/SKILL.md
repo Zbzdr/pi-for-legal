@@ -168,7 +168,7 @@ CP-002: Acme responded, consent form attached, needs countersignature
 
 Not all blocking items are equal. A consent that takes 30 days to get is critical path. A good-standing certificate that takes 2 days is not, even though both are blocking.
 
-For each blocking item, estimate time-to-complete. The ones where `(due date - today) < estimated time` are at risk. Those go at the top of every status report.
+Call `legal_time` for the report date. For each blocking item, estimate time-to-complete. The ones where `(due date - current system date) < estimated time` are at risk. Those go at the top of every status report.
 
 If the checklist has more than ~10 items, or any time the user asks: offer the dashboard (see project legal profile `## Outputs → Dashboard offer for data-heavy outputs`). Shape the offer for this output — counts by status (done / in progress / not started / at risk), a critical-path view grouped by workstream, and a sortable grid with item, owner, due date, and days-to-due.
 

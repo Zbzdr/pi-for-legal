@@ -50,6 +50,7 @@ try {
   const loaded = await discoverAndLoadExtensions([extensionPath], projectRoot, join(agentRoot, "loader"));
   assert.deepEqual(loaded.errors, []);
   assert.equal(loaded.extensions[0].tools.has("legal_matter_session"), true);
+  assert.equal(loaded.extensions[0].tools.has("legal_time"), true);
 
   const client = new RpcClient({
     cliPath,

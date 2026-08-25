@@ -12,7 +12,7 @@ description: "Build or update a chronology from declared document sources and up
 5. For readable sources: extract dated events. For unreachable sources: note in Gaps.
 6. De-dupe, merge with sources list per event.
 7. Tag significance (🔴/🟡/⚪) per matter theory.
-8. Write `<dataDir>/matters/[slug]/chronology.md` (or format variant per flag).
+8. Call `legal_time` for the generation date, then write `<dataDir>/matters/[slug]/outputs/chronology.md` (or format variant per flag).
 9. If prior version exists: version number increments, diff summary presented to user.
 10. Confirm before finalizing: "Here's what I built. Scan the 🔴 entries — anything I miscalled?"
 
@@ -172,7 +172,7 @@ Default output is the working chronology. Variants on request.
 
 ### Working chronology (default)
 
-Location: `<dataDir>/matters/[slug]/chronology.md`. Complete, tagged, annotated. The reference doc counsel works from.
+Location: `<dataDir>/matters/[slug]/outputs/chronology.md`. Complete, tagged, annotated. The reference doc counsel works from.
 
 ```markdown
 [WORK-PRODUCT HEADER — per package config ## Outputs — differs by role; see `## Who's using this`]
@@ -185,7 +185,8 @@ Location: `<dataDir>/matters/[slug]/chronology.md`. Complete, tagged, annotated.
 
 **Matter:** [slug]
 **Mode:** matter | documents
-**Built:** [YYYY-MM-DD]
+**Generated:** [YYYY-MM-DD from `legal_time`]
+**Generation date basis:** Unix date system record
 **Sources:** [N] documents across [source types]
 **Entries:** [N] ([N] 🔴 / [N] 🟡 / [N] ⚪)
 **Pivot fact:** [one sentence]
@@ -196,9 +197,9 @@ Location: `<dataDir>/matters/[slug]/chronology.md`. Complete, tagged, annotated.
 
 ## Timeline
 
-| Date | Event | Tag | 🔒 | Sources |
-|---|---|---|---|---|
-| [YYYY-MM-DD] | [what happened, one sentence] | 🔴/🟡/⚪ | [blank / 🔒-flag / 🔒-review] | [file paths or Bates] |
+| Event date | Event | Date basis | Tag | 🔒 | Sources |
+|---|---|---|---|---|---|
+| [YYYY-MM-DD or Unknown date] | [what happened, one sentence] | [source document / user provided / web search — verify / not verified] | 🔴/🟡/⚪ | [blank / 🔒-flag / 🔒-review] | [file paths or Bates] |
 
 ---
 
@@ -252,7 +253,7 @@ Filter to events where a named witness is sender, recipient, attendee, or subjec
 
 ## Incremental builds
 
-If `chronology.md` exists:
+If `outputs/chronology.md` exists:
 
 - Read prior version
 - Build new chronology from current sources
@@ -262,10 +263,10 @@ If `chronology.md` exists:
 
 ## Integration with matter.md / history.md
 
-**Intentionally separate** (in-house `--matter` mode). `history.md` is counsel's running log — decisions, updates, procedural milestones, internal strategy notes. `chronology.md` is the advocacy-facing timeline of facts. They overlap but don't merge:
+**Intentionally separate** (in-house `--matter` mode). `history.md` is counsel's running log — decisions, updates, procedural milestones, internal strategy notes. `outputs/chronology.md` is the advocacy-facing timeline of facts. They overlap but don't merge:
 
 - A hold was issued → goes in history.md (internal action). Usually not in chronology (not a fact of the dispute).
-- The counterparty sent a breach notice on March 14 → goes in chronology.md (🟡 — establishes their knowledge). Also in history.md if the intake referenced it.
+- The counterparty sent a breach notice on March 14 → goes in outputs/chronology.md (🟡 — establishes their knowledge). Also in history.md if the intake referenced it.
 - Our reserve recommendation memo was drafted → history.md only.
 
 When counsel wants history events in the chronology, they can paste them. The default is they stay separate.
