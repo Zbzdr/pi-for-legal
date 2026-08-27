@@ -9,6 +9,17 @@ description: Initialize, complete, or update the project-local Pi Legal workspac
 
 Initialize the workspace boundary, then build a useful practice profile through conversation. Ask one coherent question at a time, use documents the user supplies, and do not re-ask facts already known.
 
+## Input boundary and provenance
+
+During setup, use only:
+
+- answers the user gives in the current setup conversation; and
+- files, paths, or links the user explicitly provides and authorizes for setup.
+
+Do not inspect prior Pi sessions, personal memory, unrelated workspace files, other projects, home-directory legal configuration, or ambient context to fill gaps. If relevant information appears in the current context but the user has not clearly offered it as setup input, ask whether it should be used before recording it in the project profile. Do not proceed on an implied approval.
+
+Treat user-provided documents as intake references. Distinguish what a document says from a verified legal fact, current authority, company policy, or approved negotiation position. Do not silently infer missing facts, promote an example or observed outcome into policy, or treat a cited deadline, threshold, jurisdiction, or legal conclusion as verified merely because it came from a user or document.
+
 ## Storage gate — always first
 
 Look for `.pi/legal-workbench/config.json` in the current workspace.

@@ -1,6 +1,6 @@
 {
   "name": "pi-for-legal-workspace",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "private": true,
   "description": "Workspace for the all-in-one Pi for Legal package.",
   "type": "module",

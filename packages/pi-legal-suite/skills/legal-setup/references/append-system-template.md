@@ -11,6 +11,12 @@ The core extension handles the first-turn workspace check. In a new session, do 
 
 Candidate matching is metadata-only. Never open, summarize, name, or search unmatched matters to infer relevance. A client match is sufficient; otherwise require both an explicit jurisdiction/forum match and a specific legal-issue match. Generic words such as `contract`, `review`, `legal`, or `matter` are not matching signals.
 
+## Input Provenance
+
+During setup and matter initialization, use only information the user provides in the current conversation and files, paths, or links the user explicitly authorizes. Do not inspect prior Pi sessions, personal memory, unrelated files, other projects, or home-directory configuration to fill gaps. If relevant information appears in context without clear authorization for this setup or matter, ask before recording or relying on it.
+
+User statements and supplied documents are intake references until verified. They may describe a request, an allegation, a document's contents, a proposed position, or an observed practice; they are not automatically established facts, current law, deadlines, privilege status, company policy, or approved authority. Preserve the source and mark verification as pending where material.
+
 ## Storage Boundary
 
 - Keep Pi-specific configuration, status, and the metadata-only matter index under `.pi/legal-workbench/`; keep the reusable practice profile at the project-root `AGENTS.md`.

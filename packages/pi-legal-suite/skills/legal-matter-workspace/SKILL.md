@@ -11,9 +11,19 @@ Resolve the schema-v4 project config, project-root `AGENTS.md` profile, and `mat
 
 For `new`, `bind`, `close`, `status`, and explicit `list` operations, use `legal_matter_session`. The tool performs deterministic file and session-state changes. Do not recreate those operations with ad hoc shell commands.
 
+## Matter creation boundary — intake only
+
+Creating a matter initializes a directory and records explicit intake metadata. It does not complete factual intake, conflicts review, legal research, currentness checking, or substantive analysis.
+
+- Use only the user's current, explicit answers and files, paths, or links the user expressly provides for this matter. Do not inspect prior sessions, unrelated files, other projects, home-directory configuration, or ambient context to fill gaps.
+- If relevant information appears in context but the user has not clearly authorized it for this matter, ask before recording it.
+- Treat the user's statements and supplied documents as intake references. Record what the user requested or what a document says, but do not convert it into an established fact, legal conclusion, deadline, governing-law assumption, privilege classification, or approved policy.
+- Do not infer missing facts or verify legal propositions as a side effect of directory creation. Leave material verification-dependent fields pending and identify them as open questions.
+- After creation, tell the user what was recorded as intake metadata and what remains to be verified before substantive work.
+
 ## Commands by intent
 
-- **new:** collect matter name, lowercase kebab-case slug, client/organization, client aliases, jurisdictions/forums, specific legal-issue keywords, scope, responsible lawyers, confidentiality constraints, sources, deadlines, and matter-specific overrides. Show the path and metadata, obtain confirmation, then call `legal_matter_session` with `action: create` and `confirmed: true`.
+- **new:** collect matter name, lowercase kebab-case slug, client/organization, client aliases, jurisdictions/forums, specific legal-issue keywords, scope, responsible lawyers, confidentiality constraints, sources, deadlines, and matter-specific overrides as user-provided intake metadata. Record any explicitly provided file paths or links under the matter's intake references. Show the path and metadata, obtain confirmation, then call `legal_matter_session` with `action: create` and `confirmed: true`.
 - **list:** only when the user explicitly asks to see matters, call `legal_matter_session` with `action: list`. A new-session match must rely on the extension's metadata-only candidates and must not list unrelated matters.
 - **bind/switch:** obtain the user's choice, then call `legal_matter_session` with `action: bind` and `confirmed: true`. The binding belongs to the current Pi session; do not store a global active matter in the practice profile.
 - **status:** call `legal_matter_session` with `action: status`.

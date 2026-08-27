@@ -230,6 +230,8 @@ test("legal workbench bootstraps once, binds session IDs, and guards matter writ
     jurisdictions: ["New York"],
     issueKeywords: ["trade secrets"],
     scope: "Review and negotiate mutual NDA",
+    intakeRequest: "Please initialize a matter for the proposed mutual NDA review.",
+    providedFiles: ["inputs/requested-nda.docx"],
     confirmed: true,
   }, undefined, undefined, context);
   assert.match(createResult.content[0].text, /Session bound to new-york-nda/);
@@ -244,6 +246,10 @@ test("legal workbench bootstraps once, binds session IDs, and guards matter writ
   const matterFile = readFileSync(join(matterPath, "matter.md"), "utf8");
   assert.match(matterFile, /session-test/);
   assert.doesNotMatch(matterFile, /Raw session/);
+  assert.match(matterFile, /Intake status: initialization only; verification pending/);
+  assert.match(matterFile, /Please initialize a matter for the proposed mutual NDA review/);
+  assert.match(matterFile, /inputs\/requested-nda\.docx/);
+  assert.match(matterFile, /not verified facts, legal conclusions, deadlines/);
   assert.match(sessionName, /new-york-nda/);
   const timeResult = await timeTool.execute("time-1", {}, undefined, undefined, context);
   assert.match(timeResult.content[0].text, /System date: \d{4}-\d{2}-\d{2}/);

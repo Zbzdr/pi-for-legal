@@ -6,6 +6,7 @@
 - Client/organization: [name]
 - Status: active
 - Opened: [date]
+- Intake status: initialization only; verification pending
 - Client aliases: [names used for metadata-only session matching]
 - Responsible lawyer: [name/role]
 - Team: [names/roles]
@@ -17,10 +18,19 @@
 ## Current State
 
 - Objectives:
-- Material facts:
+- Material facts: [not established at matter creation]
 - Open questions:
-- Deadlines:
+- Deadlines: [not established at matter creation]
 - Next action:
+
+## Intake References
+
+This matter was initialized from the user's explicit intake. The entries below are references for organizing work, not verified facts, legal conclusions, deadlines, governing-law assumptions, privilege classifications, or approved policy. Preserve their source and complete verification before relying on them in substantive work.
+
+- User request: [not recorded]
+- Explicitly provided files or links: [none recorded]
+- Other user-provided references: [none recorded]
+- Verification status: pending
 
 ## Matter-specific overrides
 

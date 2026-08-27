@@ -248,16 +248,25 @@ function appendSessionToMatter(matterPath: string, sessionId: string, boundAt: s
 	writeFileSync(matterPath, content, "utf8");
 }
 
-function matterFile(record: MatterRecord, scope: string): string {
+function matterFile(record: MatterRecord, scope: string, intakeRequest = "", providedFiles: string[] = []): string {
+	const files = providedFiles.map((file) => file.trim()).filter(Boolean);
+	const fileText = files.length ? files.map((file) => `- ${file}`).join("\n") : "[none recorded]";
 	return `# Matter: ${record.name}\n\n` +
 		`- Slug: ${record.slug}\n` +
 		`- Client/organization: ${record.client || "Not specified"}\n` +
 		`- Status: ${record.status}\n` +
 		`- Opened: ${record.openedAt.slice(0, 10)}\n` +
+		`- Intake status: initialization only; verification pending\n` +
 		`- Jurisdictions/forums: ${record.jurisdictions.join(", ") || "Not specified"}\n` +
 		`- Legal issues: ${record.issueKeywords.join(", ") || "Not specified"}\n` +
 		`- Scope: ${scope || "Not specified"}\n\n` +
-		`## Current State\n\n- Objectives:\n- Material facts:\n- Open questions:\n- Deadlines:\n- Next action:\n\n` +
+		`## Current State\n\n- Objectives:\n- Material facts: [not established at matter creation]\n- Open questions:\n- Deadlines: [not established at matter creation]\n- Next action:\n\n` +
+		`## Intake References\n\n` +
+		`This matter was initialized from the user's explicit intake. The entries below are references for organizing work, not verified facts, legal conclusions, deadlines, governing-law assumptions, privilege classifications, or approved policy. Preserve their source and complete verification before relying on them in substantive work.\n\n` +
+		`- User request: ${intakeRequest.trim() || "[not recorded]"}\n` +
+		`- Explicitly provided files or links:\n${fileText}\n` +
+		`- Other user-provided references: [none recorded]\n` +
+		`- Verification status: pending\n\n` +
 		`## Outputs\n\nStore matter work product in \`outputs/\` or a clearly named subfolder below it.\n\n` +
 		`## Associated Pi Sessions\n\n| Session ID | Bound | Status |\n|---|---|---|\n` +
 		`<!-- pi-legal:sessions:start -->\n<!-- pi-legal:sessions:end -->\n\n` +
@@ -309,6 +318,12 @@ const matterParameters = {
 			description: "Specific legal issues; avoid generic words such as contract or review",
 		},
 		scope: { type: "string", description: "Short engagement or internal matter scope" },
+		intakeRequest: { type: "string", description: "The user's explicit matter request, recorded as an unverified intake reference" },
+		providedFiles: {
+			type: "array",
+			items: { type: "string" },
+			description: "File paths or links explicitly provided by the user for this matter; record references only",
+		},
 		confirmed: { type: "boolean", description: "Must be true after the user expressly chooses create or bind" },
 	},
 } as any;
@@ -375,6 +390,8 @@ export default function legalWorkbench(pi: ExtensionAPI): void {
 			"Before substantive legal work in a configured workspace, bind the session to a matter with legal_matter_session.",
 			"Do not list or inspect unrelated matters merely to guess context; use candidates injected on the first turn or an explicit user request.",
 			"The list action is available only when the user's current message explicitly asks to list matters.",
+			"Matter creation is initialization only. Use only explicit current-session intake and explicitly provided file references; do not inspect prior sessions, unrelated files, other projects, or home-directory configuration.",
+			"Treat user statements and supplied documents as unverified intake references. Do not turn them into established facts, legal conclusions, deadlines, governing-law assumptions, privilege classifications, or approved policy during creation.",
 		],
 		parameters: matterParameters,
 		executionMode: "sequential",
@@ -454,7 +471,7 @@ export default function legalWorkbench(pi: ExtensionAPI): void {
 					for (const directory of ["outputs"]) {
 						mkdirSync(join(matterPath, directory), { recursive: true });
 					}
-					writeFileSync(join(matterPath, "matter.md"), matterFile(record, params.scope?.trim() ?? ""), "utf8");
+					writeFileSync(join(matterPath, "matter.md"), matterFile(record, params.scope?.trim() ?? "", params.intakeRequest, params.providedFiles), "utf8");
 					writeFileSync(join(matterPath, "history.md"), `# Matter History\n\nAppend-only event log. Most recent at top.\n\n---\n\n## ${now} — Matter opened\n\nSystem record: matter created in Pi Legal Workbench.\n`, "utf8");
 					writeFileSync(join(matterPath, "notes.md"), "# Matter Notes\n\n", "utf8");
 					index.matters.push(record);
