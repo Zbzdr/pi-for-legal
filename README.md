@@ -1,62 +1,64 @@
 # Pi for Legal
 
-Pi for Legal 是 [Anthropic Claude for Legal](https://github.com/anthropics/claude-for-legal) 在 Pi 上的独立移植。本项目主要工作由ChatGPT5.6-sol完成。
+> **Other languages / 其他语言**: [简体中文](README.zh.md)
 
-项目默认采用 workspace-first：package 安装在当前项目，实践 profile、matter 和工作材料也保存在项目目录中。外部检索和协作工具由用户按需配置。
+Pi for Legal is an independent port of [Anthropic Claude for Legal](https://github.com/anthropics/claude-for-legal) to Pi. The primary development work on this project was done by ChatGPT5.6-sol.
 
-## 它目前能做什么
+The project is workspace-first by default: the package is installed in the current project, and practice profiles, matters, and working materials are also kept in the project directory. External retrieval and collaboration tools are configured by the user on demand.
 
-- 多法域法律研究：识别适用法和权威层级，检查时效与后续处理，并输出带来源说明的 memo；
-- 商业合同：路由并审查 MSA、SaaS、NDA、vendor agreement、修订和续期事项；
-- 法务工作流：privacy、regulatory、AI governance、employment、corporate、litigation、IP 和 product；
-- 项目级 setup、quick defaults、实践 profile、matter 隔离、playbook 学习、升级判断和业务摘要；
-- 经确认后生成带自动备份的轻量 DOCX tracked redline；
-- 在没有可靠外部来源时明确标记验证缺口，不把模型记忆包装成已完成的法律检索。
+## What it can do today
 
-目前唯一维护和发布的 all-in-one 包包含 88 个 Skills 和一个项目级 extension，不内置 MCP、web access、邮件、Slack、todo 或其他 Pi extensions。
+- Multi-jurisdiction legal research: identifies applicable law and hierarchies of authority, checks whether authorities are current and how they have been treated subsequently, and produces memos with source attribution;
+- Commercial contracts: routes and reviews MSA, SaaS, NDA, vendor agreement, amendment, and renewal matters;
+- Legal workflows: privacy, regulatory, AI governance, employment, corporate, litigation, IP, and product;
+- Project-level setup, quick defaults, practice profiles, matter isolation, playbook learning, upgrade decisions, and business summaries;
+- Lightweight DOCX tracked redlines with automatic backup, generated after confirmation;
+- Explicitly flags verification gaps when no reliable external source is available, rather than dressing up model memory as completed legal research.
 
-DOCX redline 首次使用时会在当前项目的 `.pi/legal-workbench/venvs/docx-redline/` 建立 Python 虚拟环境，并在用户确认后安装固定版本的 `python-docx` 和 `lxml`；不会改动系统 Python。
+The only maintained and published all-in-one package ships 88 skills and a project-level extension. It does not bundle MCP, web access, email, Slack, todo, or other Pi extensions.
+
+The first time DOCX redline is used, a Python virtual environment is created at `.pi/legal-workbench/venvs/docx-redline/` in the current project and, after user confirmation, pinned versions of `python-docx` and `lxml` are installed; the system Python is never modified.
 
 ## Quick start
 
-当前支持 macOS 和 Linux 等带有 `bash` 与 Unix `date` 命令的环境。setup、matter extension 和日期工具会通过 `bash date` 取得本机日历日期；Windows/PowerShell 尚未纳入支持范围，后续再补充适配。
+Currently supported environments include macOS and Linux — anything with `bash` and the Unix `date` command. Setup, the matter extension, and the date utilities get the local calendar date via `bash date`; Windows/PowerShell is not yet in scope and will be added later.
 
-在需要使用法律工作流的项目目录里安装：
+Install the package in the project directory where you want to use the legal workflows:
 
 ```bash
 pi install -l npm:@zbzdr/pi-legal-suite
 ```
 
-启动 Pi 后先运行：
+After starting Pi, run:
 
 ```text
 /skill:legal-setup
 ```
 
-Setup 会询问实践类型、法域、审查偏好和数据目录，并在写入前展示准确路径。
+Setup asks about your practice type, jurisdiction, review preferences, and data directory, and shows the exact paths before writing anything.
 
-按提示完成 setup 后，重启 Pi，或在当前 Pi 中重新加载：
+After completing setup as prompted, restart Pi or reload in the current Pi session:
 
 ```text
 /reload
 ```
 
-然后可以在原 session 或新 session 中描述任务；根据提示选择或创建事务，然后开始研究、审查或起草工作。
+Then describe your task in the same or a new session; follow the prompts to select or create a matter, and begin research, review, or drafting.
 
-## Setup 后会发生什么
+## What happens after setup
 
-- 项目根目录会有 Pi 自动加载的 `AGENTS.md`，用于保存法律实践 profile；
-- `.pi/APPEND_SYSTEM.md` 会追加法律工作区的固定规则，并保留原有项目规则；
-- 项目根目录的 `matters/` 和 `logs/` 会被初始化，但不会自动创建具体 matter；可见的 `legal-workbench/` 包装目录不再创建；
-- 每个新 session 首先询问复用或创建哪个 matter，之后的资料和输出放在对应 matter 的 `outputs/` 下；Pi 原始 session 仍使用默认位置。
-- 需要记录“今天”或生成报告日期时，extension 提供 `legal_time`，从 Unix `date` 读取短格式 `YYYY-MM-DD`；它只代表系统记录日期，不证明底层法律事件发生在当天。
+- An `AGENTS.md` is created at the project root and auto-loaded by Pi to hold your legal practice profile;
+- `.pi/APPEND_SYSTEM.md` gets the fixed rules for the legal workspace appended, preserving any existing project rules;
+- `matters/` and `logs/` are initialized at the project root, but no specific matter is created automatically; the visible `legal-workbench/` wrapper directory is no longer created;
+- Each new session first asks whether to reuse or create a matter; materials and outputs then go under that matter's `outputs/`, while raw Pi sessions keep using the default location;
+- When "today" must be recorded or report dates generated, the extension provides `legal_time`, which reads the short `YYYY-MM-DD` format from Unix `date`; it only reflects the system-recorded date and does not establish that the underlying legal event occurred on that day.
 
-从 0.5.0 起，默认可见目录已改为项目根目录下的 `matters/` 和 `logs/`；旧的 `legal-workbench/` 可见目录不会自动迁移。
+Since 0.5.0, the default visible directories have moved to `matters/` and `logs/` at the project root; old `legal-workbench/` visible directories are not migrated automatically.
 
-接下来可以直接描述任务，也可以显式调用 Skill：
+From here you can describe a task directly, or invoke a skill explicitly:
 
 ```text
-/skill:legal-research 比较纽约法与英格兰法下这个免责条款的可执行性
+/skill:legal-research Compare the enforceability of this indemnity clause under New York and English law
 /skill:legal-contract-review review ./contracts/vendor-msa.pdf
 /skill:legal-docx-redline ./contracts/inbound-nda.docx
 /skill:legal-litigation-matter-intake
@@ -64,46 +66,46 @@ Setup 会询问实践类型、法域、审查偏好和数据目录，并在写�
 /skill:legal-customize
 ```
 
-所有输出均为供法律工作者复核的工作稿，不构成法律意见。涉及现行法、判例有效性或监管状态时，应进行充分核实。
+All output is working draft material for review by a legal professional and does not constitute legal advice. Verify current law, case validity, and regulatory status thoroughly where relevant.
 
-## 更新
+## Updates
 
-在安装 package 的项目目录中运行：
+In the project directory where the package is installed, run:
 
 ```bash
 pi update npm:@zbzdr/pi-legal-suite
 ```
 
-也可以一次更新当前项目安装的全部 Pi packages：
+Or update all Pi packages installed in the current project at once:
 
 ```bash
 pi update --extensions
 ```
 
-（该命令会同时更新已经安装的其他 Pi packages，不会安装尚未安装的 package。）
+(That command also updates any other Pi packages already installed in the project; it does not install packages that are not yet installed.)
 
-更新完成后，在正在运行的 Pi 中输入 `/reload`，或重新启动 Pi。
+After updating, type `/reload` in a running Pi, or restart Pi.
 
-带版本号的安装会锁定版本。例如 `npm:@zbzdr/pi-legal-suite@0.4.0` 不会被上述命令自动升级；需要改用新的版本号重新安装：
+Versioned installs pin the version. For example, `npm:@zbzdr/pi-legal-suite@0.4.0` will not be auto-upgraded by the commands above; install the new version number instead:
 
 ```bash
 pi install -l npm:@zbzdr/pi-legal-suite@<new-version>
 ```
 
-项目本地安装仍然优先。无 `-l` 的全局安装属于次要支持模式，会让 suite 出现在该用户的所有 Pi 项目中；setup、profile 和 matter 仍按当前 workspace 分开维护。
+Local project installs take precedence. Global installs without `-l` are a secondary support mode that makes the suite available in all of a user's Pi projects; setup, profiles, and matters are still maintained per current workspace.
 
-## 来源与许可
+## Sources and license
 
-本项目基于 `claude-for-legal` revision `4a6c651889c97cc9140580363c73e0eb17379c2b` 适配。Skills、提示词和参考模板如含上游材料，均保留来源及修改说明；详细对应关系见 [docs/upstream-map.md](docs/upstream-map.md)。当前移植以 Markdown/JSON 工作流为主，没有打包上游的第三方插件或 MCP connector 实现。
+This project is adapted from `claude-for-legal` revision `4a6c651889c97cc9140580363c73e0eb17379c2b`. Where skills, prompts, and reference templates contain upstream material, provenance and modification notes are preserved; see [docs/upstream-map.md](docs/upstream-map.md) for the detailed mapping. The current port is primarily Markdown/JSON workflows and does not bundle upstream third-party plugins or MCP connector implementations.
 
-上游材料由 Anthropic PBC 按 Apache License 2.0 提供，本项目同样采用 Apache-2.0。见 [LICENSE](LICENSE) 和 [NOTICE](NOTICE)。Pi for Legal 与 Anthropic 没有从属或背书关系；Claude、Anthropic 及第三方产品名称仍属于各自权利人。
+Upstream material is provided by Anthropic PBC under the Apache License 2.0; this project is likewise licensed under Apache-2.0. See [LICENSE](LICENSE) and [NOTICE](NOTICE). Pi for Legal has no affiliation with or endorsement from Anthropic; Claude, Anthropic, and third-party product names remain the property of their respective owners.
 
-## 未来更新路线图
+## Roadmap
 
-- 优化工作区内按照session来隔离任务context的策略；
-- 深化 CN 及其他法域的本地化资料、来源策略和专门模板；
-- 从轻量精确替换扩展到复杂 DOCX redline、批注和格式保真；
-- 实现法律检索 MCP的接入和配置，必要时依赖第三方 MCP adapter；
-- 以单整合包的形式，把 MCP、web access、todo、ask-user-question 等常用能力组合起来；最终让用户在一个工作区里只安装一个包，就能完成主要法律任务。
+- Optimize the strategy for isolating task context per session within the workspace;
+- Deepen localized materials, source strategies, and specialized templates for CN and other jurisdictions;
+- Move from lightweight precise replacement to complex DOCX redlines, comments, and format fidelity;
+- Implement legal-research MCP integration and configuration, relying on third-party MCP adapters where necessary;
+- Combine commonly used capabilities such as MCP, web access, todo, and ask-user-question into a single integrated package, so users can install one package per workspace and handle the main legal tasks.
 
-以上功能将分阶段实现。
+These features will be implemented in stages.
