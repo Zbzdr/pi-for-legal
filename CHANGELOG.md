@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- 删除 `packages/` 下 10 个已 deprecated 的私有快照目录（131 个文件，占被跟踪文件的 47%）。它们不在 workspaces、不被任何脚本/测试/CI 引用，且技能内容是 suite 的陈旧副本：88 个技能名无一是 suite 缺失的，55 个同名但内容已分叉，agent 有读到旧版的风险。上游映射不受影响（`import-upstream-domains.mjs` 始终直接写入 `packages/pi-legal-suite/skills`）。内容仍可从 Git 历史或已发布的 npm 版本取回；`deprecate-legacy-packages.mjs` 只依赖包名，不受影响。
+- 将 `packages/` 边界从“其他目录必须是 private 快照”改为“只允许 `pi-legal-suite`”，`validate-package.mjs` 与 `test/package.test.mjs` 同步收紧，原断言在目录删除后会静默失效。
+
 - 新增 macOS/Linux 的无凭据 CI、打包参考文件断言和三项只读模型行为检查；记录本地验证结果与未覆盖的 Word GUI / 法律时效评估边界。
 
 - DOCX redline 改为映射可用通用文档能力，由模型规划实现；保留确认、matter 内备份和验证契约，移除 maintained suite 的固定替换引擎和 Python bootstrap。

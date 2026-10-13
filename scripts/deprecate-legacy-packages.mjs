@@ -2,6 +2,8 @@ import { execFileSync } from "node:child_process";
 
 const apply = process.argv.includes("--apply");
 const message = "This package is no longer maintained. Install @zbzdr/pi-legal-suite instead.";
+// Only the published names are needed: the local private snapshots of these packages were removed from the
+// repository, so this list deliberately keeps the npm package names and nothing else.
 const packages = [
   "@zbzdr/pi-legal-core",
   "@zbzdr/pi-commercial-legal",

@@ -30,11 +30,14 @@ test("workspace exposes one publishable suite with 88 Skills and one extension",
   assert.equal(skillNames().length, 88);
   assert.equal(existsSync(extensionPath), true);
 
-  for (const entry of readdirSync(join(root, "packages"), { withFileTypes: true })) {
-    if (!entry.isDirectory() || entry.name === "pi-legal-suite") continue;
-    const manifestPath = join(root, "packages", entry.name, "package.json");
-    assert.equal(JSON.parse(readFileSync(manifestPath, "utf8")).private, true, `${entry.name} must be an archived private snapshot`);
-  }
+  const extraPackageDirectories = readdirSync(join(root, "packages"), { withFileTypes: true })
+    .filter((entry) => entry.isDirectory() && entry.name !== "pi-legal-suite")
+    .map((entry) => entry.name);
+  assert.deepEqual(
+    extraPackageDirectories,
+    [],
+    "packages/ must contain only the published suite; former private snapshots are recovered from git history",
+  );
 });
 
 test("workspace validator accepts the single-package boundary", () => {

@@ -126,10 +126,7 @@ if (manifest.piLegal?.skillCount !== skillFiles.length) fail("piLegal.skillCount
 
 for (const entry of readdirSync(join(root, "packages"), { withFileTypes: true })) {
   if (!entry.isDirectory() || entry.name === "pi-legal-suite") continue;
-  const legacyManifestPath = join(root, "packages", entry.name, "package.json");
-  if (existsSync(legacyManifestPath) && JSON.parse(readFileSync(legacyManifestPath, "utf8")).private !== true) {
-    fail(`${entry.name}: legacy source snapshot must be private`);
-  }
+  fail(`${entry.name}: packages/ may only contain the published suite; former private snapshots are recovered from git history`);
 }
 
 if (errors.length) {
