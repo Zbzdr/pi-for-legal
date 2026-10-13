@@ -96,6 +96,10 @@ pi install -l npm:@zbzdr/pi-legal-suite@<new-version>
 
 Local project installs take precedence. Global installs without `-l` are a secondary support mode that makes the suite available in all of a user's Pi projects; setup, profiles, and matters are still maintained per current workspace.
 
+## Upstream tracking
+
+The latest recorded legal-upstream check found no changes since the initial mapping. To repeat it with a separate upstream checkout, run `npm run track:upstream -- <checkout> --fetch`. This reports changes without importing or merging them. See [the review process](docs/upstream-sync.md) and [the recorded status](docs/upstream-status.json).
+
 ## Sources and license
 
 This project is adapted from `claude-for-legal` revision `4a6c651889c97cc9140580363c73e0eb17379c2b`. Where skills, prompts, and reference templates contain upstream material, provenance and modification notes are preserved; see [docs/upstream-map.md](docs/upstream-map.md) for the detailed mapping. The current port is primarily Markdown/JSON workflows and does not bundle upstream third-party plugins or MCP connector implementations.

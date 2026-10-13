@@ -96,6 +96,10 @@ pi install -l npm:@zbzdr/pi-legal-suite@<new-version>
 
 项目本地安装仍然优先。无 `-l` 的全局安装属于次要支持模式，会让 suite 出现在该用户的所有 Pi 项目中；setup、profile 和 matter 仍按当前 workspace 分开维护。
 
+## 上游追踪
+
+最近一次法律上游核对确认：与初次映射相比没有新提交或文件变更。可用独立上游 checkout 运行 `npm run track:upstream -- <checkout> --fetch` 再次检查；该命令只报告差异，不自动导入或合并。详见[审查流程](docs/upstream-sync.md)和[已记录的状态](docs/upstream-status.json)。
+
 ## 来源与许可
 
 本项目基于 `claude-for-legal` revision `4a6c651889c97cc9140580363c73e0eb17379c2b` 适配。Skills、提示词和参考模板如含上游材料，均保留来源及修改说明；详细对应关系见 [docs/upstream-map.md](docs/upstream-map.md)。当前移植以 Markdown/JSON 工作流为主，没有打包上游的第三方插件或 MCP connector 实现。

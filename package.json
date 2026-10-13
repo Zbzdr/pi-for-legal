@@ -22,6 +22,7 @@
   "scripts": {
     "prepare:package": "node scripts/prepare-all-packages.mjs",
     "sync:upstream-domains": "node scripts/import-upstream-domains.mjs",
+    "track:upstream": "node scripts/track-upstream.mjs",
     "check": "npm run prepare:package && node scripts/validate-package.mjs",
     "pretest": "npm run prepare:package",
     "test": "node --test test/*.test.mjs",

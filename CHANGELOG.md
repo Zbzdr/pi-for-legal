@@ -5,6 +5,7 @@
 - DOCX redline 改为映射可用通用文档能力，由模型规划实现；保留确认、matter 内备份和验证契约，移除 maintained suite 的固定替换引擎和 Python bootstrap。
 - 将上游 leave-tracker agent 的 knowhow 映射为随包参考材料，恢复按需休假登记与只读检查；缺少依据的期限保持 pending，写入需确认，不安装或承诺自动调度/提醒。
 - 上游导入保留 Pi 的休假路由/存储/确认包装，刷新参考材料，并校验 checkout 与 reviewed revision 一致且干净，避免错误来源标注。
+- 新增可重复的 `track:upstream` 差异报告，分别记录初次映射、reviewed pin、观察到的上游提交与关键来源 blob；2026-10-13 fresh fetch 确认法律上游与初次映射相同，无新提交或文件更新，不自动导入或合并。
 - 每次 agent turn、matter 状态/操作和内置 write/edit 调用都重新核对当前分支绑定与磁盘索引；其他 session 关闭 matter 后，不再沿用旧缓存授权写入。
 - 在关闭、移除或移动索引记录、配置失效及恢复旧 session/分支时阻止旧 matter 写入，并提示重新绑定或修复工作区。
 - 使用项目内 `matter-operation.lock` 保护多个 Pi 进程对索引和 session 关联表的读改写；竞争调用返回可重试错误，异常退出遗留锁需人工核实后清理。

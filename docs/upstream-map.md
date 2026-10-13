@@ -2,6 +2,10 @@
 
 Packages are adapted from Anthropic's `claude-for-legal` revision `4a6c651889c97cc9140580363c73e0eb17379c2b` (2026-07-23).
 
+## Upstream comparison and review record
+
+The initial local mapping and the freshly fetched legal upstream `origin/main` both point to the revision above as of 2026-10-13: zero new commits and zero changed files. See [upstream-sync.md](upstream-sync.md) for the review process, [upstream-tracking.json](upstream-tracking.json) for the initial mapping and local overrides, and [upstream-status.json](upstream-status.json) for the observed commit and source blob IDs. Run `npm run track:upstream -- <checkout> --fetch` to check again; this does not import or auto-merge changes.
+
 ## Package boundary
 
 Only `@zbzdr/pi-legal-suite` is maintained and published. Its `skills/` directory contains the shared, commercial, privacy, regulatory, AI governance, employment, corporate, litigation, IP, and product workflows; its `extensions/` directory contains the single lifecycle extension.

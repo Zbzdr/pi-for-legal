@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "repositoryUrl": "https://github.com/anthropics/claude-for-legal.git",
+  "defaultBranch": "main",
+  "initialMapping": {
+    "localCommit": "f3e742518604c2d7e07154e53d92579f6565ebc3",
+    "upstreamRevision": "4a6c651889c97cc9140580363c73e0eb17379c2b"
+  },
+  "sourcePaths": [
+    "commercial-legal/skills/review/SKILL.md",
+    "commercial-legal/skills/vendor-agreement-review/SKILL.md",
+    "employment-legal/skills/log-leave/SKILL.md",
+    "employment-legal/skills/leave-tracker/SKILL.md",
+    "employment-legal/agents/leave-tracker.md"
+  ],
+  "localOverrides": [
+    {
+      "skill": "legal-docx-redline",
+      "policy": "Legal approval and verification wrapper; delegate execution to a visible general DOCX capability or an approved model-directed plan."
+    },
+    {
+      "skill": "legal-employment-log-leave",
+      "policy": "Preserve Pi on-demand intake, matter-local paths, confirmed writes and pending unsupported deadlines; refresh register knowhow from the reviewed agent."
+    },
+    {
+      "skill": "legal-employment-leave-tracker",
+      "policy": "Preserve Pi on-demand/read-only wrapper; map agent knowhow into references without scheduling or notification promises."
+    },
+    {
+      "skill": "legal-setup, legal-matter-workspace and shared core",
+      "policy": "Review upstream setup and lifecycle changes manually; retain Pi-specific project/session boundaries and deterministic matter tools."
+    }
+  ],
+  "externalCapabilities": [
+    {
+      "name": "general DOCX capability",
+      "referenceUrl": "https://github.com/anthropics/skills/tree/main/skills/docx",
+      "bundled": false,
+      "policy": "Use an already visible capability under its own license; this is a delegation reference, not a pinned or redistributed dependency."
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-13T04:00:38.086Z",
+  "remoteUrl": "https://github.com/anthropics/claude-for-legal.git",
+  "networkFetch": true,
+  "targetRef": "origin/main",
+  "initialRevision": "4a6c651889c97cc9140580363c73e0eb17379c2b",
+  "reviewedRevision": "4a6c651889c97cc9140580363c73e0eb17379c2b",
+  "observedRevision": "4a6c651889c97cc9140580363c73e0eb17379c2b",
+  "relationToInitial": "same",
+  "aheadBy": 0,
+  "behindBy": 0,
+  "changedFileCount": 0,
+  "commits": [],
+  "commitsTruncated": false,
+  "changes": [],
+  "sourceBlobs": [
+    {
+      "path": "commercial-legal/skills/review/SKILL.md",
+      "initial": "54cb9c12623a2d6fbf06c0410eacde6e3252a356",
+      "reviewed": "54cb9c12623a2d6fbf06c0410eacde6e3252a356",
+      "observed": "54cb9c12623a2d6fbf06c0410eacde6e3252a356"
+    },
+    {
+      "path": "commercial-legal/skills/vendor-agreement-review/SKILL.md",
+      "initial": "91364c50b9efd7dfdffd3d4bd36dbe1a54d60a29",
+      "reviewed": "91364c50b9efd7dfdffd3d4bd36dbe1a54d60a29",
+      "observed": "91364c50b9efd7dfdffd3d4bd36dbe1a54d60a29"
+    },
+    {
+      "path": "employment-legal/skills/log-leave/SKILL.md",
+      "initial": "e30bcff7acf21db1cd6ed34f9955fee80cdefde1",
+      "reviewed": "e30bcff7acf21db1cd6ed34f9955fee80cdefde1",
+      "observed": "e30bcff7acf21db1cd6ed34f9955fee80cdefde1"
+    },
+    {
+      "path": "employment-legal/skills/leave-tracker/SKILL.md",
+      "initial": "00ea1f05443f2e51a7079800d592a93db33bcc08",
+      "reviewed": "00ea1f05443f2e51a7079800d592a93db33bcc08",
+      "observed": "00ea1f05443f2e51a7079800d592a93db33bcc08"
+    },
+    {
+      "path": "employment-legal/agents/leave-tracker.md",
+      "initial": "d48d70ec9a17f59761796a859c5549b780a9b15c",
+      "reviewed": "d48d70ec9a17f59761796a859c5549b780a9b15c",
+      "observed": "d48d70ec9a17f59761796a859c5549b780a9b15c"
+    }
+  ],
+  "policy": "Comparison only. No checkout, import, installation, or modification of Skills. All upstream changes require review before advancing the manifest pin; retain Pi local overrides and external licenses."
+}
