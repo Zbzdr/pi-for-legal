@@ -1,11 +1,18 @@
 node_modules/
 dist/
+
+# Installed agent tooling stays local; repo conventions in docs/agents/ stay tracked.
 .pi/
+.agents/
+skills-lock.json
+
 .npmrc
 .env
 .env.*
 *.log
 *.tgz
 .DS_Store
+
+# Generated per-package attribution files (copied from the repo root by scripts/prepare-all-packages.mjs).
 packages/*/LICENSE
 packages/*/NOTICE

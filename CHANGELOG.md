@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- 将工程技能的 issue tracker、triage 标签和领域文档布局配置纳入 `docs/agents/`，由 `AGENTS.md` 引用，新 clone 可复现仓库约定；已安装的技能与 agent 工具链（`.pi/`、`.agents/`、`skills-lock.json`）仍仅保留本地，不随 npm 包发布。
+
 - 删除 `packages/` 下 10 个已 deprecated 的私有快照目录（131 个文件，占被跟踪文件的 47%）。它们不在 workspaces、不被任何脚本/测试/CI 引用，且技能内容是 suite 的陈旧副本：88 个技能名无一是 suite 缺失的，55 个同名但内容已分叉，agent 有读到旧版的风险。上游映射不受影响（`import-upstream-domains.mjs` 始终直接写入 `packages/pi-legal-suite/skills`）。内容仍可从 Git 历史或已发布的 npm 版本取回；`deprecate-legacy-packages.mjs` 只依赖包名，不受影响。
 - 将 `packages/` 边界从“其他目录必须是 private 快照”改为“只允许 `pi-legal-suite`”，`validate-package.mjs` 与 `test/package.test.mjs` 同步收紧，原断言在目录删除后会静默失效。
 
