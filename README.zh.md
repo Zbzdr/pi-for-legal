@@ -17,6 +17,8 @@ Pi for Legal 是 [Anthropic Claude for Legal](https://github.com/anthropics/clau
 
 目前唯一维护和发布的 all-in-one 包包含 88 个 Skills 和一个项目级 extension，不内置 MCP、web access、邮件、Slack、todo 或其他 Pi extensions。
 
+这 88 个 Skills 中，`legal-employment-log-leave` 和 `legal-employment-leave-tracker` 暂时搁置：保留显式命令用于说明限制，但不登记休假、不计算期限、不提供或承诺自动提醒，也不进入模型自动选择。已有人员台账不会被修改或删除。
+
 DOCX redline 首次使用时会在当前项目的 `.pi/legal-workbench/venvs/docx-redline/` 建立 Python 虚拟环境，并在用户确认后安装固定版本的 `python-docx` 和 `lxml`；不会改动系统 Python。
 
 ## Quick start

@@ -20,6 +20,7 @@ if (!upstreamRoot || !existsSync(join(upstreamRoot, ".git"))) {
 }
 
 const sharedSkills = new Set(["cold-start-interview", "customize", "matter-workspace"]);
+const deferredSkills = new Set(["legal-employment-log-leave", "legal-employment-leave-tracker"]);
 
 const domains = [
   {
@@ -246,9 +247,19 @@ for (const domain of domains) {
   for (const sourceName of sourceSkillNames(domain).sort()) {
     if (sharedSkills.has(sourceName) || domain.skip?.has(sourceName)) continue;
     const sourceSkillRoot = join(upstreamRoot, domain.upstream, "skills", sourceName);
-    const { description, body, internalWorker } = parseSkill(readFileSync(join(sourceSkillRoot, "SKILL.md"), "utf8"));
     const name = destinationName(domain, sourceName);
     const destinationSkillRoot = join(destinationSkills, name);
+    if (deferredSkills.has(name)) {
+      // Keep the checked-in explanatory stub; importing the upstream launcher
+      // would silently re-enable a workflow whose agent is not bundled.
+      const stub = join(destinationSkillRoot, "SKILL.md");
+      if (!existsSync(stub) || !readFileSync(stub, "utf8").includes("## Status: deferred")) {
+        throw new Error(`${name}: restore the checked-in deferred Skill before syncing upstream`);
+      }
+      names.push(name);
+      continue;
+    }
+    const { description, body, internalWorker } = parseSkill(readFileSync(join(sourceSkillRoot, "SKILL.md"), "utf8"));
     rmSync(destinationSkillRoot, { recursive: true, force: true });
     mkdirSync(destinationSkillRoot, { recursive: true });
 

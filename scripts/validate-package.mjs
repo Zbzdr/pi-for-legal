@@ -13,6 +13,7 @@ const internalWorkers = new Set([
   "legal-employment-internal-investigation",
   "legal-employment-international-expansion",
 ]);
+const deferredSkills = new Set(["legal-employment-log-leave", "legal-employment-leave-tracker"]);
 
 function walk(directory) {
   if (!existsSync(directory)) return [];
@@ -90,7 +91,8 @@ for (const skillFile of skillFiles) {
   if (name) names.add(name);
 
   const hidden = /^disable-model-invocation:\s*true\s*$/m.test(frontmatter[1]);
-  if (name && internalWorkers.has(name) !== hidden) fail(`${name}: progressive-disclosure flag is incorrect`);
+  if (name && (internalWorkers.has(name) || deferredSkills.has(name)) !== hidden) fail(`${name}: progressive-disclosure flag is incorrect`);
+  if (name && deferredSkills.has(name) && !text.includes("## Status: deferred")) fail(`${name}: deferred workflow must remain paused`);
 
   for (const path of walk(skillRoot)) {
     if (lstatSync(path).isSymbolicLink()) fail(`${relative(packageRoot, path)}: symlink not allowed`);

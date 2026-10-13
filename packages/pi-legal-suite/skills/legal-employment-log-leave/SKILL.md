@@ -1,54 +1,30 @@
 ---
 name: legal-employment-log-leave
-description: "Add a new leave to the leave register with the minimum information needed to start tracking deadlines. Use when an employee goes on leave and you want the tracker to watch designation, certification, and exhaustion clocks from day one."
+description: "Deferred protected-leave workflow. Explicit invocation explains why employee leave registration, deadline calculation, and monitoring are not enabled in this release."
+disable-model-invocation: true
 ---
+
 # /skill:legal-employment-log-leave
 
 > **Attribution:** Adapted from Anthropic's `claude-for-legal/employment-legal` at revision `4a6c651889c97cc9140580363c73e0eb17379c2b` under Apache-2.0 and modified for Pi. See the package `NOTICE`.
-Adds a new leave entry to `<dataDir>/employment-legal/leave-register.yaml` with the minimum
-information needed to start tracking deadlines. Use when an employee goes on
-leave and you want the tracker to watch the clocks from day one.
 
-## Instructions
+## Status: deferred
 
-1. Read the project legal profile → jurisdiction table and Systems section.
+Employee protected-leave registration and monitoring are not enabled in this release. This command is retained only to explain the limitation and preserve compatibility; do not execute the old workflow.
 
-2. Ask all of the following in a single prompt — do not drip them one at a time:
+The upstream `log-leave` Skill adds an employee's protected-leave record. Its companion `leave-tracker` agent researches jurisdiction-specific rules, reads the register or an authorized HRIS, and identifies required decisions when invoked. That complete agent workflow is not bundled here. Neither this package nor the upstream agent self-schedules; background reminders require a separate configured and verified integration.
 
-   > A few quick questions to set up leave tracking:
-   >
-   > - Employee name or role (anonymized is fine)
-   > - Where do they work? (State — this determines which rules apply)
-   > - Leave type: FMLA / state leave (which state) / USERRA / ADA accommodation
-   > - Leave start date
-   > - Is this intermittent leave?
-   > - Expected return date (if known — leave blank if not)
-   > - Has the designation notice been sent? If yes, when?
-   > - Has medical certification been requested? If yes, when?
+## Instructions on explicit invocation
 
-3. Using the jurisdiction table in the project legal profile, look up the applicable leave
-   entitlement (hours/weeks) for this leave type in this jurisdiction.
+1. Tell the user this feature is deferred, not operating.
+2. Do not create or update a leave register, calculate or certify a deadline, claim a completed leave check, or promise automatic alerts.
+3. Do not load an absent agent, silently substitute model memory for researched rules, or recreate this feature through shell commands or another Skill.
+4. Preserve existing leave registers and personnel records unchanged. Do not inspect sensitive employee records merely to explain the paused feature.
+5. Recommend the user's established HR/legal tracking process. A separate substantive legal question may be scoped and routed to `/skill:legal-research` with appropriate source verification, but that does not enable this tracker.
 
-4. Compute the first upcoming deadline based on the information provided:
-   - Designation not yet sent → deadline is 5 business days from leave start
-   - Med cert requested but not received → deadline is 15 days from request date
-   - Both sent and received → next deadline is at 75% exhaustion
+## Requirements before re-enabling
 
-5. Write a new entry to `<dataDir>/employment-legal/leave-register.yaml` using the leave register
-   format from the leave-tracker agent. If the file doesn't exist, create it.
-
-6. Confirm with a single line:
-   > "Logged. [Employee/Role] — [Leave type] — [Jurisdiction] — started [date].
-   > First deadline: [what it is and when]. Leave tracker will alert automatically."
-
-## Examples
-
-```
-/skill:legal-employment-log-leave
-```
-
-```
-/skill:legal-employment-log-leave
-Sarah (Sr. Engineer, works in California) just started FMLA today for a
-serious health condition. Intermittent. No designation sent yet.
-```
+- A complete project-local register format and clearly authorized storage/access boundary.
+- Jurisdiction, employer coverage, employee eligibility, actual work schedule, relevant event dates, and current controlling sources for each calculated deadline.
+- Tested deadline calculations and explicit separation of statutory obligations from internal reminder thresholds.
+- A complete on-demand checking workflow; any optional scheduling or HRIS integration must be configured and actually verified before describing it as available.

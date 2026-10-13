@@ -1,16 +1,20 @@
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 import { execFileSync } from "node:child_process";
 import {
+	closeSync,
 	existsSync,
 	mkdirSync,
+	openSync,
 	readFileSync,
 	realpathSync,
 	renameSync,
+	unlinkSync,
 	writeFileSync,
 } from "node:fs";
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 
 const CONFIG_PATH = ".pi/legal-workbench/config.json";
+const OPERATION_LOCK_PATH = ".pi/legal-workbench/matter-operation.lock";
 const BINDING_ENTRY = "pi-legal-matter-binding";
 const GENERIC_ISSUES = new Set([
 	"agreement",
@@ -69,7 +73,7 @@ interface MatterBinding {
 }
 
 function jsonResult(text: string, details: Record<string, unknown> = {}) {
-	return { content: [{ type: "text" as const, text }], details };
+	return { content: [{ type: "text" as const, text }], details, ...(details.error === true ? { isError: true } : {}) };
 }
 
 function systemDate(): string {
@@ -140,6 +144,39 @@ function resolveWorkspacePath(cwd: string, input: string, label: string, visible
 		throw new Error(`${label} must use a visible workspace directory, not a dot-directory`);
 	}
 	return resolvedTarget;
+}
+
+// Exclusive creation protects the complete read-modify-write operation across Pi
+// processes. Never steal a lock based on its age: its owner may still be running.
+function acquireMatterOperationLock(cwd: string): () => void {
+	const path = resolveWorkspacePath(cwd, OPERATION_LOCK_PATH, "matter operation lock");
+	mkdirSync(dirname(path), { recursive: true });
+	let handle: number;
+	try {
+		handle = openSync(path, "wx", 0o600);
+	} catch (error) {
+		if ((error as NodeJS.ErrnoException).code === "EEXIST") {
+			throw new Error(`Another legal matter operation holds ${OPERATION_LOCK_PATH}. Retry after it finishes. If a process crashed, verify that no matter operation is running and inspect the workspace before manually removing the lock.`);
+		}
+		throw error;
+	}
+	let released = false;
+	const release = () => {
+		if (released) return;
+		released = true;
+		try {
+			closeSync(handle);
+		} finally {
+			unlinkSync(path);
+		}
+	};
+	try {
+		writeFileSync(handle, `${JSON.stringify({ pid: process.pid, acquiredAt: new Date().toISOString() })}\n`, "utf8");
+	} catch (error) {
+		release();
+		throw error;
+	}
+	return release;
 }
 
 function loadConfig(cwd: string): WorkbenchConfig | undefined {
@@ -223,16 +260,20 @@ function sessionBinding(ctx: ExtensionContext): MatterBinding | undefined {
 	return binding;
 }
 
-function validatedSessionBinding(ctx: ExtensionContext): MatterBinding | undefined {
+function validatedSessionBinding(ctx: ExtensionContext, config?: WorkbenchConfig, index?: MatterIndex): MatterBinding | undefined {
 	const binding = sessionBinding(ctx);
 	if (!binding) return undefined;
 	try {
-		const config = loadConfig(ctx.cwd);
-		if (!config) return undefined;
-		const record = loadIndex(ctx.cwd, config).matters.find((matter) =>
+		config ??= loadConfig(ctx.cwd);
+		if (!config || loadStatus(ctx.cwd, config).setupStatus !== "complete") return undefined;
+		const record = (index ?? loadIndex(ctx.cwd, config)).matters.find((matter) =>
 			matter.slug === binding.slug && matter.path === binding.path && matter.status === "active",
 		);
-		return record ? binding : undefined;
+		if (!record) return undefined;
+		const matterPath = resolveWorkspacePath(ctx.cwd, record.path, "matter path", true);
+		const matterRoot = resolveWorkspacePath(ctx.cwd, config.matterRoot, "matterRoot", true);
+		if (!isWithin(matterRoot, matterPath) || !existsSync(join(matterPath, "matter.md"))) return undefined;
+		return { ...binding, name: record.name };
 	} catch {
 		return undefined;
 	}
@@ -330,23 +371,27 @@ const matterParameters = {
 
 export default function legalWorkbench(pi: ExtensionAPI): void {
 	let bootstrapPending = false;
-	let activeBinding: MatterBinding | undefined;
 	let listRequestedForPrompt = false;
 
 	pi.on("session_start", (_event, ctx) => {
-		activeBinding = validatedSessionBinding(ctx);
+		listRequestedForPrompt = false;
 		bootstrapPending = !ctx.sessionManager.getEntries().some((entry) =>
 			entry.type === "message" && (entry.message.role === "user" || entry.message.role === "assistant"),
 		);
 	});
 
-	pi.on("session_tree", (_event, ctx) => {
-		activeBinding = validatedSessionBinding(ctx);
+	pi.on("session_tree", () => {
+		listRequestedForPrompt = false;
 	});
 
 	pi.on("before_agent_start", (event, ctx) => {
 		listRequestedForPrompt = /(?:\/skill:legal-matter-workspace\s+list|\b(?:list|show|enumerate)\s+(?:all\s+)?matters?\b|事务列表|列出(?:所有)?事务|查看(?:所有)?事务)/iu.test(event.prompt);
-		if (!bootstrapPending) return;
+		// The selected branch stores intent; the on-disk index determines whether
+		// that intent is still valid. Do not cache authorization across turns.
+		const binding = sessionBinding(ctx);
+		const activeBinding = validatedSessionBinding(ctx);
+		const invalidBinding = Boolean(binding && !activeBinding);
+		if (!bootstrapPending && !invalidBinding) return;
 		bootstrapPending = false;
 
 		try {
@@ -363,6 +408,11 @@ export default function legalWorkbench(pi: ExtensionAPI): void {
 				};
 			}
 			if (activeBinding) return;
+			if (invalidBinding) {
+				return {
+					systemPrompt: `${event.systemPrompt}\n\n## Pi Legal Matter Binding Invalidated\nThe previously bound matter is no longer active or its binding is no longer valid in this workspace. Stop substantive work, do not use the old matter as writable context, and ask the user to choose another active matter or create a new one. Use legal_matter_session only after the user chooses. If workspace state was damaged or moved, route to /skill:legal-setup for repair. Do not inspect unrelated matters.`,
+				};
+			}
 
 			const candidates = matchingMatters(event.prompt, loadIndex(ctx.cwd, config));
 			const candidateText = candidates.length
@@ -397,11 +447,14 @@ export default function legalWorkbench(pi: ExtensionAPI): void {
 		executionMode: "sequential",
 
 		async execute(_toolCallId, params, _signal, _onUpdate, ctx) {
+			let releaseLock: (() => void) | undefined;
 			try {
 				const config = loadConfig(ctx.cwd);
 				if (!config) return jsonResult("Legal workbench is not initialized. Run /skill:legal-setup.", { error: true });
+				releaseLock = acquireMatterOperationLock(ctx.cwd);
 				const status = loadStatus(ctx.cwd, config);
 				const index = loadIndex(ctx.cwd, config);
+				const activeBinding = validatedSessionBinding(ctx, config, index);
 
 				if (params.action === "status") {
 					return jsonResult(JSON.stringify({ setupStatus: status.setupStatus, activeMatter: activeBinding ?? null }, null, 2), {
@@ -440,7 +493,6 @@ export default function legalWorkbench(pi: ExtensionAPI): void {
 					index.updatedAt = now;
 					writeJsonAtomic(resolveWorkspacePath(ctx.cwd, config.indexPath, "indexPath"), index);
 					if (activeBinding?.slug === record.slug) {
-						activeBinding = undefined;
 						pi.appendEntry(BINDING_ENTRY, null);
 					}
 					return jsonResult(`Matter closed: ${record.slug}. All files remain at ${record.path}. Start or bind another matter before further substantive writes.`, {
@@ -480,12 +532,14 @@ export default function legalWorkbench(pi: ExtensionAPI): void {
 				}
 
 				if (!record || record.status !== "active") return jsonResult(`Active matter not found: ${params.slug}`, { error: true });
-				activeBinding = bindMatter(pi, ctx, config, record);
+				const newBinding = bindMatter(pi, ctx, config, record);
 				return jsonResult(`Session bound to ${record.slug}. Keep substantive legal files under ${record.path}.`, {
-					activeMatter: activeBinding,
+					activeMatter: newBinding,
 				});
 			} catch (error) {
 				return jsonResult(`Legal matter operation failed: ${error instanceof Error ? error.message : String(error)}`, { error: true });
+			} finally {
+				releaseLock?.();
 			}
 		},
 	});
@@ -520,7 +574,14 @@ export default function legalWorkbench(pi: ExtensionAPI): void {
 		if (event.toolName !== "write" && event.toolName !== "edit") return;
 		try {
 			const config = loadConfig(ctx.cwd);
-			if (!config || loadStatus(ctx.cwd, config).setupStatus !== "complete") return;
+			if (!config || loadStatus(ctx.cwd, config).setupStatus !== "complete") {
+				if (sessionBinding(ctx)) return { block: true, reason: "The bound legal workspace is missing or setup is incomplete. Repair setup before writing substantive files." };
+				return;
+			}
+			if (existsSync(resolveWorkspacePath(ctx.cwd, OPERATION_LOCK_PATH, "matter operation lock"))) {
+				return { block: true, reason: "Another legal matter operation is in progress. Retry the write after it finishes." };
+			}
+			const activeBinding = validatedSessionBinding(ctx, config);
 			const inputPath = typeof event.input.path === "string" ? event.input.path : "";
 			if (!inputPath) return { block: true, reason: "Legal workspace write/edit call has no path" };
 			const target = resolveWorkspacePath(ctx.cwd, inputPath, "write path");

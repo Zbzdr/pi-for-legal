@@ -17,6 +17,8 @@ The project is workspace-first by default: the package is installed in the curre
 
 The only maintained and published all-in-one package ships 88 skills and a project-level extension. It does not bundle MCP, web access, email, Slack, todo, or other Pi extensions.
 
+Two of those 88 skills, `legal-employment-log-leave` and `legal-employment-leave-tracker`, are currently deferred: explicit invocation explains the limitation without registering leave, calculating deadlines, or promising reminders. They are excluded from automatic model selection; existing personnel records are not changed.
+
 The first time DOCX redline is used, a Python virtual environment is created at `.pi/legal-workbench/venvs/docx-redline/` in the current project and, after user confirmation, pinned versions of `python-docx` and `lxml` are installed; the system Python is never modified.
 
 ## Quick start

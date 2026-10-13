@@ -57,6 +57,7 @@ pi update npm:@zbzdr/pi-legal-suite
 - 88 个 Agent Skills 和一个项目级 extension，没有运行时 npm 依赖；DOCX redline 首次使用会在项目内建立独立 Python 虚拟环境；
 - 保留上游覆盖的美国、英国、EEA/EU 和跨境工作流，所有实质输出均是供律师复核的工作稿；
 - 不内置 MCP、web access、邮件、Slack、todo 或其他 extensions；
+- 88 个 Skills 中的 `legal-employment-log-leave` 和 `legal-employment-leave-tracker` 暂时搁置；显式调用只说明限制，不登记、不计算期限、不承诺自动提醒，也不修改或删除已有台账；
 - 没有可靠外部来源时会保留验证标签；实质法律结论仍需充分核实。
 - 业务日期与记录日期分开处理：事件日期只能来自用户、源文件或已验证来源；无法确定时保留 `unknown`，不会用文件修改时间或当前日期替代。
 

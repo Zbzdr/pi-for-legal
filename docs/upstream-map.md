@@ -51,6 +51,12 @@ The suite exposes legal judgment workflows as Agent Skills rather than custom Pi
 
 Deterministic operations remain bundled scripts invoked under their governing Skill. This includes workspace initialization, DOCX mutation, and the project-local Python environment bootstrap. The core extension registers only `legal_matter_session`, where structured file and session-state changes benefit from a narrow schema. Stateful playbook learning remains a Skill because comparability, reuse, and policy changes require legal judgment and explicit confirmation. Future tools should remain narrowly scoped and should not replace review Skills.
 
+## Deferred protected-leave workflows
+
+The upstream `employment-legal/skills/log-leave/SKILL.md` records protected employee leave. Its companion `employment-legal/agents/leave-tracker.md` contains the register format and researched, jurisdiction-specific checking workflow. That agent is not bundled in this port, and even upstream explicitly requires a separate integration for scheduling. The launcher alone is not a working tracker.
+
+`legal-employment-log-leave` and `legal-employment-leave-tracker` therefore remain as deferred, explicit-only explanatory commands. They do not write registers, calculate deadlines, or claim reminders. Existing personnel records are retained unchanged. The importer preserves these checked-in stubs rather than restoring the incomplete upstream launchers; re-enabling requires a complete local workflow, verified sources, and tests. The package still contains 88 Skill directories, including these two deferred entries.
+
 ## Excluded upstream areas
 
 - `law-student`: educational rather than lawyer/legal-team workflow;
