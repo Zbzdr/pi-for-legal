@@ -12,14 +12,14 @@ The project is workspace-first by default: the package is installed in the curre
 - Commercial contracts: routes and reviews MSA, SaaS, NDA, vendor agreement, amendment, and renewal matters;
 - Legal workflows: privacy, regulatory, AI governance, employment, corporate, litigation, IP, and product;
 - Project-level setup, quick defaults, practice profiles, matter isolation, playbook learning, upgrade decisions, and business summaries;
-- Lightweight DOCX tracked redlines with automatic backup, generated after confirmation;
+- Approved DOCX tracked redlines through an available general document capability, with matter-local backups and verification requirements;
 - Explicitly flags verification gaps when no reliable external source is available, rather than dressing up model memory as completed legal research.
 
 The only maintained and published all-in-one package ships 88 skills and a project-level extension. It does not bundle MCP, web access, email, Slack, todo, or other Pi extensions.
 
-Two of those 88 skills, `legal-employment-log-leave` and `legal-employment-leave-tracker`, are currently deferred: explicit invocation explains the limitation without registering leave, calculating deadlines, or promising reminders. They are excluded from automatic model selection; existing personnel records are not changed.
+Protected-leave registration and checking run on demand through `legal-employment-log-leave` and `legal-employment-leave-tracker`. The upstream agent's knowhow is bundled as a reference, not a required subagent. Records stay in the authorized active matter; unsupported deadlines remain pending. No scheduler or reminder service is installed. External automation can invoke Pi's CLI/RPC/SDK only after separately approved configuration.
 
-The first time DOCX redline is used, a Python virtual environment is created at `.pi/legal-workbench/venvs/docx-redline/` in the current project and, after user confirmation, pinned versions of `python-docx` and `lxml` are installed; the system Python is never modified.
+DOCX redline follows the legal upstream's delegation model: the model reads an available general `docx` Skill or equivalent capability, plans surgical changes, and applies source-preservation and verification gates. This package does not bundle that external Skill, a mandatory redline engine, or a fixed Python runtime. If no suitable capability is available, it offers an approved local implementation plan or a Word-ready change table; it never installs dependencies silently.
 
 ## Quick start
 
@@ -106,7 +106,7 @@ Upstream material is provided by Anthropic PBC under the Apache License 2.0; thi
 
 - Optimize the strategy for isolating task context per session within the workspace;
 - Deepen localized materials, source strategies, and specialized templates for CN and other jurisdictions;
-- Move from lightweight precise replacement to complex DOCX redlines, comments, and format fidelity;
+- Improve DOCX capability mappings and validation evidence for complex tracked changes, comments, and format fidelity;
 - Implement legal-research MCP integration and configuration, relying on third-party MCP adapters where necessary;
 - Combine commonly used capabilities such as MCP, web access, todo, and ask-user-question into a single integrated package, so users can install one package per workspace and handle the main legal tasks.
 

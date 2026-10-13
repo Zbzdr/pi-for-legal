@@ -1,30 +1,26 @@
 ---
 name: legal-employment-leave-tracker
-description: "Deferred protected-leave workflow. Explicit invocation explains why employee leave registration, deadline calculation, and monitoring are not enabled in this release."
-disable-model-invocation: true
+description: Check an authorized project-local protected-leave register on demand, verify applicable rules and calendars, and identify decisions or verification gaps. Use when the user asks about open leaves, designation/certification/exhaustion clocks, or leave-related accommodation; it does not self-schedule.
 ---
 
-# /skill:legal-employment-leave-tracker
+# On-demand protected-leave check
 
-> **Attribution:** Adapted from Anthropic's `claude-for-legal/employment-legal` at revision `4a6c651889c97cc9140580363c73e0eb17379c2b` under Apache-2.0 and modified for Pi. See the package `NOTICE`.
+> **Attribution:** Adapted from Anthropic's claude-for-legal/employment-legal leave-tracker Skill and agent at revision `4a6c651889c97cc9140580363c73e0eb17379c2b` under Apache-2.0 and modified for Pi. See the package NOTICE.
 
-## Status: deferred
+## Pi on-demand workflow
 
-Employee protected-leave registration and monitoring are not enabled in this release. This command is retained only to explain the limitation and preserve compatibility; do not execute the old workflow.
+Read `references/leave-workflow.md` fully. It carries the upstream agent's research, clock ownership, schedule/proration, accommodation, decision-point, and register knowhow as a reference executed by the current model, not a required subagent or background service.
 
-The upstream `log-leave` Skill adds an employee's protected-leave record. Its companion `leave-tracker` agent researches jurisdiction-specific rules, reads the register or an authorized HRIS, and identifies required decisions when invoked. That complete agent workflow is not bundled here. Neither this package nor the upstream agent self-schedules; background reminders require a separate configured and verified integration.
+- Resolve the project config/profile and call `legal_matter_session` with `action: status`. Use only an authorized active matter. The default register is `<matter>/outputs/employment/leave-register.yaml`; reports, backups, and source manifests also stay under that matter.
+- If no register or approved source is provided, ask for one or offer `/skill:legal-employment-log-leave`. Do not scan other matters, home directories, historical sessions, or a global HR portfolio to guess context. An organizational leave-tracking matter may contain multiple employees only when that scope is expressly authorized.
+- Default to a read-only check. Query HRIS only through visibly available, successfully verified, authorized read access and only for this matter's scope. Do not assume an integration exists, install one, or upload employee information without approval.
+- Identify jurisdiction, employer coverage, employee eligibility, normal schedule and units, event dates, measurement method, and controlling sources before relying on a clock. Calculate only supported deadlines; show unverified records in a separate `verification pending` group. Incomplete review must not be summarized as "no action needed".
+- Use `legal_time` for the recording/as-of date. Distinguish employee obligations, employer obligations, statutory deadlines, and internal reminder preferences. Do not convert an internal alert threshold into law or infer entitlement from a 40-hour week.
+- Report required decisions and open evidence gaps with source anchors. Preserve uncertainty; do not make termination decisions, send notices, certify eligibility, or issue legal conclusions on missing authority.
+- Offer a register update or saved report only when appropriate. Preview the exact path/changes and obtain confirmation before writing; preserve existing notes, provenance, and unrelated rows. Update `last_checked` only for records actually checked, with limitations alongside it.
 
-## Instructions on explicit invocation
+## Optional automation, not a prerequisite
 
-1. Tell the user this feature is deferred, not operating.
-2. Do not create or update a leave register, calculate or certify a deadline, claim a completed leave check, or promise automatic alerts.
-3. Do not load an absent agent, silently substitute model memory for researched rules, or recreate this feature through shell commands or another Skill.
-4. Preserve existing leave registers and personnel records unchanged. Do not inspect sensitive employee records merely to explain the paused feature.
-5. Recommend the user's established HR/legal tracking process. A separate substantive legal question may be scoped and routed to `/skill:legal-research` with appropriate source verification, but that does not enable this tracker.
+This workflow runs when requested. Pi can be invoked by an external job through its print/JSON CLI, RPC, or SDK, but this package installs no scheduler, recurring task, notification channel, or credentials. Do not show `Next scheduled check` unless a separately approved integration has actually been configured and verified.
 
-## Requirements before re-enabling
-
-- A complete project-local register format and clearly authorized storage/access boundary.
-- Jurisdiction, employer coverage, employee eligibility, actual work schedule, relevant event dates, and current controlling sources for each calculated deadline.
-- Tested deadline calculations and explicit separation of statutory obligations from internal reminder thresholds.
-- A complete on-demand checking workflow; any optional scheduling or HRIS integration must be configured and actually verified before describing it as available.
+A suggested next review date is only a recommendation, not a scheduled reminder. Automation must additionally specify the workspace and authorized register scope, read-only/write permissions, source access, failure handling, and notification destination. Never bypass the matter/approval gates to make a headless run work.

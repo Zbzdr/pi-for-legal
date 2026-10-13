@@ -1,3 +1,5 @@
+import { execFileSync } from "node:child_process";
+import { LEAVE_AGENT_PATH, LEAVE_OVERRIDE_SKILLS, renderLeaveKnowhow } from "./leave-knowhow.mjs";
 import {
   cpSync,
   existsSync,
@@ -12,15 +14,20 @@ import { fileURLToPath } from "node:url";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const upstreamRoot = process.argv[2];
-const revision = "4a6c651889c97cc9140580363c73e0eb17379c2b";
+const revision = JSON.parse(readFileSync(join(root, "packages/pi-legal-suite/package.json"), "utf8")).piLegal.upstreamRevision;
 
 if (!upstreamRoot || !existsSync(join(upstreamRoot, ".git"))) {
   console.error("Usage: node scripts/import-upstream-domains.mjs /path/to/claude-for-legal");
   process.exit(2);
 }
 
+const actualRevision = execFileSync("git", ["-C", upstreamRoot, "rev-parse", "HEAD"], { encoding: "utf8" }).trim();
+if (actualRevision !== revision) throw new Error(`Upstream checkout ${actualRevision} differs from reviewed revision ${revision}; run track:upstream and review before updating the manifest pin`);
+if (execFileSync("git", ["-C", upstreamRoot, "status", "--porcelain"], { encoding: "utf8" }).trim()) {
+  throw new Error("Upstream checkout must be clean so attribution matches the pinned source");
+}
+
 const sharedSkills = new Set(["cold-start-interview", "customize", "matter-workspace"]);
-const deferredSkills = new Set(["legal-employment-log-leave", "legal-employment-leave-tracker"]);
 
 const domains = [
   {
@@ -249,13 +256,20 @@ for (const domain of domains) {
     const sourceSkillRoot = join(upstreamRoot, domain.upstream, "skills", sourceName);
     const name = destinationName(domain, sourceName);
     const destinationSkillRoot = join(destinationSkills, name);
-    if (deferredSkills.has(name)) {
-      // Keep the checked-in explanatory stub; importing the upstream launcher
-      // would silently re-enable a workflow whose agent is not bundled.
-      const stub = join(destinationSkillRoot, "SKILL.md");
-      if (!existsSync(stub) || !readFileSync(stub, "utf8").includes("## Status: deferred")) {
-        throw new Error(`${name}: restore the checked-in deferred Skill before syncing upstream`);
+    if (LEAVE_OVERRIDE_SKILLS.has(name)) {
+      // Preserve Pi routing/approval/storage instructions, but refresh the
+      // upstream agent knowhow rather than importing its incomplete launcher.
+      const wrapper = join(destinationSkillRoot, "SKILL.md");
+      if (!existsSync(wrapper) || !readFileSync(wrapper, "utf8").includes("## Pi on-demand workflow")) {
+        throw new Error(`${name}: restore the checked-in Pi on-demand wrapper before syncing upstream`);
       }
+      const knowhow = renderLeaveKnowhow(readFileSync(join(upstreamRoot, LEAVE_AGENT_PATH), "utf8"), revision);
+      const references = join(destinationSkillRoot, "references");
+      mkdirSync(references, { recursive: true });
+      const resource = name === "legal-employment-log-leave"
+        ? ["leave-register.md", knowhow.register]
+        : ["leave-workflow.md", knowhow.workflow];
+      writeFileSync(join(references, resource[0]), resource[1]);
       names.push(name);
       continue;
     }

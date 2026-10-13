@@ -12,14 +12,14 @@ Pi for Legal 是 [Anthropic Claude for Legal](https://github.com/anthropics/clau
 - 商业合同：路由并审查 MSA、SaaS、NDA、vendor agreement、修订和续期事项；
 - 法务工作流：privacy、regulatory、AI governance、employment、corporate、litigation、IP 和 product；
 - 项目级 setup、quick defaults、实践 profile、matter 隔离、playbook 学习、升级判断和业务摘要；
-- 经确认后生成带自动备份的轻量 DOCX tracked redline；
+- 经确认后通过可用的通用文档能力生成 DOCX tracked redline，要求 matter 内备份和验证；
 - 在没有可靠外部来源时明确标记验证缺口，不把模型记忆包装成已完成的法律检索。
 
 目前唯一维护和发布的 all-in-one 包包含 88 个 Skills 和一个项目级 extension，不内置 MCP、web access、邮件、Slack、todo 或其他 Pi extensions。
 
-这 88 个 Skills 中，`legal-employment-log-leave` 和 `legal-employment-leave-tracker` 暂时搁置：保留显式命令用于说明限制，但不登记休假、不计算期限、不提供或承诺自动提醒，也不进入模型自动选择。已有人员台账不会被修改或删除。
+`legal-employment-log-leave` 和 `legal-employment-leave-tracker` 支持按需登记、核验和检查受保护休假。上游 agent 的 knowhow 映射为随包参考材料，不要求运行独立 agent。台账保存在当前授权 matter 内，缺少依据的期限保持待核验；本包不安装定时器或提醒服务。需要自动化时，可在另行确认配置后由外部任务调用 Pi 的 CLI、RPC 或 SDK。
 
-DOCX redline 首次使用时会在当前项目的 `.pi/legal-workbench/venvs/docx-redline/` 建立 Python 虚拟环境，并在用户确认后安装固定版本的 `python-docx` 和 `lxml`；不会改动系统 Python。
+DOCX redline 按法律上游的委托方式工作：模型读取当前可用的通用 `docx` Skill 或等效能力，自主规划最小粒度修改，并遵守原文保护、备份和验证要求。本包不捆绑外部 Skill、强制的修订引擎或固定 Python 环境；缺少能力时提供经批准的本地实施方案或可供 Word 使用的修改表，不会静默安装依赖。
 
 ## Quick start
 
@@ -106,7 +106,7 @@ pi install -l npm:@zbzdr/pi-legal-suite@<new-version>
 
 - 优化工作区内按照session来隔离任务context的策略；
 - 深化 CN 及其他法域的本地化资料、来源策略和专门模板；
-- 从轻量精确替换扩展到复杂 DOCX redline、批注和格式保真；
+- 深化复杂 DOCX redline、批注和格式保真的能力映射与验证证据；
 - 实现法律检索 MCP的接入和配置，必要时依赖第三方 MCP adapter；
 - 以单整合包的形式，把 MCP、web access、todo、ask-user-question 等常用能力组合起来；最终让用户在一个工作区里只安装一个包，就能完成主要法律任务。
 

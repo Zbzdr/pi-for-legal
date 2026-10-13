@@ -275,36 +275,11 @@ test("legal workbench bootstraps once, binds session IDs, and guards matter writ
   assert.match(readFileSync(join(matterPath, "history.md"), "utf8"), /## \d{4}-\d{2}-\d{2} — Matter closed/);
 });
 
-test("DOCX redline writes tracked changes, preserves source, and uses a pinned local runtime", (t) => {
-  const temporary = mkdtempSync(join(tmpdir(), "pi-legal-docx-test-"));
-  t.after(() => rmSync(temporary, { recursive: true, force: true }));
+test("DOCX redline maps an available capability instead of shipping a fixed engine", () => {
   const skillRoot = join(skillsRoot, "legal-docx-redline");
-  const source = join(temporary, "contract.docx");
-  const edits = join(temporary, "edits.json");
-  const output = join(temporary, "contract.redline.docx");
-  const documentXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body><w:p><w:r><w:t>Liability is limited to three </w:t></w:r><w:r><w:t>months of fees.</w:t></w:r></w:p><w:sectPr/></w:body></w:document>`;
-  mkdirSync(join(temporary, "docx", "word"), { recursive: true });
-  writeFileSync(join(temporary, "docx", "[Content_Types].xml"), `<?xml version="1.0"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="xml" ContentType="application/xml"/></Types>`);
-  writeFileSync(join(temporary, "docx", "word", "document.xml"), documentXml);
-  execFileSync("zip", ["-q", "-r", source, "."], { cwd: join(temporary, "docx") });
-  writeFileSync(edits, JSON.stringify({ edits: [
-    { match: "Liability", replacement: "Aggregate liability" },
-    { match: "three months", replacement: "twelve months" },
-  ] }));
-  execFileSync("python3", [
-    join(skillRoot, "scripts", "docx_redline.py"), source,
-    "--edits", edits,
-    "--output", output,
-    "--workspace", temporary,
-    "--allow-stdlib-fallback",
-  ]);
-  const redlineXml = execFileSync("unzip", ["-p", output, "word/document.xml"], { encoding: "utf8" });
-  assert.match(redlineXml, /<w:del\b/);
-  assert.match(redlineXml, /<w:ins\b/);
-  assert.match(redlineXml, /twelve months/);
-  assert.equal(execFileSync("unzip", ["-p", source, "word/document.xml"], { encoding: "utf8" }), documentXml);
-
-  const requirements = readFileSync(join(skillRoot, "scripts", "requirements.txt"), "utf8");
-  assert.match(requirements, /^python-docx==1\.2\.0$/m);
-  assert.match(requirements, /^lxml==6\.1\.1$/m);
+  const text = readFileSync(join(skillRoot, "SKILL.md"), "utf8");
+  assert.match(text, /read its instructions from the advertised path/i);
+  assert.match(text, /Model-written scripts are allowed/);
+  assert.equal(existsSync(join(skillRoot, "scripts")), false);
+  assert.equal(existsSync(join(skillRoot, "references", "docx-workflow.md")), true);
 });
