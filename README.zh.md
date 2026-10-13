@@ -98,7 +98,7 @@ pi install -l npm:@zbzdr/pi-legal-suite@<new-version>
 
 ## 上游追踪
 
-最近一次法律上游核对确认：与初次映射相比没有新提交或文件变更。可用独立上游 checkout 运行 `npm run track:upstream -- <checkout> --fetch` 再次检查；该命令只报告差异，不自动导入或合并。详见[审查流程](docs/upstream-sync.md)和[已记录的状态](docs/upstream-status.json)。
+最近一次法律上游核对确认：与初次映射相比没有新提交或文件变更。可用独立上游 checkout 运行 `npm run track:upstream -- <checkout> --fetch` 再次检查；该命令只报告差异，不自动导入或合并。详见[审查流程](docs/upstream-sync.md)、[已记录的状态](docs/upstream-status.json)及[验证范围与结果](docs/verification-2026-10-13.md)。
 
 ## 来源与许可
 

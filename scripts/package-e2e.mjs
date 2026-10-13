@@ -27,6 +27,12 @@ try {
   assert.equal(existsSync(extensionPath), true);
   assert.equal(existsSync(join(skillsRoot, "legal-setup", "scripts", "init_workspace.mjs")), true);
   assert.equal(existsSync(join(skillsRoot, "legal-setup", "references", "append-system-template.md")), true);
+  for (const resource of [
+    "legal-docx-redline/references/docx-workflow.md",
+    "legal-employment-leave-tracker/references/leave-workflow.md",
+    "legal-employment-log-leave/references/leave-register.md",
+  ]) assert.equal(existsSync(join(skillsRoot, resource)), true, `Missing packaged workflow reference: ${resource}`);
+  assert.equal(existsSync(join(skillsRoot, "legal-docx-redline", "scripts")), false);
   const expected = new Set(readdirSync(skillsRoot, { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
     .map((entry) => `skill:${entry.name}`));

@@ -8,5 +8,8 @@ Upstream: https://github.com/anthropics/claude-for-legal
 Reference revision: 4a6c651889c97cc9140580363c73e0eb17379c2b (2026-07-23)
 
 The adapted material has been modified for Pi's Agent Skills and package
-formats. Claude-specific plugin paths, agents, hooks, and connector declarations
-are not included.
+formats. Claude-specific plugin paths, executable agent/hook declarations, and
+connector declarations are not included. Protected-leave agent knowhow is
+adapted into on-demand Skill references without requiring an agent runtime.
+The external general DOCX Skill is referenced, not redistributed; its separate
+license is not replaced by this package's license.

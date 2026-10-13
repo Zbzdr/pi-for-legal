@@ -14,7 +14,7 @@ function skillPaths() {
   return [resolve(root, "packages", "pi-legal-suite", "skills")];
 }
 
-async function runScenario(name, prompt, prepare, checks, useCoreExtension = false) {
+async function runScenario(name, prompt, prepare, checks, useCoreExtension = false, readOnly = false) {
   if (scenarioFilter && scenarioFilter !== name) return;
   const cwd = mkdtempSync(join(tmpdir(), `pi-legal-${name}-`));
   if (prepare) prepare(cwd);
@@ -32,6 +32,7 @@ async function runScenario(name, prompt, prepare, checks, useCoreExtension = fal
       "--approve",
       "--no-extensions",
       ...(useCoreExtension ? ["--extension", resolve(root, "packages", "pi-legal-suite", "extensions", "legal-workbench.ts")] : []),
+      ...(readOnly ? ["--tools", "read"] : []),
       "--no-skills",
       ...selectedSkillPaths.flatMap((path) => ["--skill", path]),
       "--no-prompt-templates",
@@ -44,9 +45,7 @@ async function runScenario(name, prompt, prepare, checks, useCoreExtension = fal
     await client.start();
     const state = await client.getState();
     assert.ok(state.model, `${name}: Pi has no configured model`);
-    const idle = client.waitForIdle(240_000);
-    await client.prompt(prompt);
-    await idle;
+    await client.promptAndWait(prompt, undefined, 240_000);
     const output = await client.getLastAssistantText();
     assert.ok(output?.trim(), `${name}: empty assistant output`);
     for (const check of checks) check(output);
@@ -293,4 +292,51 @@ await runScenario(
   ],
 );
 
+await runScenario(
+  "docx-capability-mapping",
+  "/skill:legal-docx-redline 这是工作流说明测试，我尚未提供 Word 文件或批准任何修改。不要安装依赖、联网、创建或修改文件。只说明你如何发现并读取可用通用 DOCX 能力；如果能力缺失，有什么可选方案，以及输出红线前需要哪些原文保护和验证步骤。不要声称当前已经安装了通用 docx Skill。",
+  undefined,
+  [
+    (output) => assert.match(output, /docx|Word|OOXML/i),
+    (output) => assert.match(output, /可用|available|发现|discover|能力|capabilit/i),
+    (output) => assert.match(output, /原文|source|备份|backup/i),
+    (output) => assert.match(output, /验证|核验|validat|verif/i),
+    (output) => assert.match(output, /修改表|变更表|change table|方案|plan/i),
+    (output) => assert.doesNotMatch(output, /已经生成|已生成红线|redline has been generated|installed successfully/i),
+  ],
+  false,
+  true,
+);
+
+await runScenario(
+  "leave-on-demand-intake",
+  "/skill:legal-employment-log-leave 这是工作流说明测试，不要读取人员资料、检索或写文件。我只知道一名美国员工开始休假，但没有州、雇主覆盖、资格、工作时间、具体日期或现行规则依据。解释如何按需登记待核验信息；不要计算具体法定期限，也不要承诺自动提醒。",
+  undefined,
+  [
+    (output) => assert.match(output, /州|state|jurisdiction/i),
+    (output) => assert.match(output, /待核验|待核实|pending|unknown|未知|null/i),
+    (output) => assert.match(output, /matter|事项|事务/i),
+    (output) => assert.match(output, /确认|confirm/i),
+    (output) => assert.doesNotMatch(output, /会自动提醒|will alert automatically|5\s*(?:个)?工作日|15\s*天/i),
+  ],
+  false,
+  true,
+);
+
+await runScenario(
+  "leave-on-demand-no-scheduler",
+  "/skill:legal-employment-leave-tracker 这是工作流说明测试，尚未提供台账。不要检索、联网或写文件。说明缺少后台定时机制是否阻止本次按需检查，以及只读模式、未核验期限和建议下次复核日期应如何处理；不要把建议日期说成已经排定的提醒。",
+  undefined,
+  [
+    (output) => assert.match(output, /按需|on-demand|本次|手动/i),
+    (output) => assert.match(output, /只读|read-only/i),
+    (output) => assert.match(output, /待核验|待核实|pending|未核验|未验证/i),
+    (output) => assert.match(output, /建议|suggest|recommend/i),
+    (output) => assert.doesNotMatch(output, /已经安排|已安排.*提醒|scheduled successfully|会自动提醒/i),
+  ],
+  false,
+  true,
+);
+
+assert.ok(results.length, `No behavior scenario matched: ${scenarioFilter}`);
 console.log(JSON.stringify({ ok: true, scenarioCount: results.length, results }, null, 2));

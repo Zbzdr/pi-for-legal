@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- 新增 macOS/Linux 的无凭据 CI、打包参考文件断言和三项只读模型行为检查；记录本地验证结果与未覆盖的 Word GUI / 法律时效评估边界。
+
 - DOCX redline 改为映射可用通用文档能力，由模型规划实现；保留确认、matter 内备份和验证契约，移除 maintained suite 的固定替换引擎和 Python bootstrap。
 - 将上游 leave-tracker agent 的 knowhow 映射为随包参考材料，恢复按需休假登记与只读检查；缺少依据的期限保持 pending，写入需确认，不安装或承诺自动调度/提醒。
 - 上游导入保留 Pi 的休假路由/存储/确认包装，刷新参考材料，并校验 checkout 与 reviewed revision 一致且干净，避免错误来源标注。

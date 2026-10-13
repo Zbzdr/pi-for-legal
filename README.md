@@ -98,7 +98,7 @@ Local project installs take precedence. Global installs without `-l` are a secon
 
 ## Upstream tracking
 
-The latest recorded legal-upstream check found no changes since the initial mapping. To repeat it with a separate upstream checkout, run `npm run track:upstream -- <checkout> --fetch`. This reports changes without importing or merging them. See [the review process](docs/upstream-sync.md) and [the recorded status](docs/upstream-status.json).
+The latest recorded legal-upstream check found no changes since the initial mapping. To repeat it with a separate upstream checkout, run `npm run track:upstream -- <checkout> --fetch`. This reports changes without importing or merging them. See [the review process](docs/upstream-sync.md), [the recorded status](docs/upstream-status.json), and [verification scope and results](docs/verification-2026-10-13.md).
 
 ## Sources and license
 
