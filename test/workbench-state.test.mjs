@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { execFileSync, spawn } from "node:child_process";
-import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import fs, { existsSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { syncBuiltinESMExports } from "node:module";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
@@ -165,6 +166,50 @@ test("the project lock rejects contending operations without writes or stealing 
   assert.equal(s.guard("matters/shared-matter/outputs/report.md"), undefined);
   await create(s, "other-matter");
   assert.equal(existsSync(lockPath), false);
+});
+
+test("a released lock is never realpathed as a transient leaf", async (t) => {
+  const { cwd, lockPath } = workspace(t);
+  const s = session(cwd, "release-race");
+  await create(s);
+  const originalRealpath = fs.realpathSync;
+  let releases = 0;
+  t.after(() => { t.mock.restoreAll(); syncBuiltinESMExports(); });
+  t.mock.method(fs, "realpathSync", (path, ...args) => {
+    // Deterministically release our test-owned lock at path-validation time.
+    // The old leaf resolver then throws ENOENT; directory-only resolution works.
+    if (/[/\\]\.pi[/\\]legal-workbench(?:[/\\]matter-operation\.lock)?$/.test(String(path)) && existsSync(lockPath)) {
+      rmSync(lockPath);
+      releases++;
+    }
+    return originalRealpath(path, ...args);
+  });
+  syncBuiltinESMExports();
+  writeFileSync(lockPath, "test-owned lock about to be released");
+  const result = await s.call({ action: "status" });
+  assert.notEqual(result.isError, true, result.content[0].text);
+  assert.equal(result.details.activeMatter.slug, "shared-matter");
+  assert.equal(releases, 1);
+  writeFileSync(lockPath, "test-owned lock about to be released");
+  assert.equal(s.guard("matters/shared-matter/outputs/report.md"), undefined);
+  assert.equal(releases, 2);
+});
+
+test("existing lock symlinks, including dangling ones, are neither followed nor ignored", async (t) => {
+  const { cwd, lockPath } = workspace(t);
+  const s = session(cwd, "symlink-lock");
+  await create(s);
+  const target = join(cwd, "test-lock-target.txt");
+  writeFileSync(target, "preserve target");
+  symlinkSync(target, lockPath);
+  assert.equal((await s.call({ action: "status" })).isError, true);
+  assert.equal(s.guard("matters/shared-matter/outputs/report.md")?.block, true);
+  assert.equal(readFileSync(target, "utf8"), "preserve target");
+  rmSync(target); // Keep the test-owned lock as a dangling symlink.
+  assert.equal((await s.call({ action: "status" })).isError, true);
+  assert.equal(s.guard("matters/shared-matter/outputs/report.md")?.block, true);
+  rmSync(lockPath);
+  assert.notEqual((await s.call({ action: "status" })).isError, true);
 });
 
 test("independent Pi processes preserve all index records and session associations", async (t) => {

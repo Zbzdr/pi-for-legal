@@ -3,6 +3,7 @@ import { execFileSync } from "node:child_process";
 import {
 	closeSync,
 	existsSync,
+	lstatSync,
 	mkdirSync,
 	openSync,
 	readFileSync,
@@ -11,7 +12,7 @@ import {
 	unlinkSync,
 	writeFileSync,
 } from "node:fs";
-import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
+import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 
 const CONFIG_PATH = ".pi/legal-workbench/config.json";
 const OPERATION_LOCK_PATH = ".pi/legal-workbench/matter-operation.lock";
@@ -146,10 +147,18 @@ function resolveWorkspacePath(cwd: string, input: string, label: string, visible
 	return resolvedTarget;
 }
 
+function matterOperationLockPath(cwd: string): string {
+	// Validate the stable directory, not the transient leaf: another process may
+	// unlink its lock between existsSync and realpathSync. Exclusive open below
+	// refuses any existing entry (including a symlink) without following it.
+	const directory = resolveWorkspacePath(cwd, dirname(OPERATION_LOCK_PATH), "matter operation lock directory");
+	return join(directory, basename(OPERATION_LOCK_PATH));
+}
+
 // Exclusive creation protects the complete read-modify-write operation across Pi
 // processes. Never steal a lock based on its age: its owner may still be running.
 function acquireMatterOperationLock(cwd: string): () => void {
-	const path = resolveWorkspacePath(cwd, OPERATION_LOCK_PATH, "matter operation lock");
+	const path = matterOperationLockPath(cwd);
 	mkdirSync(dirname(path), { recursive: true });
 	let handle: number;
 	try {
@@ -578,7 +587,7 @@ export default function legalWorkbench(pi: ExtensionAPI): void {
 				if (sessionBinding(ctx)) return { block: true, reason: "The bound legal workspace is missing or setup is incomplete. Repair setup before writing substantive files." };
 				return;
 			}
-			if (existsSync(resolveWorkspacePath(ctx.cwd, OPERATION_LOCK_PATH, "matter operation lock"))) {
+			if (lstatSync(matterOperationLockPath(ctx.cwd), { throwIfNoEntry: false })) {
 				return { block: true, reason: "Another legal matter operation is in progress. Retry the write after it finishes." };
 			}
 			const activeBinding = validatedSessionBinding(ctx, config);
