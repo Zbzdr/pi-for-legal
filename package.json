@@ -17,7 +17,7 @@
     "packages/pi-legal-suite"
   ],
   "engines": {
-    "node": ">=20"
+    "node": ">=22.19"
   },
   "scripts": {
     "prepare:package": "node scripts/prepare-all-packages.mjs",
@@ -29,6 +29,7 @@
     "test:rpc": "node scripts/rpc-smoke.mjs",
     "test:package": "node scripts/package-e2e.mjs",
     "test:behavior": "node scripts/behavior-eval.mjs",
+    "test:document-behavior": "node scripts/document-behavior-eval.mjs",
     "pack": "node scripts/pack-packages.mjs",
     "publish:dry-run": "node scripts/publish-packages.mjs --dry-run",
     "publish": "node scripts/publish-packages.mjs --publish",
@@ -36,6 +37,14 @@
     "deprecate:legacy:apply": "node scripts/deprecate-legacy-packages.mjs --apply"
   },
   "devDependencies": {
-    "@earendil-works/pi-coding-agent": "0.84.1"
+    "@earendil-works/pi-coding-agent": "1.1.0"
+  },
+  "overrides": {
+    "@earendil-works/pi-agent-core": "1.1.0",
+    "@earendil-works/pi-ai": "1.1.0",
+    "@earendil-works/pi-codemode": "1.1.0",
+    "@earendil-works/pi-mcp": "1.1.0",
+    "@earendil-works/pi-tui": "1.1.0",
+    "@earendil-works/chord": "1.1.0"
   }
 }

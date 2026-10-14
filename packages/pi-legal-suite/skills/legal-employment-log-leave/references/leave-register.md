@@ -24,7 +24,7 @@
   state_leave_time_used: [same unit]
   state_leave_entitlement: [same unit]
   accommodation_process_initiated: [true/false]
-  last_updated: [system recording date from legal_time]
+  last_updated: [system recording date from Unix date]
   last_checked: [actual check date or null; retain the check's limitations]
   controlling_sources: "[pinpoint cites used for the above deadlines]"
   notes: ""

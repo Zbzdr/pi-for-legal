@@ -13,7 +13,7 @@ const setupScript = fileURLToPath(new URL("../packages/pi-legal-suite/skills/leg
 function workspace(t) {
   const cwd = mkdtempSync(join(tmpdir(), "pi-legal-state-test-"));
   t.after(() => rmSync(cwd, { recursive: true, force: true }));
-  execFileSync(process.execPath, [setupScript, "--workspace", cwd, "--data-dir", ".", "--phase", "complete"]);
+  execFileSync(process.execPath, [setupScript, "--workspace", cwd, "--data-dir", ".", "--phase", "complete", "--document-git", "manual"]);
   return {
     cwd,
     indexPath: join(cwd, ".pi/legal-workbench/matter-index.json"),

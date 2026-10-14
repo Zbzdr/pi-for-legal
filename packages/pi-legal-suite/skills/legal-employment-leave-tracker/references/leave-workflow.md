@@ -2,7 +2,7 @@
 
 ## Pi execution boundary
 
-Run this knowhow in the current requested task; no agent instance or scheduler is required. Read the bound matter and approved profile, not a global employee portfolio. The default register and all outputs remain under the active matter. Unknown coverage, eligibility, event dates, calendars, or rules stay pending; an unchecked record is not a clean record. Numeric law-based deadlines require current controlling sources, clock ownership, and a documented calculation basis. Internal alert tiers below are preferences, not law. Use legal_time for recording dates, not evidence of an event. Preview and confirm writes; preserve existing notes. Report a suggested next review separately from any actually verified external schedule.
+Run this knowhow in the current requested task; no agent instance or scheduler is required. Read the bound matter and approved profile, not a global employee portfolio. The default register and all outputs remain under the active matter. Unknown coverage, eligibility, event dates, calendars, or rules stay pending; an unchecked record is not a clean record. Numeric law-based deadlines require current controlling sources, clock ownership, and a documented calculation basis. Internal alert tiers below are preferences, not law. Use Unix date for recording dates, not evidence of an event. Preview and confirm writes; preserve existing notes. Report a suggested next review separately from any actually verified external schedule.
 
 # On-demand protected-leave knowhow
 
@@ -261,7 +261,7 @@ Do not overwrite any `notes` fields the attorney has added manually.
   state_leave_time_used: [same unit]
   state_leave_entitlement: [same unit]
   accommodation_process_initiated: [true/false]
-  last_updated: [system recording date from legal_time]
+  last_updated: [system recording date from Unix date]
   last_checked: [actual check date or null; retain the check's limitations]
   controlling_sources: "[pinpoint cites used for the above deadlines]"
   notes: ""

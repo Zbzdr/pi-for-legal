@@ -15,7 +15,7 @@ Pi for Legal 是 [Anthropic Claude for Legal](https://github.com/anthropics/clau
 - 经确认后通过可用的通用文档能力生成 DOCX tracked redline，要求 matter 内备份和验证；
 - 在没有可靠外部来源时明确标记验证缺口，不把模型记忆包装成已完成的法律检索。
 
-目前唯一维护和发布的 all-in-one 包包含 88 个 Skills 和一个项目级 extension，不内置 MCP、web access、邮件、Slack、todo 或其他 Pi extensions。
+目前唯一维护和发布的 all-in-one 包包含 89 个 Skills 和一个项目级 extension，不内置 MCP、web access、邮件、Slack、todo 或其他 Pi extensions。
 
 `legal-employment-log-leave` 和 `legal-employment-leave-tracker` 支持按需登记、核验和检查受保护休假。上游 agent 的 knowhow 映射为随包参考材料，不要求运行独立 agent。台账保存在当前授权 matter 内，缺少依据的期限保持待核验；本包不安装定时器或提醒服务。需要自动化时，可在另行确认配置后由外部任务调用 Pi 的 CLI、RPC 或 SDK。
 
@@ -23,7 +23,7 @@ DOCX redline 按法律上游的委托方式工作：模型读取当前可用的�
 
 ## Quick start
 
-当前支持 macOS 和 Linux 等带有 `bash` 与 Unix `date` 命令的环境。setup、matter extension 和日期工具会通过 `bash date` 取得本机日历日期；Windows/PowerShell 尚未纳入支持范围，后续再补充适配。
+当前支持带有 `bash` 与 Unix `date` 的 macOS/Linux。Markdown 文档 Git 还需要 Git 与 Pi 1.1 或更新版本（Node.js 22.19+）；Windows/PowerShell 暂不支持。
 
 在需要使用法律工作流的项目目录里安装：
 
@@ -47,13 +47,25 @@ Setup 会询问实践类型、法域、审查偏好和数据目录，并在写�
 
 然后可以在原 session 或新 session 中描述任务；根据提示选择或创建事务，然后开始研究、审查或起草工作。
 
+## Markdown 文档 Git（开发中，尚未发布 npm）
+
+用 `/skill:legal-document-edit` 起草、微调和更换章节起草逻辑。首次 workspace setup 一并确认本地 Git 范围和提交身份；以后绑定的 matter 按需自动建立独立仓库，不重复询问每次 commit，也不建立共享整个工作区的 Git 仓库。旧版/手动模式仍支持每 matter 单独纳入。
+
+普通微调直接修改当前文件，不必每回合开分支或 worktree。实质起草前记录该文件/章节的原文位置；已经按 a 逻辑提交后改用 b 逻辑，先从 Git 查原文与历史，再重拟该章节，而非在 a 的结构上叠加，除非明确要求沿用 a。**起草参考不等于 Git 父提交**：b 仍能增量提交在最新版之后，保留其他章节的最新修改。worktree 仅用于真正并行的方案，位于 `<matter>/outputs/revisions/<proposal>/`。
+
+现有 extension 在原生工具、codemode 内嵌调用及 shell/脚本工具完成后固定实际 Markdown 差异。说明结合真实 diff 与本轮用户要求；摘要失败使用明确机械记录。模型判断内容不确定时是否需要先问，确定时直接落稿自动 commit；草案检查点不等于批准立场或发送。保留旧方案及人工/暂存修改，不自动 push。生命周期记录 `matter.md`/`history.md`、结构化台账、配置/日志和二进制不在文档 Git 范围内。
+
+DOCX 仅在明确要求时交付，默认按字、词、短语、句子的顺序采用最小修改；无损 Markdown/DOCX 同步暂缓。一次 shell/脚本调用算一次事务，内部中间保存及任意外部编辑器写入不逐次提交。
+
+本功能尚未发布 npm；可审查开发 checkout 后，本地安装其 `packages/pi-legal-suite`。已有 schema-4 工作区保持原来路径，可用新版 legal-setup 初始化脚本增量加入 Git 设置并刷新托管 `.pi/APPEND_SYSTEM.md`，不覆盖已填写的 profile 和 matter 文件。Git 历史会保留已删除的敏感内容；setup 授权和远端共享应分别确认。
+
 ## Setup 后会发生什么
 
 - 项目根目录会有 Pi 自动加载的 `AGENTS.md`，用于保存法律实践 profile；
 - `.pi/APPEND_SYSTEM.md` 会追加法律工作区的固定规则，并保留原有项目规则；
 - 项目根目录的 `matters/` 和 `logs/` 会被初始化，但不会自动创建具体 matter；可见的 `legal-workbench/` 包装目录不再创建；
 - 每个新 session 首先询问复用或创建哪个 matter，之后的资料和输出放在对应 matter 的 `outputs/` 下；Pi 原始 session 仍使用默认位置。
-- 需要记录“今天”或生成报告日期时，extension 提供 `legal_time`，从 Unix `date` 读取短格式 `YYYY-MM-DD`；它只代表系统记录日期，不证明底层法律事件发生在当天。
+- 确需日历日期时使用普通 Unix `date` 命令，不再提供专用时间工具；记录日期和 Git 时间均不证明底层法律事件日期。
 
 从 0.5.0 起，默认可见目录已改为项目根目录下的 `matters/` 和 `logs/`；旧的 `legal-workbench/` 可见目录不会自动迁移。
 
@@ -102,7 +114,7 @@ pi install -l npm:@zbzdr/pi-legal-suite@<new-version>
 
 ## 来源与许可
 
-本项目基于 `claude-for-legal` revision `4a6c651889c97cc9140580363c73e0eb17379c2b` 适配。Skills、提示词和参考模板如含上游材料，均保留来源及修改说明；详细对应关系见 [docs/upstream-map.md](docs/upstream-map.md)。当前移植以 Markdown/JSON 工作流为主，没有打包上游的第三方插件或 MCP connector 实现。
+本项目基于 `claude-for-legal` revision `4a6c651899c97cc9140580363c73e0eb17379c2b` 适配。Skills、提示词和参考模板如含上游材料，均保留来源及修改说明；详细对应关系见 [docs/upstream-map.md](docs/upstream-map.md)。当前移植以 Markdown/JSON 工作流为主，没有打包上游的第三方插件或 MCP connector 实现。
 
 上游材料由 Anthropic PBC 按 Apache License 2.0 提供，本项目同样采用 Apache-2.0。见 [LICENSE](LICENSE) 和 [NOTICE](NOTICE)。Pi for Legal 与 Anthropic 没有从属或背书关系；Claude、Anthropic 及第三方产品名称仍属于各自权利人。
 

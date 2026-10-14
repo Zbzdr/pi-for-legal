@@ -14,7 +14,7 @@ import { fileURLToPath } from "node:url";
 
 function usage(message) {
 	if (message) console.error(message);
-	console.error("Usage: node init_workspace.mjs --workspace <path> --data-dir <visible-relative-path> [--phase initialize|complete] [--force-system] [--force-profile]");
+	console.error("Usage: node init_workspace.mjs --workspace <path> --data-dir <visible-relative-path> [--phase initialize|complete] [--document-git auto|manual] [--git-author-name <name>] [--git-author-email <email>] [--force-system] [--force-profile]");
 	process.exit(2);
 }
 
@@ -34,7 +34,7 @@ function parseArguments(argv) {
 		const argument = argv[index];
 		if (argument === "--force-system") values.forceSystem = true;
 		else if (argument === "--force-profile") values.forceProfile = true;
-		else if (["--workspace", "--data-dir", "--phase"].includes(argument)) {
+		else if (["--workspace", "--data-dir", "--phase", "--document-git", "--git-author-name", "--git-author-email"].includes(argument)) {
 			const value = argv[index + 1];
 			if (!value) usage(`Missing value for ${argument}`);
 			values[argument.slice(2).replace(/-([a-z])/g, (_, letter) => letter.toUpperCase())] = value;
@@ -43,6 +43,7 @@ function parseArguments(argv) {
 	}
 	if (!values.workspace || !values.dataDir) usage("--workspace and --data-dir are required");
 	if (!["initialize", "complete"].includes(values.phase)) usage("--phase must be initialize or complete");
+	if (values.documentGit && !["auto", "manual"].includes(values.documentGit)) usage("--document-git must be auto or manual");
 	return values;
 }
 
@@ -133,10 +134,6 @@ const indexPath = join(stateDir, "matter-index.json");
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const referencesDir = resolve(scriptDir, "..", "references");
 
-mkdirSync(stateDir, { recursive: true });
-for (const directory of [data.absolute, join(data.absolute, "matters"), join(data.absolute, "logs")]) {
-	mkdirSync(directory, { recursive: true });
-}
 const config = {
 	schemaVersion: 4,
 	profilePath: "AGENTS.md",
@@ -145,14 +142,32 @@ const config = {
 	dataDir: data.relative,
 	matterRoot,
 	};
-if (existsSync(configPath)) {
-	const existing = JSON.parse(readFileSync(configPath, "utf8"));
-	if (JSON.stringify(existing) !== JSON.stringify(config)) {
-		throw new Error("config.json already exists with an older or different layout; remove the old legal workspace after backing it up, then run /skill:legal-setup again");
-	}
-} else {
-	writeJsonAtomic(configPath, config);
+const existing = existsSync(configPath) ? JSON.parse(readFileSync(configPath, "utf8")) : undefined;
+if (existing) {
+	const { documentGit: _git, ...paths } = existing;
+	if (Object.keys(paths).length !== Object.keys(config).length || Object.entries(config).some(([key, value]) => paths[key] !== value)) throw new Error("config.json already exists with an older or different layout; back up the workspace and decide what to retain before rerunning setup");
 }
+const mode = options.documentGit ?? existing?.documentGit?.mode ?? "auto";
+if (!["auto", "manual"].includes(mode)) throw new Error("Invalid existing document Git mode; choose auto or manual explicitly");
+let documentGit = { mode };
+if (mode === "auto") {
+	let name = options.gitAuthorName ?? existing?.documentGit?.authorName;
+	let email = options.gitAuthorEmail ?? existing?.documentGit?.authorEmail;
+	if (!name || !email) {
+		try {
+			const identity = execFileSync("git", ["-C", workspace, "var", "GIT_AUTHOR_IDENT"], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }).trim();
+			const match = /^(.*) <([^<>]+)> \d+ [+-]\d{4}$/.exec(identity);
+			name ??= match?.[1]; email ??= match?.[2];
+		} catch { /* Setup asks for an explicit local author rather than changing global Git config. */ }
+	}
+	if (!name?.trim() || !email?.trim() || /[\r\n\x00<>]/.test(name + email)) throw new Error("Document Git setup needs an author name/email. Provide --git-author-name and --git-author-email, or explicitly choose --document-git manual. No global Git settings are changed.");
+	execFileSync("git", ["--version"], { stdio: "pipe" });
+	documentGit = { mode, authorName: name, authorEmail: email };
+}
+config.documentGit = documentGit;
+mkdirSync(stateDir, { recursive: true });
+for (const directory of [data.absolute, join(data.absolute, "matters"), join(data.absolute, "logs")]) mkdirSync(directory, { recursive: true });
+writeJsonAtomic(configPath, config);
 
 const systemTemplate = readFileSync(join(referencesDir, "append-system-template.md"), "utf8");
 const systemResult = options.forceSystem

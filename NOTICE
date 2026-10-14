@@ -13,3 +13,7 @@ connector declarations are not included. Protected-leave agent knowhow is
 adapted into on-demand Skill references without requiring an agent runtime.
 The external general DOCX Skill is referenced, not redistributed; its separate
 license is not replaced by this package's license.
+
+The Markdown document-history implementation and legal-document-edit workflow
+are original Pi Legal contributions. Aider and Manubot are cited as design
+references only; their implementation code is not redistributed.

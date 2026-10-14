@@ -5,7 +5,7 @@ description: "Issue, refresh, release, or report on legal holds — drafts the h
 # /skill:legal-litigation-legal-hold
 
 > **Attribution:** Adapted from Anthropic's `claude-for-legal/litigation-legal` at revision `4a6c651889c97cc9140580363c73e0eb17379c2b` under Apache-2.0 and modified for Pi. See the package `NOTICE`.
-1. Call `legal_time` before generating a status report or writing a system-recorded hold date. If the user supplies an event or issuance date, preserve that date and its source separately.
+1. Run `date +%Y-%m-%d` using the shell before generating a status report or writing a system-recorded hold date. If the user supplies an event or issuance date, preserve that date and its source separately.
 2. If `--status` (no slug): read `_log.yaml`, produce portfolio-wide hold report.
 3. Otherwise: load `<dataDir>/matters/[slug]/matter.md` + log row.
 4. Load the project legal profile → privilege markings, hold template pointer, escalation norms.
@@ -157,7 +157,7 @@ release. You may be asked to reaffirm compliance at periodic intervals.
 
 ### `--refresh` — periodic reaffirmation
 
-Refresh cadence: default 6 months; adjustable per matter. When `next_refresh < [current date from `legal_time`]` (or user invokes manually), the skill drafts a refresh notice.
+Refresh cadence: default 6 months; adjustable per matter. When `next_refresh < [current date from `date +%Y-%m-%d`]` (or user invokes manually), the skill drafts a refresh notice.
 
 **Inputs:**
 1. Any **scope changes** since last refresh (new topics surfaced in discovery, new custodians, new systems).
@@ -204,7 +204,7 @@ Do not send the release notice without an explicit yes.
 Read `_log.yaml`. Produce a report:
 
 ```markdown
-# Legal Hold Status — [YYYY-MM-DD from `legal_time`]
+# Legal Hold Status — [YYYY-MM-DD from `date +%Y-%m-%d`]
 
 ## Active holds
 
@@ -214,7 +214,7 @@ Read `_log.yaml`. Produce a report:
 
 ## ⚠️ Attention
 
-- **Refresh overdue:** [list slugs where next_refresh < current date from `legal_time`]
+- **Refresh overdue:** [list slugs where next_refresh < current date from `date +%Y-%m-%d`]
 - **Refresh due within 30 days:** [list]
 - **Matters active without hold issued:** [list — high/critical risk first]
 - **Matters closed with hold still active:** [list — consider release]

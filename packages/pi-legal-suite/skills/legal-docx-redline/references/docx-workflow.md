@@ -10,6 +10,8 @@ A reference implementation of the general workflow is documented at https://gith
 
 ## Planning
 
+A Word deliverable requires an explicit user request; ordinary text revision remains Markdown work. Default to character, word, phrase, then sentence edits in that order when each smaller edit suffices. DOCX/Markdown lossless round-tripping is not available: comments, existing tracked changes, fields, anchors, and layout require separate preservation and verification.
+
 1. Inventory paragraphs, tables, fields, hyperlinks, text boxes, headers/footers, numbering, bookmarks/comments, and existing revisions relevant to each approved edit.
 2. Anchor edits to actual source clauses and exact text or verified structural locations. Visible text can be split across runs; tabs, line breaks, field boundaries, revision wrappers, and different stories must not disappear from the matching model.
 3. Preserve run properties and structural anchors. Merging adjacent runs is safe only when their properties and structural context are compatible; do not join text across meaningful boundaries just to make a string match.

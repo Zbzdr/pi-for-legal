@@ -15,6 +15,10 @@
   ],
   "localOverrides": [
     {
+      "skill": "legal-document-edit",
+      "policy": "Original Pi Markdown-first workflow: setup-authorized matter-local Git, in-place incremental edits, recorded chapter originals for changes of drafting logic, optional parallel worktrees, event-triggered checkpoints, and explicit DOCX delivery. Not an upstream import."
+    },
+    {
       "skill": "legal-docx-redline",
       "policy": "Legal approval and verification wrapper; delegate execution to a visible general DOCX capability or an approved model-directed plan."
     },

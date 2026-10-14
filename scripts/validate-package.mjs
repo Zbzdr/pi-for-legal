@@ -121,7 +121,7 @@ for (const skillFile of skillFiles) {
   }
 }
 
-if (skillFiles.length !== 88) fail(`suite must contain 88 Skills; found ${skillFiles.length}`);
+if (skillFiles.length !== 89) fail(`suite must contain 89 Skills; found ${skillFiles.length}`);
 if (manifest.piLegal?.skillCount !== skillFiles.length) fail("piLegal.skillCount is incorrect");
 
 for (const entry of readdirSync(join(root, "packages"), { withFileTypes: true })) {

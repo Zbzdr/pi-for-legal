@@ -20,10 +20,11 @@
     "legal-suite"
   ],
   "engines": {
-    "node": ">=20"
+    "node": ">=22.19"
   },
   "files": [
     "extensions",
+    "lib",
     "skills",
     "README.md",
     "LICENSE",
@@ -51,6 +52,6 @@
   "piLegal": {
     "upstreamRevision": "4a6c651889c97cc9140580363c73e0eb17379c2b",
     "extensionCount": 1,
-    "skillCount": 88
+    "skillCount": 89
   }
 }

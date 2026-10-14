@@ -12,7 +12,7 @@ description: "Build or update a chronology from declared document sources and up
 5. For readable sources: extract dated events. For unreachable sources: note in Gaps.
 6. De-dupe, merge with sources list per event.
 7. Tag significance (🔴/🟡/⚪) per matter theory.
-8. Call `legal_time` for the generation date, then write `<dataDir>/matters/[slug]/outputs/chronology.md` (or format variant per flag).
+8. Run `date +%Y-%m-%d` using the shell for the generation date, then write `<dataDir>/matters/[slug]/outputs/chronology.md` (or format variant per flag).
 9. If prior version exists: version number increments, diff summary presented to user.
 10. Confirm before finalizing: "Here's what I built. Scan the 🔴 entries — anything I miscalled?"
 
@@ -185,7 +185,7 @@ Location: `<dataDir>/matters/[slug]/outputs/chronology.md`. Complete, tagged, an
 
 **Matter:** [slug]
 **Mode:** matter | documents
-**Generated:** [YYYY-MM-DD from `legal_time`]
+**Generated:** [YYYY-MM-DD from `date +%Y-%m-%d`]
 **Generation date basis:** Unix date system record
 **Sources:** [N] documents across [source types]
 **Entries:** [N] ([N] 🔴 / [N] 🟡 / [N] ⚪)

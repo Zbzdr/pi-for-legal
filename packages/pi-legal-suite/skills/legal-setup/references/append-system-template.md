@@ -28,11 +28,19 @@ User statements and supplied documents are intake references until verified. The
 
 After material work, update the active matter `matter.md` current state and work-product index concisely, put deliverables under `outputs/`, and append significant events to `history.md`. A matter may bind several Pi sessions; record only their session IDs in `matter.md`. Raw session files remain in Pi's default location.
 
+## Markdown Drafts And Local Git
+
+Use `/skill:legal-document-edit` for substantive drafting, text corrections, alternative wording, or retrying a rejected revision. Keep process text in Markdown; preserve structured machine records and source evidence in their original formats. Workspace setup normally authorizes automatic local Git for subsequent bound matters and supplies the author identity; no per-matter or per-edit confirmation is then needed. Legacy/manual-policy workspaces still need one enrollment approval. The existing extension checkpoints mutations; the model does not need to remember to invoke a commit tool.
+
+Ordinary corrections continue the current draft and commit incrementally; do not require a new branch/worktree or baseline choice every turn. Before substantive chapter drafting, record its file/heading original with legal_document_revision draft. When switching that chapter from logic a to logic b, retrieve its Git original/history first and redraft from the source, not a's structure, unless explicitly asked to continue a. The drafting reference need not be the Git parent: preserve current edits to other chapters. Use isolated worktrees only for parallel proposals. Ask about material uncertainty, not permission to record a reversible draft. Preserve all proposal branches and human/staged edits. No automatic push or destructive history rewrite. Lifecycle metadata `matter.md` and `history.md` stays outside proposal branches and must never be rolled back with a wording experiment.
+
+DOCX is a deliverable only when expressly requested, not an automatic result of text editing. Default to the smallest justified change: character, word, phrase, then sentence. Read `/skill:legal-docx-redline` for Word revision and verification; do not claim lossless Markdown/DOCX synchronization.
+
 ## Dates And Event Provenance
 
 - Treat the date an event happened and the date a record was written as different fields. An event date must come from the user, a source document, or a verified external source; never guess it.
-- When the user says an event happened "today", call `legal_time` and record the date as `user said today; resolved by Unix date`. Do not use the tool result as evidence for any other event date.
-- When a record only needs a system date, use `legal_time` or the date supplied by the governing extension. Use the short `YYYY-MM-DD` form.
+- When the user says an event happened "today", run `date +%Y-%m-%d` using the shell and record the date as `user said today; resolved by Unix date`. Do not use the tool result as evidence for any other event date.
+- When a record only needs a system date, use `date +%Y-%m-%d` in the shell, or the date supplied by the governing extension. Use the short `YYYY-MM-DD` form.
 - If an event date cannot be established, write `unknown` or `[date not verified]` and identify the missing source. Do not substitute the current date, session date, file modification time, or model knowledge.
 - A file's modification time can be recorded as metadata such as `file_modified_at`; it is not proof of when the underlying legal event occurred.
 - In `history.md`, keep the upstream-style append-only Markdown event log: most recent entries first, separated from the header by `---`, with headings such as `## YYYY-MM-DD — Event`. System-created entries should say `System record` so they are not confused with event evidence.

@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- 移除 `legal_time` 及 Skills/生成器对它的调用要求；确需日历日期时使用普通 Unix `date`，保留事件日期与系统记录日期的来源区分。
+- 新增 `legal-document-edit`（suite 共 89 Skills）和现有 extension 内的 Markdown Git 深模块：workspace setup 默认配置每 matter 自动纳入与局部提交身份，普通微调沿当前稿增量提交、不重复审批或每回合开 worktree；逐工具检查点结合真实 diff、本轮要求及原文记录生成摘要，失败采用明确机械记录，不自动 push。
+- 区分章节起草参考与 Git parent：按 a 逻辑起草前记录 file/section 原文，改用 b 时从 Git 查询原文/历史而非沿 a 改，明确续改除外；仅重拟目标章节，保留其他最新修改。原文缺失/非精确回退须披露，长原文可分页查询。并行方案可选 worktree，已建 worktree 可跨回合续用。
+- 同布局 schema-4 setup 可增量加入 Git 策略并保留 profile/材料；新增初始化锁，防止多个进程同时初始化同一 matter。缺失身份、暂存/人工修改、hook/索引锁、部分失败和过期 binding 均保留文件并显式处理；不重写既有历史。
+- DOCX 仅在明确请求时交付，强化字→词→短语→句的最小修改规则；无损 Markdown/DOCX 同步暂缓。生命周期记录与结构化台账不纳入起草方案分支。
+- 开发验证升级至 Pi 1.1.0 并锁定同版本 Pi 依赖族，避免 npm semver 拉入不兼容的 1.2 导出；嵌套工具事件要求 Pi 1.1+。新增真实 codemode、Git 与故障恢复测试。
+
 - 将工程技能的 issue tracker、triage 标签和领域文档布局配置纳入 `docs/agents/`，由 `AGENTS.md` 引用，新 clone 可复现仓库约定；已安装的技能与 agent 工具链（`.pi/`、`.agents/`、`skills-lock.json`）仍仅保留本地，不随 npm 包发布。
 
 - 删除 `packages/` 下 10 个已 deprecated 的私有快照目录（131 个文件，占被跟踪文件的 47%）。它们不在 workspaces、不被任何脚本/测试/CI 引用，且技能内容是 suite 的陈旧副本：88 个技能名无一是 suite 缺失的，55 个同名但内容已分叉，agent 有读到旧版的风险。上游映射不受影响（`import-upstream-domains.mjs` 始终直接写入 `packages/pi-legal-suite/skills`）。内容仍可从 Git 历史或已发布的 npm 版本取回；`deprecate-legacy-packages.mjs` 只依赖包名，不受影响。

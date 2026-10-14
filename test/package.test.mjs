@@ -19,7 +19,7 @@ function skillNames() {
     .sort();
 }
 
-test("workspace exposes one publishable suite with 88 Skills and one extension", () => {
+test("workspace exposes one publishable suite with 89 Skills and one extension", () => {
   const workspace = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
   const suite = JSON.parse(readFileSync(join(packageRoot, "package.json"), "utf8"));
   assert.equal(workspace.private, true);
@@ -27,7 +27,7 @@ test("workspace exposes one publishable suite with 88 Skills and one extension",
   assert.equal(suite.name, "@zbzdr/pi-legal-suite");
   assert.equal(suite.private, undefined);
   assert.deepEqual(suite.pi, { extensions: ["./extensions"], skills: ["./skills"] });
-  assert.equal(skillNames().length, 88);
+  assert.equal(skillNames().length, 89);
   assert.equal(existsSync(extensionPath), true);
 
   const extraPackageDirectories = readdirSync(join(root, "packages"), { withFileTypes: true })
@@ -45,7 +45,7 @@ test("workspace validator accepts the single-package boundary", () => {
     cwd: root,
     encoding: "utf8",
   });
-  assert.match(output, /88 Skills, 1 extension, single publishable package/);
+  assert.match(output, /89 Skills, 1 extension, single publishable package/);
 });
 
 test("upstream internal workers retain Pi progressive disclosure", () => {
@@ -78,6 +78,9 @@ test("workspace initializer creates the project workspace and leaves Pi settings
     setupScript,
     "--workspace", temporary,
     "--data-dir", ".",
+    "--document-git", "auto",
+    "--git-author-name", "Setup Test",
+    "--git-author-email", "setup@example.invalid",
     "--phase", phase,
   ], { encoding: "utf8" });
 
@@ -92,6 +95,7 @@ test("workspace initializer creates the project workspace and leaves Pi settings
     indexPath: ".pi/legal-workbench/matter-index.json",
     dataDir: ".",
     matterRoot: "matters",
+    documentGit: { mode: "auto", authorName: "Setup Test", authorEmail: "setup@example.invalid" },
   });
   assert.equal(existsSync(join(temporary, "AGENTS.md")), true);
   assert.equal(existsSync(join(temporary, "legal-workbench", "AGENTS.md")), false);
@@ -110,6 +114,37 @@ test("workspace initializer creates the project workspace and leaves Pi settings
   JSON.parse(run("complete"));
   assert.match(readFileSync(profilePath, "utf8"), /Do not overwrite/);
   assert.equal(JSON.parse(readFileSync(join(piDirectory, "legal-workbench", "status.json"), "utf8")).setupStatus, "complete");
+});
+
+test("schema-4 Git policy setup is additive and preserves existing profiles, data and identity on resume", (t) => {
+  const cwd = mkdtempSync(join(tmpdir(), "pi-legal-git-policy-"));
+  t.after(() => rmSync(cwd, { recursive: true, force: true }));
+  const run = (...flags) => JSON.parse(execFileSync(process.execPath, [setupScript, "--workspace", cwd, "--data-dir", ".", ...flags], { encoding: "utf8" }));
+  run("--document-git", "manual");
+  const configPath = join(cwd, ".pi/legal-workbench/config.json");
+  const original = JSON.parse(readFileSync(configPath, "utf8"));
+  delete original.documentGit;
+  writeFileSync(configPath, JSON.stringify(Object.fromEntries(Object.entries(original).reverse())));
+  writeFileSync(join(cwd, "AGENTS.md"), "# Filled profile\n\nExisting user choices.\n");
+  writeFileSync(join(cwd, "matters/keep.md"), "Preserve source material.\n");
+  const added = run("--git-author-name", "Chosen Author", "--git-author-email", "chosen@example.invalid");
+  assert.equal(added.paths.documentGit.mode, "auto");
+  assert.match(readFileSync(join(cwd, "AGENTS.md"), "utf8"), /Existing user choices/);
+  assert.equal(readFileSync(join(cwd, "matters/keep.md"), "utf8"), "Preserve source material.\n");
+  const resumed = run("--phase", "complete");
+  assert.deepEqual(resumed.paths.documentGit, added.paths.documentGit);
+  assert.equal(existsSync(join(cwd, ".git")), false, "setup configures future matter repositories, not a shared repository");
+});
+
+test("automatic Git setup requires an explicit or configured author before writing workspace files", (t) => {
+  const cwd = mkdtempSync(join(tmpdir(), "pi-legal-no-git-author-"));
+  t.after(() => rmSync(cwd, { recursive: true, force: true }));
+  const config = join(cwd, "empty.gitconfig");
+  writeFileSync(config, "[user]\n useConfigOnly = true\n");
+  const env = { ...process.env, GIT_CONFIG_GLOBAL: config, GIT_CONFIG_NOSYSTEM: "1" };
+  delete env.GIT_AUTHOR_NAME; delete env.GIT_AUTHOR_EMAIL; delete env.EMAIL;
+  assert.throws(() => execFileSync(process.execPath, [setupScript, "--workspace", cwd, "--data-dir", "."], { env, stdio: "pipe" }), /author name\/email/);
+  assert.equal(existsSync(join(cwd, ".pi")), false);
 });
 
 test("workspace initializer rejects an older layout instead of migrating it", (t) => {
@@ -150,6 +185,7 @@ test("legal workbench bootstraps once, binds session IDs, and guards matter writ
     "--workspace", temporary,
     "--data-dir", ".",
     "--phase", "complete",
+    "--document-git", "manual",
   ]);
 
   const indexPath = join(temporary, ".pi", "legal-workbench", "matter-index.json");
@@ -206,9 +242,9 @@ test("legal workbench bootstraps once, binds session IDs, and guards matter writ
   const extension = await import(`../packages/pi-legal-suite/extensions/legal-workbench.ts?test=${Date.now()}`);
   extension.default(pi);
   const matterTool = tools.get("legal_matter_session");
-  const timeTool = tools.get("legal_time");
   assert.ok(matterTool);
-  assert.ok(timeTool);
+  assert.equal(tools.has("legal_time"), false);
+  assert.ok(tools.has("legal_document_revision"));
   handlers.get("session_start")({ reason: "startup" }, context);
   const bootstrap = handlers.get("before_agent_start")({
     prompt: "Please review Acme's California CCPA issue.",
@@ -254,9 +290,6 @@ test("legal workbench bootstraps once, binds session IDs, and guards matter writ
   assert.match(matterFile, /inputs\/requested-nda\.docx/);
   assert.match(matterFile, /not verified facts, legal conclusions, deadlines/);
   assert.match(sessionName, /new-york-nda/);
-  const timeResult = await timeTool.execute("time-1", {}, undefined, undefined, context);
-  assert.match(timeResult.content[0].text, /System date: \d{4}-\d{2}-\d{2}/);
-  assert.match(timeResult.content[0].text, /Unix date command/);
   assert.match(readFileSync(join(matterPath, "history.md"), "utf8"), /## \d{4}-\d{2}-\d{2} — Matter opened/);
   assert.match(readFileSync(join(matterPath, "history.md"), "utf8"), /System record: matter created/);
 

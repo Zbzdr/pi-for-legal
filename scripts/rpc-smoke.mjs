@@ -44,13 +44,14 @@ try {
   assert.deepEqual(loaded.errors, []);
   assert.equal(loaded.extensions.length, 1);
   assert.equal(loaded.extensions[0].tools.has("legal_matter_session"), true);
-  assert.equal(loaded.extensions[0].tools.has("legal_time"), true);
+  assert.equal(loaded.extensions[0].tools.has("legal_time"), false);
+  assert.equal(loaded.extensions[0].tools.has("legal_document_revision"), true);
 
   await client.start();
   const commands = await client.getCommands();
   const names = commands.filter((command) => command.source === "skill").map((command) => command.name).sort();
   assert.deepEqual(names, expected);
-  assert.equal(names.length, 88);
+  assert.equal(names.length, 89);
   assert.doesNotMatch(client.getStderr(), /Failed to load extension|extension load error/i);
 
   console.log(JSON.stringify({

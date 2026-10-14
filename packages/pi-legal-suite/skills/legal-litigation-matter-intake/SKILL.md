@@ -10,7 +10,7 @@ description: "Intake a new matter — uniform questions covering identification,
 3. Run the uniform intake: identification, conflicts check, source, risk triage, materiality, outside counsel, internal owners, legal hold, key dates, initial posture.
 4. Generate slug from matter name (lowercase, hyphens, year).
 5. Create `<dataDir>/matters/[slug]/matter.md` — full narrative intake.
-6. Call `legal_time` for the system recording date, then create `<dataDir>/matters/[slug]/history.md` — seeded with the intake as the first entry. The recording date is not proof of any underlying event date.
+6. Run `date +%Y-%m-%d` using the shell for the system recording date, then create `<dataDir>/matters/[slug]/history.md` — seeded with the intake as the first entry. The recording date is not proof of any underlying event date.
 7. Append structured row to `<dataDir>/matters/_log.yaml`.
 8. Confirm with the user: "Here's the row I'll write — any edits?"
 
@@ -233,7 +233,7 @@ Append-only event log. Most recent at top.
 
 ---
 
-## [YYYY-MM-DD from `legal_time`] — Matter opened
+## [YYYY-MM-DD from `date +%Y-%m-%d`] — Matter opened
 
 [Source, who brought it in, initial triage summary, outside counsel assigned, legal hold issued yes/no.]
 

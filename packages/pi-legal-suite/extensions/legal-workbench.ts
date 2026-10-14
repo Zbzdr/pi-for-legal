@@ -1,4 +1,5 @@
-import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
+import type { ExtensionAPI, ExtensionContext, ToolCallEvent } from "@earendil-works/pi-coding-agent";
+import { createDocumentHistory, type DocumentGitPolicy } from "../lib/document-history.ts";
 import { execFileSync } from "node:child_process";
 import {
 	closeSync,
@@ -34,6 +35,7 @@ const GENERIC_ISSUES = new Set([
 
 interface WorkbenchConfig {
 	schemaVersion: 4;
+	documentGit?: DocumentGitPolicy;
 	profilePath: string;
 	statusPath: string;
 	indexPath: string;
@@ -193,6 +195,7 @@ function loadConfig(cwd: string): WorkbenchConfig | undefined {
 	if (!existsSync(path)) return undefined;
 	const config = readJson<WorkbenchConfig>(path);
 	if (config.schemaVersion !== 4) throw new Error("Legal workbench config uses an older or unsupported layout; back up the workspace and run /skill:legal-setup again");
+	if (config.documentGit && !["auto", "manual"].includes(config.documentGit.mode)) throw new Error("Invalid document Git setup policy");
 	for (const key of ["profilePath", "statusPath", "indexPath", "dataDir", "matterRoot"] as const) {
 		if (typeof config[key] !== "string" || !config[key]) throw new Error(`Invalid legal workbench config field: ${key}`);
 	}
@@ -381,6 +384,10 @@ const matterParameters = {
 export default function legalWorkbench(pi: ExtensionAPI): void {
 	let bootstrapPending = false;
 	let listRequestedForPrompt = false;
+	const documentHistory = createDocumentHistory(pi, (ctx) => {
+		const binding = validatedSessionBinding(ctx);
+		return binding ? resolveWorkspacePath(ctx.cwd, binding.path, "active matter path", true) : undefined;
+	}, (ctx) => loadConfig(ctx.cwd)?.documentGit);
 
 	pi.on("session_start", (_event, ctx) => {
 		listRequestedForPrompt = false;
@@ -400,7 +407,8 @@ export default function legalWorkbench(pi: ExtensionAPI): void {
 		const binding = sessionBinding(ctx);
 		const activeBinding = validatedSessionBinding(ctx);
 		const invalidBinding = Boolean(binding && !activeBinding);
-		if (!bootstrapPending && !invalidBinding) return;
+		const documentPrompt = documentHistory.prompt(event.prompt, ctx);
+		if (!bootstrapPending && !invalidBinding) return documentPrompt ? { systemPrompt: `${event.systemPrompt}${documentPrompt}` } : undefined;
 		bootstrapPending = false;
 
 		try {
@@ -416,7 +424,7 @@ export default function legalWorkbench(pi: ExtensionAPI): void {
 					systemPrompt: `${event.systemPrompt}\n\n## Pi Legal Session Bootstrap\nLegal setup status is ${status.setupStatus}. Continue /skill:legal-setup before substantive legal work.`,
 				};
 			}
-			if (activeBinding) return;
+			if (activeBinding) return documentPrompt ? { systemPrompt: `${event.systemPrompt}${documentPrompt}` } : undefined;
 			if (invalidBinding) {
 				return {
 					systemPrompt: `${event.systemPrompt}\n\n## Pi Legal Matter Binding Invalidated\nThe previously bound matter is no longer active or its binding is no longer valid in this workspace. Stop substantive work, do not use the old matter as writable context, and ask the user to choose another active matter or create a new one. Use legal_matter_session only after the user chooses. If workspace state was damaged or moved, route to /skill:legal-setup for repair. Do not inspect unrelated matters.`,
@@ -553,33 +561,7 @@ export default function legalWorkbench(pi: ExtensionAPI): void {
 		},
 	});
 
-	pi.registerTool({
-		name: "legal_time",
-		label: "Legal system date",
-		description: "Return the current local calendar date from the Unix date command. This is a recording date, not evidence of when an underlying legal event occurred.",
-		promptSnippet: "Get the current system date when a user explicitly says today or a record needs a system-generated date.",
-		promptGuidelines: [
-			"Call this tool before using the current date in a legal record, report header, comparison, or deadline calculation.",
-			"Use the result as an event date only when the user explicitly said the event happened today.",
-			"Never infer an event date from a file modification time, session date, model knowledge, or this tool alone.",
-		],
-		parameters: { type: "object", additionalProperties: false, properties: {} },
-		executionMode: "sequential",
-
-		async execute() {
-			try {
-				const date = systemDate();
-				return jsonResult(`System date: ${date}\nSource: Unix date command\nUse this as a recording date. It is not evidence of an underlying event date.`, {
-					date,
-					source: "unix date command",
-				});
-			} catch (error) {
-				return jsonResult(`Could not read the system date: ${error instanceof Error ? error.message : String(error)}`, { error: true });
-			}
-		},
-	});
-
-	pi.on("tool_call", (event, ctx) => {
+	function guardPath(event: ToolCallEvent, ctx: ExtensionContext) {
 		if (event.toolName !== "write" && event.toolName !== "edit") return;
 		try {
 			const config = loadConfig(ctx.cwd);
@@ -610,5 +592,9 @@ export default function legalWorkbench(pi: ExtensionAPI): void {
 		} catch (error) {
 			return { block: true, reason: `Legal workspace path guard failed: ${error instanceof Error ? error.message : String(error)}` };
 		}
-	});
+	}
+	pi.on("tool_call", (event, ctx) => guardPath(event, ctx) ?? documentHistory.beforeTool(event, ctx));
+	pi.on("tool_result", (event, ctx) => documentHistory.afterTool(event, ctx));
+	pi.on("agent_settled", (_event, ctx) => documentHistory.settled(ctx));
+	pi.on("session_shutdown", (_event, ctx) => documentHistory.settled(ctx));
 }

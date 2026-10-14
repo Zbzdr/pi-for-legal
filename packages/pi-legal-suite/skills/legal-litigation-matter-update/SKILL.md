@@ -7,9 +7,9 @@ description: "Append a dated event to a matter's history file and refresh the lo
 > **Attribution:** Adapted from Anthropic's `claude-for-legal/litigation-legal` at revision `4a6c651889c97cc9140580363c73e0eb17379c2b` under Apache-2.0 and modified for Pi. See the package `NOTICE`.
 1. Follow the workflow and reference below.
 2. Confirm slug exists in `<dataDir>/matters/` and `_log.yaml`.
-3. Prompt for event type, event date, summary, and any log field updates (risk change, status change, next deadline shift, materiality reclassification). Do not default the event date to today. If the user says today, call `legal_time`; if the date is not established, record `unknown` and the missing source.
+3. Prompt for event type, event date, summary, and any log field updates (risk change, status change, next deadline shift, materiality reclassification). Do not default the event date to today. If the user says today, run `date +%Y-%m-%d` using the shell; if the date is not established, record `unknown` and the missing source.
 4. Append dated entry to `<dataDir>/matters/[slug]/history.md`.
-5. Update `_log.yaml` — set `last_updated` to the system recording date returned by `legal_time`, apply any field updates, and do not substitute it for an event date.
+5. Update `_log.yaml` — set `last_updated` to the system recording date returned by `date +%Y-%m-%d`, apply any field updates, and do not substitute it for an event date.
 6. Confirm.
 
 ---
@@ -53,7 +53,7 @@ Or freeform if none fits.
 
 ### 2. Date
 
-Ask for the date the event actually occurred. Accept an explicit date such as `2026-08-20`, or the user's explicit statement that it happened today. For "today", call `legal_time` before writing. If the event date cannot be established, use `unknown` and ask what source could confirm it. Never infer the event date from the session date, a file modification time, or model knowledge.
+Ask for the date the event actually occurred. Accept an explicit date such as `2026-08-20`, or the user's explicit statement that it happened today. For "today", run `date +%Y-%m-%d` using the shell before writing. If the event date cannot be established, use `unknown` and ask what source could confirm it. Never infer the event date from the session date, a file modification time, or model knowledge.
 
 ### 3. Summary
 
@@ -124,7 +124,7 @@ Most recent at top, directly under the `---` that follows the header.
 
 **Event date basis:** [user provided / source document: path and pinpoint / user said today; resolved by Unix date / unknown — not established]
 
-**Recorded at:** [YYYY-MM-DD from `legal_time`]
+**Recorded at:** [YYYY-MM-DD from `date +%Y-%m-%d`]
 
 **Fields changed:**
 - [field]: [old → new]
@@ -138,7 +138,7 @@ If no fields changed, omit the "Fields changed" block.
 ### Update `<dataDir>/matters/_log.yaml`
 
 - Apply any field changes.
-- Set `last_updated: [YYYY-MM-DD from `legal_time`]`. This is the date the record was last touched, not necessarily the date of the event.
+- Set `last_updated: [YYYY-MM-DD from `date +%Y-%m-%d`]`. This is the date the record was last touched, not necessarily the date of the event.
 
 ## Confirm
 

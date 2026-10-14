@@ -36,7 +36,7 @@ try {
   const expected = new Set(readdirSync(skillsRoot, { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
     .map((entry) => `skill:${entry.name}`));
-  assert.equal(expected.size, 88);
+  assert.equal(expected.size, 89);
 
   const projectRoot = join(temporaryRoot, "project");
   const agentRoot = join(temporaryRoot, "agent");
@@ -56,7 +56,9 @@ try {
   const loaded = await discoverAndLoadExtensions([extensionPath], projectRoot, join(agentRoot, "loader"));
   assert.deepEqual(loaded.errors, []);
   assert.equal(loaded.extensions[0].tools.has("legal_matter_session"), true);
-  assert.equal(loaded.extensions[0].tools.has("legal_time"), true);
+  assert.equal(loaded.extensions[0].tools.has("legal_time"), false);
+  assert.equal(loaded.extensions[0].tools.has("legal_document_revision"), true);
+  assert.equal(existsSync(join(unpacked, "lib", "document-history.ts")), true);
 
   const client = new RpcClient({
     cliPath,

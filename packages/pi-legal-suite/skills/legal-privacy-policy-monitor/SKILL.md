@@ -120,7 +120,7 @@ If the outputs folder is empty or has no new files since the last sweep:
 > "No new outputs since [last sweep date]. Policy appears current with recent
 > practice. Next scheduled sweep: [date]."
 
-After completing the sweep, call `legal_time` and update **Last policy sweep** in the project legal profile to that system-recorded date. Do not use it as the effective date of a policy change.
+After completing the sweep, run `date +%Y-%m-%d` using the shell and update **Last policy sweep** in the project legal profile to that system-recorded date. Do not use it as the effective date of a policy change.
 
 ### What to read in each output type
 

@@ -31,12 +31,12 @@ If it does not exist, ask where the user wants visible legal work stored before 
 
 Explain that `.pi/` contains Pi-specific configuration, status, and a metadata-only matter index. The reusable practice profile is the project-root `AGENTS.md`, which Pi loads as a context file; client facts, downloads, research, drafts, redlines, and work product stay in visible matter directories outside `.pi/`. Project-local material travels with the project if committed, so confidential paths should normally remain gitignored. Never choose a global path or write to `~/.pi` by default.
 
-Before the first write, show all exact paths and ask for confirmation. After confirmation, run `scripts/init_workspace.mjs` with the current workspace and chosen visible data directory. The script installs `references/append-system-template.md` as a managed section while preserving other `.pi/APPEND_SYSTEM.md` content, creates the project-root `AGENTS.md`, and initializes `matters/` and `logs/`. It does not create a client matter and does not change Pi's session settings.
+Before the first write, show all exact paths and the default Git policy together: one local document repository per bound matter, automatic incremental Markdown commits, retained deleted text, and no automatic push. Show the configured Git author identity (a tooling setting, not legal-profile evidence) or ask for a name/email when unavailable. Confirmation covers subsequent matters and commits; do not ask per edit. Offer manual enrollment only if the user declines this default. After confirmation, run `scripts/init_workspace.mjs` with the current workspace and chosen visible data directory. The script installs `references/append-system-template.md` as a managed section while preserving other `.pi/APPEND_SYSTEM.md` content, creates the project-root `AGENTS.md`, and initializes `matters/` and `logs/`. It does not create a client matter and does not change Pi's session settings.
 
 Default command:
 
 ```bash
-node <skill-root>/scripts/init_workspace.mjs --workspace <workspace-absolute-path> --data-dir . --phase initialize
+node <skill-root>/scripts/init_workspace.mjs --workspace <workspace-absolute-path> --data-dir . --phase initialize --document-git auto
 ```
 
 The resulting config is:
@@ -48,15 +48,22 @@ The resulting config is:
   "statusPath": ".pi/legal-workbench/status.json",
   "indexPath": ".pi/legal-workbench/matter-index.json",
   "dataDir": ".",
-  "matterRoot": "matters"
+  "matterRoot": "matters",
+  "documentGit": {
+    "mode": "auto",
+    "authorName": "<confirmed Git author>",
+    "authorEmail": "<confirmed Git email>"
+  }
 }
 ```
+
+If no configured author can be resolved, supply `--git-author-name <name> --git-author-email <email>` after the user supplies them. The script preserves existing identity settings on resume and never changes global Git configuration. `--document-git manual` retains the older per-matter enrollment path. Setup configures the policy; it does not inspect unrelated matters or initialize a shared workspace Git repository. Bound matter repositories are initialized lazily before document operations.
 
 The default setup creates `matters/` and `logs/` at the project root. It does not create a visible `legal-workbench/` wrapper directory. `.pi/legal-workbench/` remains the Pi state directory. If the project already contains `matters/` or `logs/`, confirm that those directories belong to this workspace before proceeding; setup does not delete or overwrite their existing files.
 
 The data directory must be visible, project-relative, and inside the workspace. Do not store credentials, tokens, client secrets, or private keys.
 
-If an older or different config exists, stop and ask the user to back it up and rerun setup after deciding what to retain. This release does not migrate or delete old configuration or matter files, and the deterministic initializer refuses to overwrite a different config. It does not migrate the prior visible `legal-workbench/` layout; back up any existing matter files and move them manually if needed.
+An existing schema-4 config with the same confirmed paths may add/update the Git policy without overwriting profiles or matter files; obtain setup approval for that change. If an older or different path layout exists, stop and ask the user to back it up and rerun setup after deciding what to retain. This release does not migrate or delete old configuration or matter files, and the deterministic initializer refuses to overwrite a different config. It does not migrate the prior visible `legal-workbench/` layout; back up any existing matter files and move them manually if needed.
 
 ## Resume and update
 
